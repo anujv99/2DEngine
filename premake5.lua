@@ -43,7 +43,9 @@ workspace "2DEngine"
         }
 		
 		defines {
-			"USER_ENGINE"
+			"USER_ENGINE",
+			"LOG_DETAILED",
+			--"LOG_DISABLED"
 		}
 
         pchsource "%{prj.name}/src/pch.cpp"

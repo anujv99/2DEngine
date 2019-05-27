@@ -2,16 +2,16 @@
 
 #include "spdlog/spdlog.h"
 
+#define ADD_FILE_LINE(x) std::string(\
+										"[ " +\
+										std::string(__FILE__).substr(std::string(__FILE__).find_last_of("\\") + 1) +\
+										" : " +\
+										std::to_string(__LINE__) + " ] " +\
+										std::string(x)\
+									)
 
-#if defined(ENGINE_DEBUG) && defined(USER_ENGINE)
-	#define ADD_FILE_LINE(x) std::string(\
-											"[ " +\
-											std::string(__FILE__).substr(std::string(__FILE__).find_last_of("\\") + 1) +\
-											" : " +\
-											std::to_string(__LINE__) + " ] " +\
-											std::string(x)\
-										)
-
+#if defined(ENGINE_DEBUG) && defined(USER_ENGINE) && !defined(LOG_DISABLED)
+	
 	#ifdef LOG_DETAILED
 		#define LOG_CRITICAL(x, ...)	prev::Logger::Log(User::ENGINE, LOG_LEVEL_CRITICAL, ADD_FILE_LINE(x) __VA_ARGS__)
 		#define LOG_ERROR(x, ...)		prev::Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ADD_FILE_LINE(x)  __VA_ARGS__)
@@ -26,7 +26,7 @@
 		#define LOG_TRACE(x, ...)		prev::Logger::Log(User::ENGINE, LOG_LEVEL_TRACE, x __VA_ARGS__)
 	#endif
 
-#elif defined(ENGINE_DEBUG)
+#elif defined(ENGINE_DEBUG) && !defined(LOG_DISABLED)
 
 	#ifdef LOG_DETAILED
 		#define LOG_CRITICAL(x, ...)	prev::Logger::Log(User::CLIENT, LOG_LEVEL_CRITICAL, ADD_FILE_LINE(x) __VA_ARGS__)
@@ -41,7 +41,12 @@
 		#define LOG_INFO(x, ...)		prev::Logger::Log(User::CLIENT, LOG_LEVEL_INFO, x __VA_ARGS__)
 		#define LOG_TRACE(x, ...)		prev::Logger::Log(User::CLIENT, LOG_LEVEL_TRACE, x __VA_ARGS__)
 	#endif
-
+#else
+	#define LOG_CRITICAL(x, ...)
+	#define LOG_ERROR(x, ...)
+	#define LOG_WARN(x, ...)
+	#define LOG_INFO(x, ...)
+	#define LOG_TRACE(x, ...)
 #endif
 
 namespace prev {
