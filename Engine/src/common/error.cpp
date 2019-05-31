@@ -9,17 +9,13 @@ namespace prev {
 
 	std::vector<Error::ErrorDispatcher::ErrorFunc> Error::ErrorDispatcher::m_DispatchFunctions;
 
-	Error::Error(const ErrorType & errorType, const std::string & message) {
-		m_ErrorLevel = errorType;
-		m_Message = message;
+	Error::Error(const ErrorType & errorType, const std::string & message) : 
+		m_ErrorLevel(errorType), m_Message(message) {
 		ErrorDispatcher::Dispatch(this);
 	}
 
-	Error::Error(const ErrorType & errorType, const std::string & message, const std::string & file, const std::string & line) {
-		m_ErrorLevel = errorType;
-		m_Message = message;
-		m_File = file.substr(file.find_last_of("\\") + 1);
-		m_Line = line;
+	Error::Error(const ErrorType & errorType, const std::string & message, const std::string & file, const std::string & line) : 
+		m_ErrorLevel(errorType), m_Message(message), m_File(file.substr(file.find_last_of("\\") + 1)), m_Line(line) {
 		ErrorDispatcher::Dispatch(this);
 	}
 

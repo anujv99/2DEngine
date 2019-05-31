@@ -21,7 +21,7 @@ namespace prev {
 			Window::Ref().PollEvents();
 
 			auto pos = Window::Ref().GetMousePosition();
-			LOG_TRACE("{0}, {1}", pos.first, pos.second);
+			//LOG_TRACE("{0}, {1}", pos.first, pos.second);
 
 		}
 	}
