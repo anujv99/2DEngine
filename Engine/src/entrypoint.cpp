@@ -1,7 +1,9 @@
 #include "pch.h"
 
 #include "application.h"
-#include "helper/log.h"
+#include "common/log.h"
+
+#include "src/common/timer.h"
 
 namespace prev {
 
@@ -16,5 +18,6 @@ namespace prev {
 }
 
 int main() {
+	prev::Logger::Initialize(); // To be initialized at first
 	return prev::MAIN_METHOD();
 }

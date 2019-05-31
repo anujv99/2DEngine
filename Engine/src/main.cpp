@@ -7,7 +7,6 @@ using namespace prev;
 class Sandbox : public Application {
 public:
 	Sandbox() {
-
 	}
 };
 

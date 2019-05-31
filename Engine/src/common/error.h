@@ -5,11 +5,13 @@
 #include <vector>
 #include <functional>
 
-#define ERROR_TRACE(e, m) { Error(e, m, __FILE__, std::to_string(__LINE__)); }
+#define ERROR_TRACE(e, m) { prev::Error automaticError(prev::e, m, __FILE__, std::to_string(__LINE__)); }
 
 namespace prev {
 
 	enum ErrorType {
+		ERR_WINDOW_CREATION_FAILED,
+		ERR_ASSERTION_FAILED,
 		ERR_TYPE_INVALID_FUNCTION,
 		ERR_TYPE_UNKNOWN
 	};

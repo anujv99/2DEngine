@@ -8,7 +8,7 @@
 
 namespace prev {
 
-	std::vector<std::function<void(std::string, LogLevel)>> s_LogCallbacks;
+	std::vector<std::function<void(std::string, LogLevel)>> g_LogCallbacks;
 
 	template<typename Mutex>
 	class CustomSink : public spdlog::sinks::base_sink<Mutex> {
@@ -37,7 +37,7 @@ namespace prev {
 				LOG_WARN("Unknown Log Level");
 				break;
 			}
-			for (auto & func : s_LogCallbacks) {
+			for (auto & func : g_LogCallbacks) {
 				func(fmt::to_string(formatted), level);
 			}
 		}
@@ -45,8 +45,8 @@ namespace prev {
 		virtual void flush_() override { }
 	};
 
-	std::shared_ptr<spdlog::logger> Logger::m_CoreLogger;
-	std::shared_ptr<spdlog::logger> Logger::m_ClinetLogger;
+	std::shared_ptr<spdlog::logger> Logger::s_CoreLogger;
+	std::shared_ptr<spdlog::logger> Logger::s_ClinetLogger;
 
 	std::shared_ptr<CustomSink<spdlog::details::null_mutex>> s_CustomSink;
 
@@ -55,19 +55,19 @@ namespace prev {
 
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 
-		m_CoreLogger = spdlog::stderr_color_st("ENGINE");
-		m_CoreLogger->set_level(spdlog::level::trace);
-		m_CoreLogger->sinks().push_back(s_CustomSink);
+		s_CoreLogger = spdlog::stderr_color_st("ENGINE");
+		s_CoreLogger->set_level(spdlog::level::trace);
+		s_CoreLogger->sinks().push_back(s_CustomSink);
 
-		m_ClinetLogger = spdlog::stderr_color_st("APP");
-		m_ClinetLogger->set_level(spdlog::level::trace);
-		m_ClinetLogger->sinks().push_back(s_CustomSink);
+		s_ClinetLogger = spdlog::stderr_color_st("APP");
+		s_ClinetLogger->set_level(spdlog::level::trace);
+		s_ClinetLogger->sinks().push_back(s_CustomSink);
 
 		LOG_INFO("Logger Initialized Successfully");
 	}
 	
 	void Logger::AddLogCallback(LogCallbackFunc callbackFunction) {
-		s_LogCallbacks.push_back(callbackFunction);
+		g_LogCallbacks.push_back(callbackFunction);
 	}
 
 }

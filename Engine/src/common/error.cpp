@@ -41,8 +41,8 @@ namespace prev {
 			Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("LINE NUM   : " + m_Line).c_str());
 		}
 		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR CODE : " + m_ErrorCode).c_str());
-		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR TYPE : " + m_ErrorType).c_str());
-		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR DESC : " + m_Message).c_str());
+		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR INFO : " + m_ErrorType).c_str());
+		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR MSG  : " + m_Message).c_str());
 		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, "------------------------------------------");
 	}
 
@@ -51,6 +51,14 @@ namespace prev {
 		case ERR_TYPE_INVALID_FUNCTION:
 			error->m_ErrorType = "Invalid function pointer passed";
 			error->m_ErrorCode = CONVERT_TO_STRING(ERR_TYPE_INVALID_FUNCTION);
+			break;
+		case ERR_WINDOW_CREATION_FAILED:
+			error->m_ErrorType = "Unable to create window";
+			error->m_ErrorCode = CONVERT_TO_STRING(ERR_WINDOW_CREATION_FAILED);
+			break;	
+		case ERR_ASSERTION_FAILED:
+			error->m_ErrorType = "Assertion failed";
+			error->m_ErrorCode = CONVERT_TO_STRING(ERR_ASSERTION_FAILED);
 			break;
 		case ERR_TYPE_UNKNOWN:
 			error->m_ErrorType = "An unknown error has occurred";
