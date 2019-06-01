@@ -15,19 +15,19 @@ namespace prev {
 
 	WindowsWindow::WindowsWindow(const DisplayMode & displayMode) : Window(displayMode) {
 		m_HInst = GetModuleHandle(nullptr);
-		m_DisplaySize = std::make_pair(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+		m_DisplaySize = Vec2i(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 
-		m_DisplayPos.first = (m_DisplaySize.first - displayMode.GetWindowSize().first) / 2;
-		m_DisplayPos.second = (m_DisplaySize.second - displayMode.GetWindowSize().second) / 2;
+		m_DisplayPos.x = (m_DisplaySize.x - displayMode.GetWindowSize().x) / 2;
+		m_DisplayPos.y = (m_DisplaySize.y - displayMode.GetWindowSize().y) / 2;
 
 		switch (displayMode.GetWindowStyle()) {
 			case WindowStyle::WINDOWED:
 				m_WindowClassStyle	= CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 				m_WindowExStyle		= WS_EX_APPWINDOW;
-				m_WindowStyle		= WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU;
+				m_WindowStyle		= WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 				break;
 			case WindowStyle::FULLSCREEN:
-				m_DisplayPos = std::make_pair(0u, 0u);
+				m_DisplayPos = Vec2i(0u, 0u);
 			case WindowStyle::BORDERLESS:
 				m_WindowClassStyle	= CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 				m_WindowExStyle		= WS_EX_APPWINDOW;
@@ -67,11 +67,28 @@ namespace prev {
 		return false;
 	}
 
-	std::pair<int, int> WindowsWindow::GetMousePosition() {
+	Vec2i WindowsWindow::GetMousePosition() {
+		RECT r;
+		auto g = GetClientRect(m_HWnd, &r);
 		POINT pt = {};
 		GetCursorPos(&pt);
 		ScreenToClient(m_HWnd, &pt);
-		return std::pair<int, int>(pt.x, pt.y);
+		return Vec2i(pt.x, pt.y);
+	}
+
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+		switch (msg) {
+			case WM_SIZE:
+			{
+				POINTS pt = MAKEPOINTS(lParam);
+				int a = 0;
+				break;
+			}
+			default:
+				return DefWindowProc(hWnd, msg, wParam, lParam);
+		}
+
+		return 0;
 	}
 
 	bool WindowsWindow::RegisterWindowClass(const DisplayMode & displayMode) {
@@ -80,7 +97,7 @@ namespace prev {
 
 		wc.cbSize				= sizeof(wc);
 		wc.style				= m_WindowClassStyle;
-		wc.lpfnWndProc			= DefWindowProcA;
+		wc.lpfnWndProc			= WndProc;
 		wc.cbClsExtra			= 0;
 		wc.cbWndExtra			= 0;
 		wc.hInstance			= m_HInst;
@@ -107,14 +124,12 @@ namespace prev {
 	bool WindowsWindow::CreateWindowsWindow(const DisplayMode & displayMode) {
 
 		RECT rect;
-		rect.left		= 0;
-		rect.top		= 0;
-		rect.right		= displayMode.GetWindowSize().first;
-		rect.bottom		= displayMode.GetWindowSize().second;
+		rect.left		= 100;
+		rect.top		= 100;
+		rect.right		= rect.left + displayMode.GetWindowSize().x;
+		rect.bottom		= rect.top + displayMode.GetWindowSize().y;
 
-		BOOL hasMenu = displayMode.GetWindowStyle() == WindowStyle::WINDOWED;
-
-		BOOL result = AdjustWindowRectEx(&rect, m_WindowStyle, hasMenu, m_WindowExStyle);
+		BOOL result = AdjustWindowRectEx(&rect, m_WindowStyle, FALSE, m_WindowExStyle);
 
 		if (result == FALSE) {
 			auto errorCode = GetLastError();
@@ -127,7 +142,7 @@ namespace prev {
 		m_HWnd = CreateWindowExA(
 			m_WindowExStyle,
 			WINDOW_CLASS_NAME, DEFAULT_WINDOW_TITLE, m_WindowStyle,
-			m_DisplayPos.first, m_DisplayPos.second, rect.right - rect.left, rect.bottom - rect.top,
+			m_DisplayPos.x, m_DisplayPos.y, rect.right - rect.left, rect.bottom - rect.top,
 			nullptr, nullptr, m_HInst, nullptr
 		);
 
@@ -138,12 +153,13 @@ namespace prev {
 			ERROR_TRACE(ERR_WINDOW_CREATION_FAILED, "Unable to create window, " + serror);
 			return false;
 		}
+
+		RECT createdRect;
+		GetClientRect(m_HWnd, &createdRect);
 		
-		ShowWindow(m_HWnd, SW_SHOW);
+		ShowWindow(m_HWnd, SW_SHOWNORMAL);
 		SetForegroundWindow(m_HWnd);
 		SetFocus(m_HWnd);
-
-		ZeroMemory(&m_Message, sizeof(m_Message));
 
 		return true;
 	}

@@ -5,6 +5,9 @@
 
 #include "src/graphics/window.h"
 
+#include "math/vec3.h"
+#include "math/vec2i.h"
+
 namespace prev {
 
 	Application::Application() {
@@ -21,7 +24,7 @@ namespace prev {
 			Window::Ref().PollEvents();
 
 			auto pos = Window::Ref().GetMousePosition();
-			//LOG_TRACE("{0}, {1}", pos.first, pos.second);
+			LOG_WARN("{}", pos);
 
 		}
 	}

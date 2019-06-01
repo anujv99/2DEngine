@@ -1,7 +1,7 @@
 #pragma once
 
-#define TIME_THIS_SCOPE		prev::TimeThis timer(__FILE__, __FUNCTION__, __LINE__, false);
-#define TIME_THIS_SCOPE_MS	prev::TimeThis timer(__FILE__, __FUNCTION__, __LINE__, true);
+#define TIME_THIS_SCOPE		prev::TimeThis timer(__FILE__, __FUNCTION__, __LINE__, false)
+#define TIME_THIS_SCOPE_MS	prev::TimeThis timer(__FILE__, __FUNCTION__, __LINE__, true)
 
 #if defined _MSC_VER
 typedef std::chrono::time_point<std::chrono::steady_clock> pv_time_point;

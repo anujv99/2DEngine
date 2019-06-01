@@ -16,7 +16,7 @@ namespace prev {
 		// Inherited via Window
 		virtual bool GetKeyboardKeyState(int keyCode) override;
 		virtual bool GetMouseButtonState(int buttonCode) override;
-		virtual std::pair<int, int> GetMousePosition() override;
+		Vec2i GetMousePosition() override;
 		virtual void PollEvents() override;
 	private:
 		bool RegisterWindowClass(const DisplayMode & displayMode);
@@ -30,8 +30,8 @@ namespace prev {
 		MSG m_Message				= {};
 
 		bool m_IsWindowReady = true;
-		std::pair<UINT, UINT> m_DisplaySize = std::make_pair(0u, 0u); //Monitor native resolution
-		std::pair<UINT, UINT> m_DisplayPos  = std::make_pair(0u, 0u);
+		Vec2i m_DisplaySize = Vec2i(0u, 0u); //Monitor native resolution
+		Vec2i m_DisplayPos  = Vec2i(0u, 0u);
 	};
 
 }

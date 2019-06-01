@@ -1,8 +1,6 @@
 #pragma once
 
-#include <map>
-#include "src/common/singleton.h"
-#include "src/common/log.h"
+#include "src/math/vec2i.h"
 
 namespace prev {
 
@@ -14,7 +12,7 @@ namespace prev {
 
 	struct DisplayMode {
 	public:
-		std::pair<unsigned int, unsigned int> GetWindowSize() const { return std::make_pair(WindowWidth, WindowHeight); }
+		Vec2i GetWindowSize() const { return WindowSize; }
 		WindowStyle GetWindowStyle() const { return Style; }
 		bool IsWindowFullscreen() const { return IsFullscreen; }
 
@@ -22,9 +20,9 @@ namespace prev {
 		void SetWindowStyle(WindowStyle style) { Style = style; }
 	public:
 		DisplayMode() :
-			WindowWidth(1280), WindowHeight(720), Style(WindowStyle::WINDOWED), IsFullscreen(false) {}
+			WindowSize(1280, 720), Style(WindowStyle::WINDOWED), IsFullscreen(false) {}
 	private:
-		unsigned int WindowWidth, WindowHeight;
+		Vec2i WindowSize;
 		WindowStyle Style;
 		bool IsFullscreen;
 	};
@@ -37,7 +35,7 @@ namespace prev {
 	protected:
 		virtual bool GetKeyboardKeyState(int keyCode) = 0;
 		virtual bool GetMouseButtonState(int buttonCode) = 0;
-		virtual std::pair<int, int> GetMousePosition() = 0;
+		virtual Vec2i GetMousePosition() = 0;
 		virtual void PollEvents() = 0;
 	protected:
 		Window(const DisplayMode & displayMode) : m_DisplayMode(displayMode) { }

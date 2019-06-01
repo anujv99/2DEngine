@@ -57,7 +57,7 @@ namespace prev {
 	}
 
 	TimeThis::~TimeThis() {
-		float deltaTime = (std::chrono::high_resolution_clock::now() - m_Start).count();
+		std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_Start;
 
 		LOG_TIMER(
 			Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "-----------------------------------");
@@ -68,19 +68,17 @@ namespace prev {
 
 		if (isMS) {
 			LOG_TIMER(
-				Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}ms", deltaTime * 1000);
+				Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}ms", duration.count() * 1000);
 			);
 		} else {
 			LOG_TIMER(
-				Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}s", deltaTime);
+				Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}s", duration.count());
 			);
 		}
 
 		LOG_TIMER(
 			Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "-----------------------------------");
 		);
-
-		deltaTime *= 0.0f;
 	}
 
 }
