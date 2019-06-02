@@ -29,17 +29,17 @@ namespace prev {
 	}
 
 	void Error::LogError() {
-		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, "------------------------------------------");
+		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, "------------------------------------------");
 		if (m_File.length() != 0) {
-			Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("FILE NAME  : " + m_File).c_str());
+			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, ("FILE NAME  : " + m_File).c_str());
 		}
 		if (m_Line.length() != 0) { 
-			Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("LINE NUM   : " + m_Line).c_str());
+			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, ("LINE NUM   : " + m_Line).c_str());
 		}
-		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR CODE : " + m_ErrorCode).c_str());
-		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR INFO : " + m_ErrorType).c_str());
-		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR MSG  : " + m_Message).c_str());
-		Logger::Log(User::ENGINE, LOG_LEVEL_ERROR, "------------------------------------------");
+		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR CODE : " + m_ErrorCode).c_str());
+		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR INFO : " + m_ErrorType).c_str());
+		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, ("ERROR MSG  : " + m_Message).c_str());
+		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, "------------------------------------------");
 	}
 
 	void Error::ErrorDispatcher::Dispatch(Error * error) {

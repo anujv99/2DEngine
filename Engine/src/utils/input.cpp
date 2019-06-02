@@ -36,7 +36,7 @@ namespace prev {
 	}
 
 	Input::Input() {
-		EventHandler::RegisterEventFunction(BIND_EVENT_FN(Input::OnEvent));
+		EventHandler::Ref().RegisterEventFunction(BIND_EVENT_FN(Input::OnEvent));
 
 		for (UINT i = 0; i < MAX_KEYS; i++) {
 			m_Keys[i] = 0;

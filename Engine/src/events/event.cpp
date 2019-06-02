@@ -5,9 +5,6 @@
 
 namespace prev {
 
-	std::vector<prev::EventHandler::EventFunc> EventHandler::s_EventFunctions;
-	std::vector<Event *> EventHandler::s_EventQueue;
-
 	void EventHandler::RegisterEventFunction(EventFunc func) {
 		if (func) {
 			s_EventFunctions.push_back(func);
@@ -17,13 +14,13 @@ namespace prev {
 	}
 
 	void EventHandler::FlushEventQueue() {
-		for (auto & e : s_EventQueue) {
-			for (auto & f : s_EventFunctions) {
-				f(*e);
+		while (!s_EventQueue.empty()) {
+			StrongHandle<Event> event = s_EventQueue.front();
+			s_EventQueue.pop();
+			for (auto & func : s_EventFunctions) {
+				func(*event);
 			}
-			delete e;
 		}
-		s_EventQueue.clear();
 	}
 
 }

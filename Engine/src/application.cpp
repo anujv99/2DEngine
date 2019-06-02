@@ -13,9 +13,12 @@
 namespace prev {
 	
 	Application::Application() {
+		Logger::CreateInst();
+		EventHandler::CreateInst();
+
 		auto dis = DisplayMode();
 		Window::CreateInst(dis);
-		EventHandler::RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
 		Input::CreateInst();
 	}
@@ -23,21 +26,31 @@ namespace prev {
 	Application::~Application() {
 		Input::DestroyInst();
 		Window::DestroyInst();
+		EventHandler::DestroyInst();
+		Logger::DestroyInst();
 	}
 
 	void Application::Run() {
-		while (true) {
+		while (m_ApplicationRunning) {
 			Window::Ref().PollEvents();
 			
-			
+			StrongHandle<Event> gg(nullptr);
 
 			Input::Ref().Update();
-			EventHandler::FlushEventQueue();
+			EventHandler::Ref().FlushEventQueue();
 		}
 	}
 
 	void Application::OnEvent(Event & e) {
-		//LOG_TRACE("{}", e);
+		LOG_WARN("{}", e);
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::WindowClosed));
+	}
+
+	bool Application::WindowClosed(WindowCloseEvent & e) {
+		m_ApplicationRunning = false;
+		return true;
 	}
 
 }

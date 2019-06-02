@@ -2,7 +2,7 @@
 
 #define BIT(x) (1 << x)
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
-#define REGISTER_EVENT(e) EventHandler::EventHappened(e)
+#define REGISTER_EVENT(e) EventHandler::Ref().EventHappened(e)
 
 namespace prev {
 
@@ -32,23 +32,23 @@ namespace prev {
 
 	class Event;
 
-	class EventHandler {
+	class EventHandler : public Singleton<EventHandler> {
 		friend class Event;
 	public:
 		using EventFunc = std::function<void(Event &)>;
-		static void RegisterEventFunction(EventFunc func);
-		static void FlushEventQueue();
+		void RegisterEventFunction(EventFunc func);
+		void FlushEventQueue();
 		template<typename T>
-		static void EventHappened(const T & e) {
-			Event * event = new T(e);
-			s_EventQueue.push_back(event);
+		void EventHappened(const T & e) {
+			StrongHandle<Event> event = new T(e);
+			s_EventQueue.push(event);
 		}
 	private:
-		static std::vector<EventFunc> s_EventFunctions;
-		static std::vector<Event *> s_EventQueue;
+		std::vector<EventFunc> s_EventFunctions;
+		std::queue<StrongHandle<Event>> s_EventQueue;
 	};
 
-	class Event {
+	class Event : public HandledObject<Event> {
 		friend class EventHandler;
 		friend class EventDispatcher;
 	public:
@@ -64,7 +64,6 @@ namespace prev {
 		inline bool Handled() const { return m_Handled; }
 	protected:
 		Event() {}
-		
 	protected:
 		bool m_Handled = false;
 	};

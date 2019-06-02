@@ -18,6 +18,5 @@ namespace prev {
 }
 
 int main() {
-	prev::Logger::Initialize(); // To be initialized at first
 	return prev::MAIN_METHOD();
 }

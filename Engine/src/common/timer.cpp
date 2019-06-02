@@ -28,7 +28,7 @@ namespace prev {
 			s_LastTimeSec++;
 			if (s_ShouldShowFPS) {
 				LOG_TIMER(
-					Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "[FPS = {0}]", s_FPS);
+					Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "[FPS = {0}]", s_FPS);
 				);
 			}
 			s_FPS = 0;
@@ -60,24 +60,24 @@ namespace prev {
 		std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_Start;
 
 		LOG_TIMER(
-			Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "-----------------------------------");
-			Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "FILE NAME : {0}", m_FileName);
-			Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "FUNC NAME : {0}", m_FunctionName);
-			Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "LINE NUM  : {0}", m_LineNumber);
+			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "-----------------------------------");
+			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "FILE NAME : {0}", m_FileName);
+			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "FUNC NAME : {0}", m_FunctionName);
+			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "LINE NUM  : {0}", m_LineNumber);
 		);
 
 		if (isMS) {
 			LOG_TIMER(
-				Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}ms", duration.count() * 1000);
+				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}ms", duration.count() * 1000);
 			);
 		} else {
 			LOG_TIMER(
-				Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}s", duration.count());
+				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}s", duration.count());
 			);
 		}
 
 		LOG_TIMER(
-			Logger::Log(User::ENGINE, LOG_LEVEL_INFO, "-----------------------------------");
+			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "-----------------------------------");
 		);
 	}
 

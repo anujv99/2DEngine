@@ -16,6 +16,8 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <queue>
+#include <stack>
 #include <list>
 #include <array>
 #include <initializer_list>
@@ -26,6 +28,8 @@
 #include "src/common/error.h"
 #include "src/common/log.h"
 #include "src/common/singleton.h"
+#include "src/common/stronghandle.h"
+#include "src/common/handledobject.h"
 #include "src/common/assert.h"
 
 #include "src/events/event.h"

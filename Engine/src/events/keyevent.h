@@ -56,9 +56,9 @@ namespace prev {
 		inline char GetPressedChar() const { return m_PressedChar; }
 
 		virtual std::string ToString() const override {
-			std::string str;
-			str = m_PressedChar;
-			return str;
+			std::stringstream ss;
+			ss << "CharacterEvent: " << m_PressedChar;
+			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(CharacterInput)

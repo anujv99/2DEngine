@@ -45,9 +45,6 @@ namespace prev {
 		virtual void flush_() override { }
 	};
 
-	std::shared_ptr<spdlog::logger> Logger::s_CoreLogger;
-	std::shared_ptr<spdlog::logger> Logger::s_ClinetLogger;
-
 	std::shared_ptr<CustomSink<spdlog::details::null_mutex>> s_CustomSink;
 
 	void Logger::Initialize() {
@@ -68,6 +65,10 @@ namespace prev {
 	
 	void Logger::AddLogCallback(LogCallbackFunc callbackFunction) {
 		g_LogCallbacks.push_back(callbackFunction);
+	}
+
+	Logger::Logger() {
+		Initialize();
 	}
 
 }
