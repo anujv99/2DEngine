@@ -44,6 +44,10 @@ namespace prev {
 
 	void Error::ErrorDispatcher::Dispatch(Error * error) {
 		switch (error->m_ErrorLevel) {
+		case ERR_WINDOW_INTERNAL_ERROR:
+			error->m_ErrorType = "An internal window error has occurred";
+			error->m_ErrorCode = CONVERT_TO_STRING(ERR_WINDOW_INTERNAL_ERROR);
+			break;
 		case ERR_TYPE_INVALID_FUNCTION:
 			error->m_ErrorType = "Invalid function pointer passed";
 			error->m_ErrorCode = CONVERT_TO_STRING(ERR_TYPE_INVALID_FUNCTION);

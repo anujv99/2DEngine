@@ -2,30 +2,37 @@
 
 #include "event.h"
 
+#include "math/vec2i.h"
+
 namespace prev {
 
 	class WindowResizeEvent : public Event {
 	public:
-		WindowResizeEvent(unsigned int width, unsigned int height) :
-			m_Width(width), m_Height(height) {}
-		inline unsigned int GetWidth() const { return m_Width; }
-		inline unsigned int GetHeight() const { return m_Height; }
+		WindowResizeEvent(unsigned int width, unsigned int height) : 
+			m_WindowSize(width, height) {}
+		inline Vec2i GetWindowSize() const { return m_WindowSize; };
 		
-		std::string ToString() const override {
+		virtual std::string ToString() const override {
 			std::stringstream ss;
-			ss << "WindowResizeEvent: " << m_Width << ", " << m_Height;
+			ss << "WindowResizeEvent: " << m_WindowSize.x << ", " << m_WindowSize.y;
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(WindowResize)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	private:
-		unsigned int m_Width, m_Height;
+		Vec2i m_WindowSize;
 	};
 
 	class WindowCloseEvent : public Event {
 	public:
 		WindowCloseEvent() {}
+
+		virtual std::string ToString() const override {
+			std::stringstream ss;
+			ss << "WindowCloseEvent";
+			return ss.str();
+		}
 
 		EVENT_CLASS_TYPE(WindowClose)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
@@ -34,21 +41,20 @@ namespace prev {
 	class WindowMoveEvent : public Event {
 	public:
 		WindowMoveEvent(unsigned int xpos, unsigned int ypos) :
-			m_Xpos(xpos), m_Ypos(ypos) {}
+			m_WindowPos(xpos, ypos) {}
 
-		inline unsigned int GetXPos() const { return m_Xpos; }
-		inline unsigned int GetYPos() const { return m_Ypos; }
+		inline Vec2i GetWindowPos() const { return m_WindowPos; }
 
-		std::string ToString() const override {
+		virtual std::string ToString() const override {
 			std::stringstream ss;
-			ss << "WindowMovedEvent: " << m_Xpos << ", " << m_Ypos;
+			ss << "WindowMovedEvent: " << m_WindowPos.x << ", " << m_WindowPos.y;
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(WindowMoved)
 		EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	private:
-		unsigned int m_Xpos, m_Ypos;
+		Vec2i m_WindowPos;
 	};
 
 	class AppTickEvent : public Event {

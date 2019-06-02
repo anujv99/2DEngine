@@ -31,8 +31,8 @@ inline Vec2 & Vec2::operator*=(const Vec2 & _vec) {
 }
 
 inline Vec2 & Vec2::operator/=(const Vec2 & _vec) {
-	Vec2_CHECK(std::fabsf(_vec.x) > FLT_MIN);
-	Vec2_CHECK(std::fabsf(_vec.y) > FLT_MIN);
+	Vec2_CHECK(std::abs(_vec.x) > FLT_MIN);
+	Vec2_CHECK(std::abs(_vec.y) > FLT_MIN);
 
 	x /= _vec.x;
 	y /= _vec.y;
@@ -96,8 +96,8 @@ inline Vec2 Vec2::operator*(const Vec2 & _vec) const {
 inline Vec2 Vec2::operator/(const Vec2 & _vec) const {
 	Vec2_CHECK(CheckVec2(*this));
 	Vec2_CHECK(CheckVec2(_vec));
-	Vec2_CHECK(std::fabsf(_vec.x) > FLT_MIN);
-	Vec2_CHECK(std::fabsf(_vec.y) > FLT_MIN);
+	Vec2_CHECK(std::abs(_vec.x) > FLT_MIN);
+	Vec2_CHECK(std::abs(_vec.y) > FLT_MIN);
 	return Vec2(x / _vec.x, y / _vec.y);
 }
 
@@ -107,7 +107,7 @@ inline Vec2 Vec2::operator*(float _v) const {
 }
 
 inline Vec2 Vec2::operator/(float _v) const {
-	Vec2_CHECK(std::fabsf(_v) > FLT_MIN);
+	Vec2_CHECK(std::abs(_v) > FLT_MIN);
 	Vec2_CHECK(CheckVec2(*this));
 	float div = 1.0f / _v;
 	return Vec2(x * div, y * div);
@@ -122,7 +122,7 @@ inline bool Vec2::operator!=(const Vec2 & _vec) const {
 }
 
 inline float Length(const Vec2 & _vec) {
-	return std::sqrtf(LengthSqr(_vec));
+	return std::sqrt(LengthSqr(_vec));
 }
 
 inline float LengthSqr(const Vec2 & _vec) {
@@ -143,7 +143,7 @@ inline Vec2 operator*(float _v, const Vec2 & _vec) {
 
 inline Vec2 Normalize(const Vec2 & _vec) {
 	float len = Length(_vec);
-	Vec2_CHECK(std::fabs(len) > FLT_MIN);
+	Vec2_CHECK(std::abs(len) > FLT_MIN);
 	float divLen = 1.0f / len;
 	return _vec * divLen;
 }
@@ -157,7 +157,7 @@ inline Vec2 Min(const Vec2 & _v1, const Vec2 & _v2) {
 }
 
 inline Vec2 Abs(const Vec2 & _vec) {
-	return Vec2(std::fabs(_vec.x), std::fabs(_vec.y));
+	return Vec2(std::abs(_vec.x), std::abs(_vec.y));
 }
 
 inline Vec2 Lerp(const Vec2 & _v1, const Vec2 & _v2, float _v) {

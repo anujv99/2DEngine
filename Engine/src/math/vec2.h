@@ -18,6 +18,9 @@ namespace prev {
 		explicit Vec2(float _v);
 		Vec2(float _x, float _y);
 
+		float & operator[](unsigned int _index) { ASSERT(_index < 2, "Index > 2"); return (&x)[_index]; }
+		const float & operator[](unsigned int _index) const { ASSERT(_index < 2, "Index > 2"); return (&x)[_index]; }
+
 		Vec2 & operator+=(const Vec2 & _vec);
 		Vec2 & operator-=(const Vec2 & _vec);
 		Vec2 & operator*=(const Vec2 & _vec);

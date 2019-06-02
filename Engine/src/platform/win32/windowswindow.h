@@ -14,9 +14,6 @@ namespace prev {
 		~WindowsWindow();
 
 		// Inherited via Window
-		virtual bool GetKeyboardKeyState(int keyCode) override;
-		virtual bool GetMouseButtonState(int buttonCode) override;
-		Vec2i GetMousePosition() override;
 		virtual void PollEvents() override;
 	private:
 		bool RegisterWindowClass(const DisplayMode & displayMode);

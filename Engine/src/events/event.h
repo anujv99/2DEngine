@@ -2,6 +2,7 @@
 
 #define BIT(x) (1 << x)
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
+#define REGISTER_EVENT(e) EventHandler::EventHappened(e)
 
 namespace prev {
 
@@ -37,8 +38,11 @@ namespace prev {
 		using EventFunc = std::function<void(Event &)>;
 		static void RegisterEventFunction(EventFunc func);
 		static void FlushEventQueue();
-	private:
-		static void EventHappened(Event * e);
+		template<typename T>
+		static void EventHappened(const T & e) {
+			Event * event = new T(e);
+			s_EventQueue.push_back(event);
+		}
 	private:
 		static std::vector<EventFunc> s_EventFunctions;
 		static std::vector<Event *> s_EventQueue;
@@ -59,9 +63,8 @@ namespace prev {
 
 		inline bool Handled() const { return m_Handled; }
 	protected:
-		Event() {
-			EventHandler::EventHappened(this);
-		}
+		Event() {}
+		
 	protected:
 		bool m_Handled = false;
 	};

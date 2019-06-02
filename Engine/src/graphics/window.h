@@ -33,9 +33,6 @@ namespace prev {
 	public:
 		DisplayMode GetDisplayMode() const { return m_DisplayMode; }
 	protected:
-		virtual bool GetKeyboardKeyState(int keyCode) = 0;
-		virtual bool GetMouseButtonState(int buttonCode) = 0;
-		virtual Vec2i GetMousePosition() = 0;
 		virtual void PollEvents() = 0;
 	protected:
 		Window(const DisplayMode & displayMode) : m_DisplayMode(displayMode) { }

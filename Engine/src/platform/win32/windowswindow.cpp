@@ -6,7 +6,135 @@
 #define DEFAULT_WINDOW_TITLE "Retarded Window"
 #define WINDOW_CLASS_NAME "Slightly_Retarded_Fart_Box"
 
+#define LBUTTONCODE		0
+#define MBUTTONCODE		1
+#define RBUTTONCODE		2
+#define X1BUTTONCODE	3
+#define X2BUTTONCODE	4
+
 namespace prev {
+
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+		switch (msg) {
+			case WM_MOUSEWHEEL:
+			{
+				short delta = GET_WHEEL_DELTA_WPARAM(wParam);
+				MouseScrolledEvent e(0, (int)delta);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_MOUSEMOVE:
+			{
+				POINTS pt = MAKEPOINTS(lParam);
+				MouseMovedEvent e((int)pt.x, (int)pt.y);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_LBUTTONDOWN:
+			{
+				MouseButtonPressedEvent e(LBUTTONCODE);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_RBUTTONDOWN:
+			{
+				MouseButtonPressedEvent e(RBUTTONCODE);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_MBUTTONDOWN:
+			{
+				MouseButtonPressedEvent e(MBUTTONCODE);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_XBUTTONDOWN:
+			{
+				WORD button = GET_XBUTTON_WPARAM(wParam);
+				UINT buttonCode = X1BUTTONCODE;
+
+				if (button == 0x0002)
+					buttonCode = X2BUTTONCODE;
+
+				MouseButtonPressedEvent e(buttonCode);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_LBUTTONUP:
+			{
+				MouseButtonReleasedEvent e(LBUTTONCODE);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_RBUTTONUP:
+			{
+				MouseButtonReleasedEvent e(RBUTTONCODE);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_MBUTTONUP:
+			{
+				MouseButtonReleasedEvent e(MBUTTONCODE);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_XBUTTONUP:
+			{
+				WORD button = GET_XBUTTON_WPARAM(wParam);
+				UINT buttonCode = X1BUTTONCODE;
+
+				if (button == 0x0002)
+					buttonCode = X2BUTTONCODE;
+
+				MouseButtonReleasedEvent e(buttonCode);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_KEYDOWN:
+			{
+				bool repeatCount = (lParam & 0x40000000);
+				KeyPressedEvent e((int)wParam, repeatCount);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_KEYUP:
+			{
+				KeyReleasedEvent e((int)wParam);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_CHAR:
+			{
+				CharacterEvent e((unsigned char)wParam);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_SIZE:
+			{
+				POINTS pt = MAKEPOINTS(lParam);
+				WindowResizeEvent e(pt.x, pt.y);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_MOVE:
+			{
+				POINTS pt = MAKEPOINTS(lParam);
+				WindowMoveEvent e(pt.x, pt.y);
+				REGISTER_EVENT(e);
+				break;
+			}
+			case WM_CLOSE:
+			{
+				WindowCloseEvent e;
+				REGISTER_EVENT(e);
+				break;
+			}
+			default:
+				return DefWindowProc(hWnd, msg, wParam, lParam);
+		}
+
+		return 0;
+	}
 
 	Window * Window::CreateEngineWindow(const DisplayMode & displayMode) {
 		WindowsWindow * window = new WindowsWindow(displayMode);
@@ -57,38 +185,6 @@ namespace prev {
 
 	WindowsWindow::~WindowsWindow() {
 
-	}
-
-	bool WindowsWindow::GetKeyboardKeyState(int keyCode) {
-		return false;
-	}
-
-	bool WindowsWindow::GetMouseButtonState(int buttonCode) {
-		return false;
-	}
-
-	Vec2i WindowsWindow::GetMousePosition() {
-		RECT r;
-		auto g = GetClientRect(m_HWnd, &r);
-		POINT pt = {};
-		GetCursorPos(&pt);
-		ScreenToClient(m_HWnd, &pt);
-		return Vec2i(pt.x, pt.y);
-	}
-
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-		switch (msg) {
-			case WM_SIZE:
-			{
-				POINTS pt = MAKEPOINTS(lParam);
-				int a = 0;
-				break;
-			}
-			default:
-				return DefWindowProc(hWnd, msg, wParam, lParam);
-		}
-
-		return 0;
 	}
 
 	bool WindowsWindow::RegisterWindowClass(const DisplayMode & displayMode) {

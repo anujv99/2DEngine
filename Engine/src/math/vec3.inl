@@ -36,9 +36,9 @@ inline Vec3 & Vec3::operator*=(const Vec3 & _vec) {
 }
 
 inline Vec3 & Vec3::operator/=(const Vec3 & _vec) {
-	Vec3_CHECK(std::fabs(_vec.x));
-	Vec3_CHECK(std::fabs(_vec.y));
-	Vec3_CHECK(std::fabs(_vec.z));
+	Vec3_CHECK(std::abs(_vec.x) > FLT_MIN);
+	Vec3_CHECK(std::abs(_vec.y) > FLT_MIN);
+	Vec3_CHECK(std::abs(_vec.z) > FLT_MIN);
 
 	x /= _vec.x;
 	y /= _vec.y;
@@ -123,6 +123,30 @@ inline Vec3 Vec3::operator/(float _v) const {
 	Vec3_CHECK(CheckVec3(*this));
 	float div = 1.0f / _v;
 	return Vec3(x * div, y * div, z * div);
+}
+
+inline Vec2 Vec3::xy() const {
+	return Vec2(x, y);
+}
+
+inline Vec2 Vec3::yx() const {
+	return Vec2(y, z);
+}
+
+inline Vec2 Vec3::yz() const {
+	return Vec2(y, z);
+}
+
+inline Vec2 Vec3::zy() const {
+	return Vec2(z, y);
+}
+
+inline Vec2 Vec3::xz() const {
+	return Vec2(x, z);
+}
+
+inline Vec2 Vec3::zx() const {
+	return Vec2(z, x);
 }
 
 inline bool Vec3::operator==(const Vec3 & _vec) const {

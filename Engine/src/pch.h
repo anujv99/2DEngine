@@ -27,3 +27,8 @@
 #include "src/common/log.h"
 #include "src/common/singleton.h"
 #include "src/common/assert.h"
+
+#include "src/events/event.h"
+#include "src/events/keyevent.h"
+#include "src/events/mouseevent.h"
+#include "src/events/applicationevent.h"

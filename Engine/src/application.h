@@ -9,6 +9,7 @@ namespace prev {
 		~Application();
 	private:
 		void Run();
+		void OnEvent(Event & e);
 	public:
 		static Application * CreateApplication();
 	};

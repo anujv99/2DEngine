@@ -18,7 +18,10 @@ namespace prev {
 		Vec3();
 		explicit Vec3(float _v);
 		Vec3(float _x, float _y, float _z);
-		Vec3(const Vec2 &_vec);
+		explicit Vec3(const Vec2 &_vec);
+
+		float & operator[](unsigned int _index) { ASSERT(_index < 3, "Index > 3"); return (&x)[_index]; }
+		const float & operator[](unsigned int _index) const { ASSERT(_index < 3, "Index > 3"); return (&x)[_index]; }
 
 		Vec3 & operator+=(const Vec3 & _vec);
 		Vec3 & operator-=(const Vec3 & _vec);
@@ -38,6 +41,13 @@ namespace prev {
 
 		Vec3 operator*(float _v) const;
 		Vec3 operator/(float _v) const;
+
+		Vec2 xy() const;
+		Vec2 yx() const;
+		Vec2 yz() const;
+		Vec2 zy() const;
+		Vec2 xz() const;
+		Vec2 zx() const;
 
 		bool operator==(const Vec3 & _vec) const;
 		bool operator!=(const Vec3 & _vec) const;

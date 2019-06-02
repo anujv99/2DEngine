@@ -2,46 +2,46 @@
 
 #include "event.h"
 
+#include "math/vec2i.h"
+
 namespace prev {
 
 	class MouseMovedEvent : public Event {
 	public:
-		MouseMovedEvent(float x, float y) :
-			m_MouseX(x), m_MouseY(y) {}
+		MouseMovedEvent(int x, int y) :
+			m_MousePos(x, y) {}
 
-		inline float GetX() const { return m_MouseX; }
-		inline float GetY() const { return m_MouseY; }
+		inline Vec2i GetMousePos() const { return m_MousePos; }
 
-		std::string ToString() const override {
+		virtual std::string ToString() const override {
 			std::stringstream ss;
-			ss << "MouseMovedEvent: " << GetX() << ", " << GetY();
+			ss << "MouseMovedEvent: " << m_MousePos.x << ", " << m_MousePos.y;
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(MouseMoved)
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	private:
-		float m_MouseX, m_MouseY;
+		Vec2i m_MousePos;
 	};
 
 	class MouseScrolledEvent : public Event {
 	public:
-		MouseScrolledEvent(float xOffset, float yOffset) :
-			m_XOffset(xOffset), m_YOffset(yOffset) {}
+		MouseScrolledEvent(int xOffset, int yOffset) :
+			m_ScrollOffset(xOffset, yOffset) {}
 
-		inline float GetXOffset() const { return m_XOffset; }
-		inline float GetYOffset() const { return m_YOffset; }
+		inline Vec2i GetScrollOffset() const { return m_ScrollOffset; }
 
-		std::string ToString() const override {
+		virtual std::string ToString() const override {
 			std::stringstream ss;
-			ss << "MouseScrolledEvent: " << GetXOffset() << ", " << GetYOffset();
+			ss << "MouseScrolledEvent: " << m_ScrollOffset.x << ", " << m_ScrollOffset.y;
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(MouseScrolled)
 		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
 	private:
-		float m_XOffset, m_YOffset;
+		Vec2i m_ScrollOffset;
 	};
 
 	class MouseButtonEvent : public Event {
@@ -53,6 +53,7 @@ namespace prev {
 	protected:
 		MouseButtonEvent(int button) :
 			m_Button(button) {}
+
 		int m_Button;
 	};
 
@@ -61,7 +62,7 @@ namespace prev {
 		MouseButtonPressedEvent(int button) :
 			MouseButtonEvent(button) {}
 
-		std::string ToString() const override {
+		virtual std::string ToString() const override {
 			std::stringstream ss;
 			ss << "MouseButtonPressedEvent: " << m_Button;
 			return ss.str();
@@ -75,7 +76,7 @@ namespace prev {
 		MouseButtonReleasedEvent(int button) :
 			MouseButtonEvent(button) {}
 
-		std::string ToString() const override {
+		virtual std::string ToString() const override {
 			std::stringstream ss;
 			ss << "MouseButtonReleasedEvent: " << m_Button;
 			return ss.str();

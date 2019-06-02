@@ -21,11 +21,9 @@ namespace prev {
 			for (auto & f : s_EventFunctions) {
 				f(*e);
 			}
+			delete e;
 		}
-	}
-
-	void EventHandler::EventHappened(Event * e) {
-		s_EventQueue.push_back(e);
+		s_EventQueue.clear();
 	}
 
 }

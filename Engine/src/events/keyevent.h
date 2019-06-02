@@ -12,7 +12,7 @@ namespace prev {
 	protected:
 		KeyEvent(int keyCode) :
 			m_KeyCode(keyCode) {}
-		
+
 		int m_KeyCode;
 	};
 
@@ -23,7 +23,7 @@ namespace prev {
 
 		inline int IsRepeating() const { return m_Repeat; }
 
-		std::string ToString() const override {
+		virtual std::string ToString() const override {
 			std::stringstream ss;
 			ss << "KeyPressedEvent: " << m_KeyCode << " (" << m_Repeat << " repeats)";
 			return ss.str();
@@ -39,7 +39,7 @@ namespace prev {
 		KeyReleasedEvent(int keycode) :
 			KeyEvent(keycode) {}
 
-		std::string ToString() const override {
+		virtual std::string ToString() const override {
 			std::stringstream ss;
 			ss << "KeyReleasedEvent: " << m_KeyCode;
 			return ss.str();
@@ -55,7 +55,7 @@ namespace prev {
 
 		inline char GetPressedChar() const { return m_PressedChar; }
 
-		std::string ToString() const override {
+		virtual std::string ToString() const override {
 			std::string str;
 			str = m_PressedChar;
 			return str;
