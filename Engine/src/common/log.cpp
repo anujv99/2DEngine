@@ -59,8 +59,6 @@ namespace prev {
 		s_ClinetLogger = spdlog::stderr_color_st("APP");
 		s_ClinetLogger->set_level(spdlog::level::trace);
 		s_ClinetLogger->sinks().push_back(s_CustomSink);
-
-		LOG_INFO("Logger Initialized Successfully");
 	}
 	
 	void Logger::AddLogCallback(LogCallbackFunc callbackFunction) {
