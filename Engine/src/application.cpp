@@ -11,7 +11,7 @@
 #include "math/vec2.h"
 
 namespace prev {
-	
+
 	Application::Application() {
 		Logger::CreateInst();
 		EventHandler::CreateInst();
@@ -33,8 +33,8 @@ namespace prev {
 	void Application::Run() {
 		while (m_ApplicationRunning) {
 			Window::Ref().PollEvents();
-			
-			StrongHandle<Event> gg(nullptr);
+
+
 
 			Input::Ref().Update();
 			EventHandler::Ref().FlushEventQueue();
@@ -42,8 +42,6 @@ namespace prev {
 	}
 
 	void Application::OnEvent(Event & e) {
-		LOG_WARN("{}", e);
-
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::WindowClosed));
 	}

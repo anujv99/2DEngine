@@ -130,7 +130,7 @@ namespace prev {
 				break;
 			}
 			default:
-				return DefWindowProc(hWnd, msg, wParam, lParam);
+				return DefWindowProcA(hWnd, msg, wParam, lParam);
 		}
 
 		return 0;

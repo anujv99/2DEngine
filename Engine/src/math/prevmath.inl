@@ -11,8 +11,6 @@ inline float ToDegrees(float _v) {
 	return _v * PV_180_PI;
 }
 
-#include "src/common/timer.h"
-
 inline float Sin(float _angle) {
 	float sine = std::sin(ToRadians(_angle));
 	if (sine <= FLT_EPSILON)
