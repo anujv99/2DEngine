@@ -20,8 +20,8 @@ namespace prev {
 		explicit Vec4(const Vec2 & _vec);
 		explicit Vec4(const Vec3 & _vec);
 
-		float & operator[](unsigned int _index) { ASSERT(_index < 4, "Index > 4"); return (&x)[_index]; }
-		const float & operator[](unsigned int _index) const { ASSERT(_index < 4, "Index > 4"); return (&x)[_index]; }
+		float & operator[](unsigned int _index) { ASSERT(_index < 4); return (&x)[_index]; }
+		const float & operator[](unsigned int _index) const { ASSERT(_index < 4); return (&x)[_index]; }
 
 		Vec4 & operator+=(const Vec4 & _vec);
 		Vec4 & operator-=(const Vec4 & _vec);

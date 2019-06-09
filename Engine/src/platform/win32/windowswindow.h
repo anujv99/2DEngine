@@ -15,6 +15,7 @@ namespace prev {
 
 		// Inherited via Window
 		virtual void PollEvents() override;
+		virtual uintptr_t GetWindowRawPointer() { return (uintptr_t)(void *)m_HWnd; }
 	private:
 		bool RegisterWindowClass(const DisplayMode & displayMode);
 		bool CreateWindowsWindow(const DisplayMode & displayMode);
@@ -26,7 +27,6 @@ namespace prev {
 		DWORD m_WindowExStyle		= 0u;
 		MSG m_Message				= {};
 
-		bool m_IsWindowReady = true;
 		Vec2i m_DisplaySize = Vec2i(0u, 0u); //Monitor native resolution
 		Vec2i m_DisplayPos  = Vec2i(0u, 0u);
 	};

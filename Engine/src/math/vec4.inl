@@ -1,4 +1,4 @@
-#define VEC4_CHECK(x) ASSERT(x, "Inavlid Vec4")
+#define VEC4_CHECK(x) ASSERT(x)
 
 inline bool CheckVec4(const Vec4 & _vec) {
 	return _vec.x <= FLT_MAX && _vec.x >= -FLT_MAX

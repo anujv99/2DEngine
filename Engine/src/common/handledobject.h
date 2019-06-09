@@ -22,18 +22,18 @@ namespace prev {
 	template<typename T>
 	void HandledObject<T>::ReleaseRef() {
 		m_ReferenceCount--;
-		ASSERT(m_ReferenceCount >= 0, "Inavlid reference count");
+		ASSERT(m_ReferenceCount >= 0);
 	}
 
 	template<typename T>
 	void HandledObject<T>::AddRef() {
 		m_ReferenceCount++;
-		ASSERT(m_ReferenceCount >= 0, "Inavlid reference count");
+		ASSERT(m_ReferenceCount >= 0);
 	}
 
 	template<typename T>
-	StrongHandle<T> prev::HandledObject<T>::GetHandle() {
-		ASSERT(m_ReferenceCount >= 0, "Inavlid reference count");
+	StrongHandle<T> HandledObject<T>::GetHandle() {
+		ASSERT(m_ReferenceCount >= 0);
 		return StrongHandle<T>((T *)this);
 	}
 

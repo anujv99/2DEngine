@@ -1,4 +1,4 @@
-#define Vec2_CHECK(v) ASSERT(v, "invalid Vec2")
+#define Vec2_CHECK(v) ASSERT(v)
 
 inline Vec2::Vec2() : x(0.0f), y(0.0f) {}
 inline Vec2::Vec2(float _v) : x(_v), y(_v) {}

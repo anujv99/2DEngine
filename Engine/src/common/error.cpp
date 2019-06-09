@@ -44,6 +44,26 @@ namespace prev {
 
 	void Error::ErrorDispatcher::Dispatch(Error * error) {
 		switch (error->m_ErrorLevel) {
+		case ERR_FILE_NOT_FOUND:
+			error->m_ErrorType = "File not found";
+			error->m_ErrorCode = CONVERT_TO_STRING(ERR_FILE_NOT_FOUND);
+			break;
+		case ERR_SHADER_ALREADY_PRESENT:
+			error->m_ErrorType = "Shader already present in the map";
+			error->m_ErrorCode = CONVERT_TO_STRING(ERR_SHADER_ALREADY_PRESENT);
+			break;
+		case ERR_SHADER_NOT_FOUND:
+			error->m_ErrorType = "Shader not found";
+			error->m_ErrorCode = CONVERT_TO_STRING(ERR_SHADER_NOT_FOUND);
+			break;
+		case ERR_D3D11_INTERNAL_ERROR:
+			error->m_ErrorType = "An internal d3d11 error has occurred";
+			error->m_ErrorCode = CONVERT_TO_STRING(ERR_D3D11_INTERNAL_ERROR);
+			break;
+		case ERR_GRAPHICS_CONTEXT_CREATION_FAILED:
+			error->m_ErrorType = "Unable to create graphics context";
+			error->m_ErrorCode = CONVERT_TO_STRING(ERR_GRAPHICS_CONTEXT_CREATION_FAILED);
+			break;
 		case ERR_WINDOW_INTERNAL_ERROR:
 			error->m_ErrorType = "An internal window error has occurred";
 			error->m_ErrorCode = CONVERT_TO_STRING(ERR_WINDOW_INTERNAL_ERROR);
@@ -72,3 +92,9 @@ namespace prev {
 	}
 
 }
+
+//////////////////////////////////////TEMPORARY//////////////////////////////////////
+
+
+
+//////////////////////////////////////TEMPORARY//////////////////////////////////////

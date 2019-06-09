@@ -3,38 +3,69 @@
 
 #include "common/log.h"
 
-#include "src/graphics/window.h"
-#include "src/utils/input.h"
+#include "graphics/window.h"
+#include "graphics/graphicscontext.h"
+#include "utils/input.h"
 
-#include "math/vec4.h"
-#include "math/vec3.h"
-#include "math/vec2.h"
+#include "graphics/renderstate.h"
+
+#include "graphics/uniform.h"
+#include "graphics/vertexlayout.h"
+#include "graphics/pixelshader.h"
+#include "graphics/vertexbufferbuilder.h"
+#include "graphics/immediategfx.h"
+
+#include "graphics/shadermanager.h"
 
 namespace prev {
 
+	StrongHandle<Uniform> uBuffer;
+
 	Application::Application() {
-		Logger::CreateInst();
+		Timer::FPSCounter(true);
 		EventHandler::CreateInst();
 
-		auto dis = DisplayMode();
-		Window::CreateInst(dis);
+		auto dis = GraphicsContext::GetDisplayModes();
+		Window::CreateInst(dis[5]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
 		Input::CreateInst();
+		GraphicsContext::CreateInst(Window::Ref().GetWindowRawPointer(), Window::Ref().GetDisplayMode());
+		RenderState::CreateInst();
+		ShaderManager::CreateInst();
+
+		////////////////////////////////////////TESTING////////////////////////////////////////
+		
+		ImmediateGFX::CreateInst();
+
+		////////////////////////////////////////TESTING////////////////////////////////////////
+
 	}
 
 	Application::~Application() {
+		ImmediateGFX::DestroyInst();
+		ShaderManager::DestroyInst();
+		RenderState::DestroyInst();
+		GraphicsContext::DestroyInst();
 		Input::DestroyInst();
 		Window::DestroyInst();
 		EventHandler::DestroyInst();
-		Logger::DestroyInst();
 	}
 
 	void Application::Run() {
 		while (m_ApplicationRunning) {
+			Timer::Update();
+
 			Window::Ref().PollEvents();
 
+			GraphicsContext::Ref().BeginFrame();
 
+			ImmediateGFX::Ref().DrawLine(Vec2(-1, 1), Vec2(1, -1));
+
+			if (Input::Ref().IsKeyDown('A'))
+				ImmediateGFX::Ref().DrawLine(Vec2(1, 1), Vec2(-1, -1));
+
+			GraphicsContext::Ref().EndFrame();
 
 			Input::Ref().Update();
 			EventHandler::Ref().FlushEventQueue();

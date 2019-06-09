@@ -11,6 +11,7 @@ namespace prev {
 	};
 
 	struct DisplayMode {
+		friend class GraphicsContext;
 	public:
 		Vec2i GetWindowSize() const { return WindowSize; }
 		WindowStyle GetWindowStyle() const { return Style; }
@@ -18,9 +19,9 @@ namespace prev {
 
 		void SetFullscreen(bool fullscreen) { IsFullscreen = fullscreen; }
 		void SetWindowStyle(WindowStyle style) { Style = style; }
-	public:
+	private:
 		DisplayMode() :
-			WindowSize(1280, 720), Style(WindowStyle::WINDOWED), IsFullscreen(false) {}
+			WindowSize(0, 0), Style(WindowStyle::WINDOWED), IsFullscreen(false) {}
 	private:
 		Vec2i WindowSize;
 		WindowStyle Style;
@@ -32,14 +33,19 @@ namespace prev {
 		friend class Singleton<Window>;
 	public:
 		DisplayMode GetDisplayMode() const { return m_DisplayMode; }
+		inline bool IsWindowReady() const { return m_IsWindowReady; }
 	protected:
 		virtual void PollEvents() = 0;
+		virtual uintptr_t GetWindowRawPointer() = 0;
 	protected:
 		Window(const DisplayMode & displayMode) : m_DisplayMode(displayMode) { }
 		virtual ~Window() {}
 		static Window * CreateEngineWindow(const DisplayMode & displayMode);
+
+		bool m_IsWindowReady = true;
 	private:
 		DisplayMode m_DisplayMode;
+
 	};
 
 	template<>

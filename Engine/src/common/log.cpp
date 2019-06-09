@@ -8,7 +8,7 @@
 
 namespace prev {
 
-	std::vector<std::function<void(std::string, LogLevel)>> g_LogCallbacks;
+	static std::vector<std::function<void(std::string, LogLevel)>> g_LogCallbacks;
 
 	template<typename Mutex>
 	class CustomSink : public spdlog::sinks::base_sink<Mutex> {

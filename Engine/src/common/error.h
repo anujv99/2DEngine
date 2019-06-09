@@ -1,15 +1,15 @@
 #pragma once
 
-#include <string>
-#include <sstream>
-#include <vector>
-#include <functional>
-
-#define ERROR_TRACE(e, m) { prev::Error automaticError(prev::e, m, __FILE__, std::to_string(__LINE__)); }
+#define ERROR_TRACE(e, m) { Error automaticError(e, m, __FILE__, std::to_string(__LINE__)); }
 
 namespace prev {
 
 	enum ErrorType {
+		ERR_FILE_NOT_FOUND,
+		ERR_SHADER_ALREADY_PRESENT,
+		ERR_SHADER_NOT_FOUND,
+		ERR_D3D11_INTERNAL_ERROR,
+		ERR_GRAPHICS_CONTEXT_CREATION_FAILED,
 		ERR_WINDOW_INTERNAL_ERROR,
 		ERR_WINDOW_CREATION_FAILED,
 		ERR_ASSERTION_FAILED,

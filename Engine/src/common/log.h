@@ -2,7 +2,7 @@
 
 #include "spdlog/spdlog.h"
 
-#include "src/common/singleton.h"
+#include "common/singleton.h"
 
 #define ADD_FILE_LINE(x) std::string(\
 										"[ " +\
@@ -15,33 +15,33 @@
 #if defined(ENGINE_DEBUG) && defined(USER_ENGINE) && !defined(LOG_DISABLED)
 	
 	#ifdef LOG_DETAILED
-		#define LOG_CRITICAL(x, ...)	prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_CRITICAL, ADD_FILE_LINE(x), __VA_ARGS__)
-		#define LOG_ERROR(x, ...)		prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, ADD_FILE_LINE(x),  __VA_ARGS__)
-		#define LOG_WARN(x, ...)		prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_WARN, ADD_FILE_LINE(x),  __VA_ARGS__)
-		#define LOG_INFO(x, ...)		prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, ADD_FILE_LINE(x), __VA_ARGS__)
-		#define LOG_TRACE(x, ...)		prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_TRACE, ADD_FILE_LINE(x), __VA_ARGS__)
+		#define LOG_CRITICAL(x, ...)	Logger::Ref().Log(User::ENGINE, LOG_LEVEL_CRITICAL, ADD_FILE_LINE(x), __VA_ARGS__)
+		#define LOG_ERROR(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, ADD_FILE_LINE(x),  __VA_ARGS__)
+		#define LOG_WARN(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_WARN, ADD_FILE_LINE(x),  __VA_ARGS__)
+		#define LOG_INFO(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, ADD_FILE_LINE(x), __VA_ARGS__)
+		#define LOG_TRACE(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_TRACE, ADD_FILE_LINE(x), __VA_ARGS__)
 	#else
-		#define LOG_CRITICAL(x, ...)	prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_CRITICAL, x __VA_ARGS__)
-		#define LOG_ERROR(x, ...)		prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, x  __VA_ARGS__)
-		#define LOG_WARN(x, ...)		prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_WARN, x  __VA_ARGS__)
-		#define LOG_INFO(x, ...)		prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, x __VA_ARGS__)
-		#define LOG_TRACE(x, ...)		prev::Logger::Ref().Log(User::ENGINE, LOG_LEVEL_TRACE, x __VA_ARGS__)
+		#define LOG_CRITICAL(x, ...)	Logger::Ref().Log(User::ENGINE, LOG_LEVEL_CRITICAL, x __VA_ARGS__)
+		#define LOG_ERROR(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, x  __VA_ARGS__)
+		#define LOG_WARN(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_WARN, x  __VA_ARGS__)
+		#define LOG_INFO(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, x __VA_ARGS__)
+		#define LOG_TRACE(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_TRACE, x __VA_ARGS__)
 	#endif
 
 #elif defined(ENGINE_DEBUG) && !defined(LOG_DISABLED)
 
 	#ifdef LOG_DETAILED
-		#define LOG_CRITICAL(x, ...)	prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_CRITICAL, ADD_FILE_LINE(x) __VA_ARGS__)
-		#define LOG_ERROR(x, ...)		prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_ERROR, ADD_FILE_LINE(x)  __VA_ARGS__)
-		#define LOG_WARN(x, ...)		prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_WARN, ADD_FILE_LINE(x)  __VA_ARGS__)
-		#define LOG_INFO(x, ...)		prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_INFO, ADD_FILE_LINE(x) __VA_ARGS__)
-		#define LOG_TRACE(x, ...)		prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_TRACE, ADD_FILE_LINE(x) __VA_ARGS__)
+		#define LOG_CRITICAL(x, ...)	Logger::Ref().Log(User::CLIENT, LOG_LEVEL_CRITICAL, ADD_FILE_LINE(x) __VA_ARGS__)
+		#define LOG_ERROR(x, ...)		Logger::Ref().Log(User::CLIENT, LOG_LEVEL_ERROR, ADD_FILE_LINE(x)  __VA_ARGS__)
+		#define LOG_WARN(x, ...)		Logger::Ref().Log(User::CLIENT, LOG_LEVEL_WARN, ADD_FILE_LINE(x)  __VA_ARGS__)
+		#define LOG_INFO(x, ...)		Logger::Ref().Log(User::CLIENT, LOG_LEVEL_INFO, ADD_FILE_LINE(x) __VA_ARGS__)
+		#define LOG_TRACE(x, ...)		Logger::Ref().Log(User::CLIENT, LOG_LEVEL_TRACE, ADD_FILE_LINE(x) __VA_ARGS__)
 	#else
-		#define LOG_CRITICAL(x, ...)	prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_CRITICAL, x __VA_ARGS__)
-		#define LOG_ERROR(x, ...)		prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_ERROR, x  __VA_ARGS__)
-		#define LOG_WARN(x, ...)		prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_WARN, x  __VA_ARGS__)
-		#define LOG_INFO(x, ...)		prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_INFO, x __VA_ARGS__)
-		#define LOG_TRACE(x, ...)		prev::Logger::Ref().Log(User::CLIENT, LOG_LEVEL_TRACE, x __VA_ARGS__)
+		#define LOG_CRITICAL(x, ...)	Logger::Ref().Log(User::CLIENT, LOG_LEVEL_CRITICAL, x __VA_ARGS__)
+		#define LOG_ERROR(x, ...)		Logger::Ref().Log(User::CLIENT, LOG_LEVEL_ERROR, x  __VA_ARGS__)
+		#define LOG_WARN(x, ...)		Logger::Ref().Log(User::CLIENT, LOG_LEVEL_WARN, x  __VA_ARGS__)
+		#define LOG_INFO(x, ...)		Logger::Ref().Log(User::CLIENT, LOG_LEVEL_INFO, x __VA_ARGS__)
+		#define LOG_TRACE(x, ...)		Logger::Ref().Log(User::CLIENT, LOG_LEVEL_TRACE, x __VA_ARGS__)
 	#endif
 #else
 	#define LOG_CRITICAL(x, ...)

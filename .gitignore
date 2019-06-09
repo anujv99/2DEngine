@@ -4,6 +4,8 @@ bin*/*
 *.sln
 Engine/*.vcxproj*
 Engine/*.vcxproj.*
+App/*.vcxproj*
+App/*.vcxproj.*
 Makefile
 Makefile.in
 

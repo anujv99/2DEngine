@@ -1,7 +1,7 @@
 #pragma once
 
 #include "prevmath.h"
-#include "src/common/assert.h"
+#include "common/assert.h"
 
 namespace prev {
 
@@ -16,8 +16,8 @@ namespace prev {
 		explicit Vec2i(int _v);
 		Vec2i(int _x, int _y);
 
-		int & operator[](unsigned int _index) { ASSERT(_index < 2, "Index > 2"); return (&x)[_index]; }
-		const int & operator[](unsigned int _index) const { ASSERT(_index < 2, "Index > 2"); return (&x)[_index]; }
+		int & operator[](unsigned int _index) { ASSERT(_index < 2); return (&x)[_index]; }
+		const int & operator[](unsigned int _index) const { ASSERT(_index < 2); return (&x)[_index]; }
 
 		Vec2i & operator+=(const Vec2i & _vec);
 		Vec2i & operator-=(const Vec2i & _vec);

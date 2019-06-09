@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/common/assert.h"
+#include "common/error.h"
 
 namespace prev {
 
@@ -44,7 +44,7 @@ namespace prev {
 
 	template<class T>
 	inline T & Singleton<T>::Ref() {
-		ASSERT(s_Instance != nullptr, "Singleton class not initialized");
+		ASSERT(s_Instance != nullptr);
 		return *s_Instance;
 	}
 

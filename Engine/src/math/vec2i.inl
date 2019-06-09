@@ -21,7 +21,7 @@ inline Vec2i & Vec2i::operator*=(const Vec2i & _vec) {
 }
 
 inline Vec2i & Vec2i::operator/=(const Vec2i & _vec) {
-	ASSERT(_vec.x && _vec.y, "division by zero");
+	ASSERT(_vec.x && _vec.y);
 	x /= _vec.x;
 	y /= _vec.y;
 	return *this;
@@ -46,7 +46,7 @@ inline Vec2i & Vec2i::operator*=(int _v) {
 }
 
 inline Vec2i & Vec2i::operator/=(int _v) {
-	ASSERT(_v, "division by zero");
+	ASSERT(_v);
 	x /= _v;
 	y /= _v;
 	return *this;
@@ -69,7 +69,7 @@ inline Vec2i Vec2i::operator*(const Vec2i & _vec) const {
 }
 
 inline Vec2i Vec2i::operator/(const Vec2i & _vec) const {
-	ASSERT(_vec.x && _vec.y, "division by zero");
+	ASSERT(_vec.x && _vec.y);
 	return Vec2i(x / _vec.x, y / _vec.y);
 }
 
@@ -78,7 +78,7 @@ inline Vec2i Vec2i::operator*(int _v) const {
 }
 
 inline Vec2i Vec2i::operator/(int _v) const {
-	ASSERT(_v, "division by zero");
+	ASSERT(_v);
 	return Vec2i(x / _v, y / _v);
 }
 

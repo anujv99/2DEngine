@@ -1,4 +1,4 @@
-#define Vec3_CHECK(v) ASSERT(v, "invalid Vec3")
+#define Vec3_CHECK(v) ASSERT(v)
 
 inline bool CheckVec3(const Vec3 & _vec) {
 	return _vec.x <= FLT_MAX && _vec.x >= -FLT_MAX
@@ -214,7 +214,7 @@ inline Vec3 Saturate(const Vec3 & _vec) {
 	return Vec3(std::clamp(_vec.x, 0.0f, 1.0f), std::clamp(_vec.y, 0.0f, 1.0f), std::clamp(_vec.z, 0.0f, 1.0f));
 }
 
-Vec3 RotateAxisX(const Vec3 & _dir, float _angle) {
+inline Vec3 RotateAxisX(const Vec3 & _dir, float _angle) {
 
 	float cosine = prev::Cos(_angle);
 	float sine = prev::Sin(_angle);
@@ -226,7 +226,7 @@ Vec3 RotateAxisX(const Vec3 & _dir, float _angle) {
 	return Vec3(newX, newY, newZ);
 }
 
-Vec3 RotateAxisY(const Vec3 & _dir, float _angle) {
+inline Vec3 RotateAxisY(const Vec3 & _dir, float _angle) {
 
 	float cosine = prev::Cos(_angle);
 	float sine = prev::Sin(_angle);
@@ -238,7 +238,7 @@ Vec3 RotateAxisY(const Vec3 & _dir, float _angle) {
 	return Vec3(newX, newY, newZ);
 }
 
-Vec3 RotateAxisZ(const Vec3 & _dir, float _angle) {
+inline Vec3 RotateAxisZ(const Vec3 & _dir, float _angle) {
 
 	float cosine = prev::Cos(_angle);
 	float sine = prev::Sin(_angle);
@@ -250,7 +250,7 @@ Vec3 RotateAxisZ(const Vec3 & _dir, float _angle) {
 	return Vec3(newX, newY, newZ);
 }
 
-Vec3 RotateAxis(const Vec3 & _dir, float _angle, const Vec3 & _axis) {
+inline Vec3 RotateAxis(const Vec3 & _dir, float _angle, const Vec3 & _axis) {
 	// http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/
 
 	float cosine = prev::Cos(_angle);

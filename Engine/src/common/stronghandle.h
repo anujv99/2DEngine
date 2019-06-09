@@ -53,7 +53,7 @@ namespace prev {
 	}
 
 	template<typename T>
-	bool StrongHandle<T>::operator!=(const T * val) const {
+	bool StrongHandle<T>::operator!=(const T * other) const {
 		return !(*this == other);
 	}
 
@@ -63,8 +63,8 @@ namespace prev {
 	}
 
 	template<typename T>
-	bool StrongHandle<T>::operator==(const T * val) const {
-		return m_PointerValue == val;
+	bool StrongHandle<T>::operator==(const T * other) const {
+		return m_PointerValue == other;
 	}
 
 	template<typename T>
