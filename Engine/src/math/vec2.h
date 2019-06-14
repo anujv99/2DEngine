@@ -62,6 +62,7 @@ namespace prev {
 	Vec2 Saturate(const Vec2 & _vec);
 	Vec2 Perpendicular(const Vec2 & _vec);
 	Vec2 UnitCircle(float _angle);
+	Vec2 Hermite(const Vec2 & _v1, const Vec2 & _tan1, const Vec2 & _v2, const Vec2 & _tan2, float _val);
 
 	inline std::ostream & operator<<(std::ostream & os, const Vec2 & _vec) {
 		return os << "[Vec2 : x = " << _vec.x <<

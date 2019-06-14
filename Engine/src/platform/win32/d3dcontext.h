@@ -23,6 +23,7 @@ namespace prev {
 		bool CreateRenderTargetView(const DXGI_MODE_DESC & displayMode);
 		bool CreateRasterizerState(const DXGI_MODE_DESC & displayMode);
 		bool CreateDepthBuffer(const DXGI_MODE_DESC & displayMode);
+		bool CreateBlendState(const DXGI_MODE_DESC & displayMode);
 	private:
 		Microsoft::WRL::ComPtr<IDXGISwapChain>				m_SwapChain;
 		Microsoft::WRL::ComPtr<ID3D11Device>				m_Device;
@@ -32,6 +33,7 @@ namespace prev {
 		Microsoft::WRL::ComPtr<ID3D11Texture2D>				m_DepthStencilBuffer;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState>		m_DepthStencilState;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>		m_DepthStencilView;
+		Microsoft::WRL::ComPtr<ID3D11BlendState>			m_BlendState;
 	};
 
 }

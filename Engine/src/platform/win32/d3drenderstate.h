@@ -15,11 +15,16 @@ namespace prev {
 
 		virtual void SetViewport(const Viewport & viewport) override;
 		virtual Viewport GetViewport() const override;
+
+		virtual void SetScissorBox(const ScissorBox & sBox) override;
+		virtual ScissorBox GetScissorBox() override;
+		virtual void DisableScissors() override;
 	private:
 		D3D_PRIMITIVE_TOPOLOGY MapPrimitiveTopology(PrimitiveTopology prim);
 	private:
 		PrimitiveTopology m_PrimitiveTopology;
 		Viewport m_Viewport;
+		ScissorBox m_ScissorBox;
 	};
 
 }

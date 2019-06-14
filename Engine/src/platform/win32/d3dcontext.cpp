@@ -58,7 +58,6 @@ namespace prev {
 		if (m_IsContextCreated == false) {
 			return;
 		}
-
 		m_IsContextCreated = InitializeD3D(displayModeDesc, hWnd);
 		if (m_IsContextCreated == false) {
 			return;
@@ -75,18 +74,22 @@ namespace prev {
 		if (m_IsContextCreated == false) {
 			return;
 		}
+		m_IsContextCreated = CreateBlendState(displayModeDesc);
+		if (m_IsContextCreated == false) {
+			return;
+		}
 
 		LOG_INFO("D3D11 Successfully Initialized");
 	}
 
 	void D3DContext::BeginFrame() {
-		float clearColor[] = { 1, 1, 0, 1 };
+		float clearColor[] = { 1, 1, 1, 1 };
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), clearColor);
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
 	void D3DContext::EndFrame() {
-		m_SwapChain->Present(0u, 0u);
+		m_SwapChain->Present(1u, 0u);
 	}
 
 	DXGI_MODE_DESC D3DContext::GetDisplayModeDesc(const DisplayMode & displayMode) {
@@ -195,7 +198,7 @@ namespace prev {
 		rd.DepthBiasClamp			= 0.0f;
 		rd.SlopeScaledDepthBias		= 0.0f;
 		rd.DepthClipEnable			= FALSE;
-		rd.ScissorEnable			= FALSE;
+		rd.ScissorEnable			= TRUE;
 		rd.MultisampleEnable		= FALSE;
 		rd.AntialiasedLineEnable	= FALSE;
 
@@ -216,7 +219,7 @@ namespace prev {
 
 		dsd.DepthEnable						= TRUE;
 		dsd.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
-		dsd.DepthFunc						= D3D11_COMPARISON_LESS;
+		dsd.DepthFunc						= D3D11_COMPARISON_LESS_EQUAL;
 		dsd.StencilEnable					= FALSE;
 
 		HRESULT hr = m_Device->CreateDepthStencilState(&dsd, m_DepthStencilState.GetAddressOf());
@@ -264,6 +267,29 @@ namespace prev {
 		m_DeviceContext->OMSetRenderTargets(1u, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 
 		return true;
+	}
+
+	bool D3DContext::CreateBlendState(const DXGI_MODE_DESC & displayMode) {
+		D3D11_BLEND_DESC bd;
+		bd.AlphaToCoverageEnable						= FALSE;
+		bd.IndependentBlendEnable						= FALSE;
+		bd.RenderTarget[0].BlendEnable					= TRUE;
+		bd.RenderTarget[0].SrcBlend						= D3D11_BLEND_SRC_ALPHA;
+		bd.RenderTarget[0].DestBlend					= D3D11_BLEND_INV_SRC_ALPHA;
+		bd.RenderTarget[0].BlendOp						= D3D11_BLEND_OP_ADD;
+		bd.RenderTarget[0].SrcBlendAlpha				= D3D11_BLEND_ZERO;
+		bd.RenderTarget[0].DestBlendAlpha				= D3D11_BLEND_ZERO;
+		bd.RenderTarget[0].BlendOpAlpha					= D3D11_BLEND_OP_ADD;
+		bd.RenderTarget[0].RenderTargetWriteMask		= D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		HRESULT hr = m_Device->CreateBlendState(&bd, m_BlendState.GetAddressOf());
+		if (FAILED(hr)) {
+			ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, "Failed to create Blend state");
+			return false;
+		}
+
+		m_DeviceContext->OMSetBlendState(m_BlendState.Get(), nullptr, 0xffffffff);
+
 	}
 
 }

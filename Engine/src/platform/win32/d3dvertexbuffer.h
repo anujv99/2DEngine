@@ -15,6 +15,7 @@ namespace prev {
 		virtual void UnBind() override;
 		virtual void SubData(const void * data, unsigned int numBytes, unsigned int byteOffset) override;
 		virtual void Init(const void * data, unsigned int numElements, unsigned int strideBytes, BufferUsage bufferType) override;
+		virtual void Draw(unsigned int numVertices, unsigned int vertexOffset) override;
 	private:
 		void CreateBuffer(const void * data);
 	private:

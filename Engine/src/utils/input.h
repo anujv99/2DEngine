@@ -24,7 +24,7 @@ namespace prev {
 		bool IsMouseButtonUp(unsigned short keyCode);
 		bool IsMouseButtonReleased(unsigned short keyCode);
 
-		inline Vec2i GetMousePosition() const { return m_MousePos; }
+		inline Vec2i GetMousePosition() const { return Vec2i(m_MousePos.x, m_WindowSize.y - m_MousePos.y); }
 		inline Vec2i GetMouseDeltaPosition() const { return m_MousePos - m_PrevMousePos; }
 		inline Vec2i GetMouseScrollDelta() const { return m_MouseScrollDelta; }
 	protected:
@@ -49,6 +49,7 @@ namespace prev {
 		Vec2i m_MousePos = Vec2i(0);
 		Vec2i m_PrevMousePos = Vec2i(0);
 		Vec2i m_MouseScrollDelta = Vec2i(0);
+		Vec2i m_WindowSize = Vec2i(0);
 	};
 
 }

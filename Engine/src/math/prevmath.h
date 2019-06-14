@@ -14,6 +14,12 @@ namespace prev {
 
 	float Sin(float _angle);
 	float Cos(float _angle);
+	float Tan(float _angle);
+
+	float ATan(float _angle);
+
+	float Clamp(float _val, float _min, float _max);
+	float Saturate(float _val);
 
 	#include "prevmath.inl"
 

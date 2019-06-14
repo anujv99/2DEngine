@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bindable.h"
+#include "uniform.h"
 
 namespace prev {
 
@@ -8,6 +9,8 @@ namespace prev {
 	protected:
 		VertexShader(const std::string & shaderName);
 	public:
+		static const unsigned int MVP_RESERVED_SLOT = 0;
+
 		virtual ~VertexShader() {}
 
 		virtual void Bind() override = 0;
@@ -23,9 +26,12 @@ namespace prev {
 			return m_ShaderName;
 		}
 
+		void UpdateMVP();
+
 		static StrongHandle<VertexShader> CreateVertexShader(const std::string & shaderName);
 	private:
 		std::string m_ShaderName;
+		StrongHandle<Uniform> m_MVPUniform;
 	};
 
 }

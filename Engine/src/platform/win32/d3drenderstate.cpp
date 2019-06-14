@@ -13,6 +13,7 @@ namespace prev {
 
 		SetPrimitiveTopology(m_PrimitiveTopology);
 		SetViewport(m_Viewport);
+		m_ScissorBox = { 0.0f, 0.0f, 0.0f, 0.0f };
 	}
 
 	void D3DRenderSate::SetPrimitiveTopology(PrimitiveTopology prim) {
@@ -54,6 +55,36 @@ namespace prev {
 		case PV_PRIM_TRIANGLESTRIP_ADJ: return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
 		default: return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 		}
+	}
+
+	void D3DRenderSate::SetScissorBox(const ScissorBox & sBox) {
+		Vec2i windowSize = Window::Ref().GetDisplayMode().GetWindowSize();
+
+		D3D11_RECT rc;
+		rc.left = sBox.Left;
+		rc.right = sBox.Right;
+		rc.top = windowSize.y - sBox.Top;
+		rc.bottom = windowSize.y - sBox.Bottom;
+
+		GetDeviceContext()->RSSetScissorRects(1, &rc);
+		m_ScissorBox = sBox;
+	}
+
+	ScissorBox D3DRenderSate::GetScissorBox() {
+		return m_ScissorBox;
+	}
+
+	void D3DRenderSate::DisableScissors() {
+		D3D11_RECT rc;
+		Vec2i windowSize = Window::Ref().GetDisplayMode().GetWindowSize();
+
+		rc.left = 0;
+		rc.right = windowSize.x;
+		rc.top = 0;
+		rc.bottom = windowSize.y;
+
+		GetDeviceContext()->RSSetScissorRects(1, &rc);
+		ZeroMemory(&m_ScissorBox, sizeof(m_ScissorBox));
 	}
 
 }

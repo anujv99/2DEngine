@@ -2,6 +2,8 @@
 
 #include "window.h"
 #include "viewport.h"
+#include "vertexshader.h"
+#include "pixelshader.h"
 
 namespace prev {
 
@@ -44,6 +46,16 @@ namespace prev {
 		//Viewport
 		virtual void SetViewport(const Viewport & viewport) = 0;
 		virtual Viewport GetViewport() const = 0;
+
+		virtual void SetScissorBox(const ScissorBox & sBox) = 0;
+		virtual ScissorBox GetScissorBox() = 0;
+		virtual void DisableScissors() = 0;
+	private:
+		friend PixelShader;
+		friend VertexShader;
+
+		StrongHandle<VertexShader> m_BoundVertexShader;
+		StrongHandle<PixelShader> m_BoundPixelShader;
 	private:
 		static RenderState * CreateRenderState();
 	protected:

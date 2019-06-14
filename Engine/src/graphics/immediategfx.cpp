@@ -1,26 +1,21 @@
 #include "pch.h"
 #include "immediategfx.h"
 
-#include "platform/win32/d3dhelper.h"
-
 static const int IMMEDIATEGFX_MAX_VERTS = 8192;
 
 namespace prev {
 
 	void ImmediateGFX::BeginDefaultShaders() {
-
+		m_VertexShader->UpdateMVP();
 	}
 
 	void ImmediateGFX::EndDefaultShaders() {
-
 	}
 
 	void ImmediateGFX::BeginDraw() {
-
 	}
 
 	void ImmediateGFX::EndDraw() {
-
 	}
 
 	void ImmediateGFX::PolygonBegin(PrimitiveTopology primitive) {
@@ -49,7 +44,7 @@ namespace prev {
 			);
 
 			RenderState::Ref().SetPrimitiveTopology(m_DrawPrimitive);
-			GetDeviceContext()->Draw(GetVertexBatch().size(), m_BufferIndex);
+			m_VertexBuffer->Draw(GetVertexBatch().size(), m_BufferIndex);
 			m_BufferIndex += GetVertexBatch().size();
 		}
 	}

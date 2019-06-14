@@ -15,4 +15,17 @@ namespace prev {
 		PV_DATA_TYPE_UINT_8,
 	};
 
+	enum TextureFormat {
+		PV_TEXTURE_FORMAT_RGBA8,
+	};
+
+	enum TextureWrapType {
+		PV_TEXTURE_WRAP_DEFAULT
+	};
+
+	enum TextureFilterType {
+		PV_TEXTURE_FILTER_DEFAULT,
+		PV_TEXTURE_FILTER_NEAREST
+	};
+
 }

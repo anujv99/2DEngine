@@ -3,7 +3,6 @@
 namespace prev {
 
 	class Application : public HandledObject<Application> {
-		friend int MAIN_METHOD();
 	public:
 		Application();
 		~Application();

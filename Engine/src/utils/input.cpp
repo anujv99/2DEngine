@@ -45,6 +45,8 @@ namespace prev {
 		for (UINT i = 0; i < MAX_MOUSE_BUTTONS; i++) {
 			m_MouseButtons[i] = 0;
 		}
+
+		m_WindowSize = Window::Ref().GetDisplayMode().GetWindowSize();
 	}
 
 	void Input::OnEvent(Event & e) {

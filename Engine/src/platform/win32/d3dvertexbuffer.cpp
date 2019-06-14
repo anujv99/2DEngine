@@ -76,6 +76,10 @@ namespace prev {
 		}
 	}
 
+	void D3DVertexBuffer::Draw(unsigned int numVertices, unsigned int vertexOffset) {
+		GetDeviceContext()->Draw(numVertices, vertexOffset);
+	}
+
 	void D3DVertexBuffer::Bind() {
 		LOG_ON_CONDITION(m_IsInitialized, LOG_ERROR, "Buffer not initialized", return)
 

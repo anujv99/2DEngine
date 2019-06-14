@@ -1,4 +1,14 @@
 
-float4 main(float4 color : OUT_COLOR) : SV_TARGET {
-	return color;
+Texture2D tex;
+SamplerState splr;
+
+struct VSIn {
+	float2 texCoords : TEXCOORD;
+	float4 color : OUT_COLOR;
+	float4 position : SV_POSITION;
+};
+
+float4 main(VSIn vsi) : SV_TARGET {
+	float4 outCol = vsi.color;
+	return outCol;
 }

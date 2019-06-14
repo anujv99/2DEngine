@@ -10,4 +10,11 @@ namespace prev {
 		Vec2 DepthValues; // x = minDepth, y = maxDepth
 	};
 
+	struct ScissorBox {
+		float Left;
+		float Right;
+		float Top;
+		float Bottom;
+	};
+
 }
