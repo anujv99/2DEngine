@@ -49,14 +49,17 @@ namespace prev {
 		s_ShouldShowFPS = isVisible;
 	}
 
-	TimeThis::TimeThis(const std::string & fileName, const std::string & functionName, const unsigned int & lineNumber, bool timeInMs) : 
-		m_FileName(fileName), m_FunctionName(functionName), m_LineNumber(lineNumber), isMS(timeInMs) {
+	TimeThis::TimeThis(const std::string & fileName, const std::string & functionName, 
+		const unsigned int & lineNumber, bool timeInMs, bool logTimeOnDestruction) :
+		m_FileName(fileName), m_FunctionName(functionName), m_LineNumber(lineNumber), isMS(timeInMs), m_LogOnDestruction(logTimeOnDestruction) {
 		m_Start = std::chrono::high_resolution_clock::now();
 
 		m_FileName = m_FileName.substr(m_FileName.find_last_of("\\") + 1);
 	}
 
 	TimeThis::~TimeThis() {
+		if (!m_LogOnDestruction) return;
+
 		std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_Start;
 
 		LOG_TIMER(

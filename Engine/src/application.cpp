@@ -20,24 +20,21 @@
 #include "graphics/sampler2d.h"
 #include "graphics/font.h"
 #include "graphics/linegraph.h"
-#include "imgui/imguimanager.h"
-#include "imgui/imgui.h"
 #include "graphics/bargraph.h"
+#include "imgui/imguilayer.h"
+#include "imgui/Imgui.h"
 
 #include "math/mat4.h"
 
 namespace prev {
-
-	LineGraph lineGraph(0.0f, 50.0f);
-	BarGraph graph(0.0, 10.0);
 
 	Application::Application() {
 		Timer::FPSCounter(true);
 		EventHandler::CreateInst();
 
 		auto dis = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 0;
-		dis[selectedDis].SetWindowStyle(WindowStyle::BORDERLESS);
+		unsigned int selectedDis = 5;
+		dis[selectedDis].SetWindowStyle(WindowStyle::WINDOWED);
 		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
@@ -47,19 +44,10 @@ namespace prev {
 		RenderState::CreateInst();
 		ShaderManager::CreateInst();
 		ImmediateGFX::CreateInst();
+		ImGuiLayer::CreateInst();
+
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
-
-		ImGuiManager::CreateInst();
-
-		Mat4 projection = Ortho(0, dis[selectedDis].GetWindowSize().x, 0, dis[selectedDis].GetWindowSize().y, -150, 150);
-		MVP::Ref().Projection().Push();
-		MVP::Ref().Projection().Load(projection);
-
-		float arr[] = { 0, 1, 2, 3, 4, 5, 6 };
-		for (unsigned int i = 0; i < std::size(arr); i++) {
-			graph.PushValue(arr[i]);
-		}
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -68,7 +56,7 @@ namespace prev {
 	Application::~Application() {
 		MVP::Ref().Projection().Pop();
 
-		ImGuiManager::DestroyInst();
+		ImGuiLayer::DestroyInst();
 		ImmediateGFX::DestroyInst();
 		ShaderManager::DestroyInst();
 		RenderState::DestroyInst();
@@ -79,9 +67,10 @@ namespace prev {
 		EventHandler::DestroyInst();
 	}
 
-	Vec2 pos = Vec2(0, 0);
-
 	void Application::Run() {
+		srand(Timer::GetTime());
+
+		LineGraph lg(0.0f, 50.0f);
 		while (m_ApplicationRunning) {
 			Timer::Update();
 
@@ -91,54 +80,13 @@ namespace prev {
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
-			ImmediateGFX::Ref().BeginDefaultShaders();
+			m_LayerStack.OnUpdate();
 
-			ImGuiManager::Ref().PreUpdate();
-			ImGuiManager::Ref().DetectConsumeInputs();
+			ImGuiLayer::Ref().StartFrame();
 
-			static bool rip = false;
-			static float radius = 1.0f;
-			static int high = -1;
+			m_LayerStack.OnImGuiUpdate();
 
-			lineGraph.PushValue(Timer::GetDeltaTime() * 1000.0f);
-
-			static Vec4 color(0.5, 0.1, 0.8, 1.0f);
-
-			ImmediateGFX::Ref().Color(color);
-			ImmediateGFX::Ref().DrawRectRounded(Vec2(500, 300), Vec2(100, 100), 1.0f);
-
-			ImGui::Begin("Retarded Window");
-			ImGui::SliderFloat("DickLength", radius, -10.0f, 10.0f);
-			ImGui::SliderInt("Hello Penis", high, -1, 10);
-
-			ImGui::Separator();
-
-			ImGui::Print("Delta Time");
-			ImGui::LineGraph(lineGraph);
-
-			ImGui::Print("Hello World What are you doing");
-
-			ImGui::CheckBox("Press to see bobs", rip);
-
-			if (rip)
-				ImGui::BarGraph(graph);
-
-			ImGui::Separator();
-
-			ImGui::SliderRGBA("BBC", color);
-
-			ImGui::Separator();
-
-			ImGui::FillBarInt("Hello Swift", color.x * 10, 0, 10);
-
-			ImGui::ColorBlockRGBA("", color);
-
-			ImGui::End();
-
-			graph.SetValueToHighlight(high);
-			graph.SetValue(radius, 3);
-
-			ImGuiManager::Ref().PostUpdate();
+			ImGuiLayer::Ref().EndFrame();
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -152,6 +100,8 @@ namespace prev {
 	void Application::OnEvent(Event & e) {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::WindowClosed));
+
+		m_LayerStack.OnEvent(e);
 	}
 
 	bool Application::WindowClosed(WindowCloseEvent & e) {

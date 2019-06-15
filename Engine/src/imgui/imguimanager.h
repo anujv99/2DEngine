@@ -59,6 +59,7 @@ namespace prev {
 		bool IsPosInWindow(Vec2i pos, StrongHandle<ImGuiWindow> window) const;
 
 		void DetectConsumeInputs();
+		bool DidMouseButtonGoDown(int button);
 
 		Font & GetFont() { return m_Font; }
 		StrongHandle<VertexShader> & GetVertexShader() { return m_VertexShader; }

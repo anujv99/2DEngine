@@ -135,7 +135,7 @@ namespace prev {
 			mouseOverAnyWindow |= mouseInWindow;
 
 			// check all mouse button presses if is in
-			for (int i = minMouseButton; i <= maxMouseButton; i += 1) {
+			for (int i = minMouseButton; i <= maxMouseButton; i++) {
 				if (Input::Ref().IsMouseButtonPressed(i)) {
 					mouseClicked = true;
 
@@ -163,6 +163,10 @@ namespace prev {
 		}
 	}
 
+	bool ImGuiManager::DidMouseButtonGoDown(int button) {
+		return m_ConsumeMouseButtons.find(button) != m_ConsumeMouseButtons.end();
+	}
+
 	prev::StrongHandle<prev::ImGuiWindow> ImGuiManager::GetWindow(const std::string & name) {
 		uint32_t hash = HashString(name);
 		auto it = m_WindowMap.find(hash);
@@ -179,6 +183,7 @@ namespace prev {
 
 	void ImGuiManager::PruneVisibleWindow() {
 		for (size_t i = 0; i < m_VisibleWindows.size(); i++) {
+
 			auto window = m_VisibleWindows[i];
 
 			if (window->FramesSinceUpdate > 0) {
@@ -239,12 +244,9 @@ namespace prev {
 		ActiveWindow = nullptr;
 		WorkingWindow = nullptr;
 
-		Data.FVec[0] = 0.0f;
-		Data.FVec[1] = 0.0f;
-		Data.FVec[2] = 0.0f;
-		Data.FVec[3] = 0.0f;
+		std::memset(&Data, 0, sizeof(sizeof(Data)));
 
-		ActiveWidgetID = WIDGET_NULL;
+		ActiveWidgetID = State::WIDGET_NULL;
 		WidgetCount = 0;
 		DoesWidgetConsumeTextInput = false;
 	}

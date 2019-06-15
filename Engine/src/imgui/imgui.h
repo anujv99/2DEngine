@@ -4,7 +4,9 @@
 #include "math/vec2i.h"
 #include "math/vec3.h"
 #include "math/vec4.h"
+#include "math/cubicspline2d.h"
 #include "math/vecconversion.h"
+
 #include "graphics/texture2d.h"
 #include "graphics/linegraph.h"
 #include "graphics/bargraph.h"
@@ -62,6 +64,7 @@ namespace prev {
 
 		static void LineGraph(prev::LineGraph & lineGraph);
 		static void BarGraph(prev::BarGraph & barGraph);
+		static void CubicSpline2D(StrongHandle<prev::CubicSpline2D> spline, Vec2 minPos, Vec2 maxPos, Vec2i dimen = Vec2i(300));
 
 		static void MoveDrawPosBy(Vec2i dimen);
 		static void MoveDrawPosNextLine(Vec2i dimen);

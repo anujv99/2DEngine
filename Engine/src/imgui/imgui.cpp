@@ -114,6 +114,11 @@ namespace prev {
 		ImmediateGFX::Ref().DrawRectRoundedWire(ToVec2(pos - Vec2i(0, dimen.y)), ToVec2(dimen), radius);
 	}
 
+	inline void ImGuiDrawPoint(Vec2i pos, float radius) {
+		ImmGfxBegin();
+		ImmediateGFX::Ref().DrawCircle(ToVec2(pos), radius);
+	}
+
 	inline void ImGuiDrawLine(Vec2i start, Vec2i end) {
 		ImmGfxBegin();
 		ImmediateGFX::Ref().DrawLine(ToVec2(start), ToVec2(end));
@@ -166,15 +171,16 @@ namespace prev {
 	}
 
 	inline bool ImGuiDidMouseJustGoDown() {
-		return Input::Ref().IsMouseButtonPressed(IMGUI_MOUSE_PRESS_BTN);
+		return ImGuiManager::Ref().DidMouseButtonGoDown(IMGUI_MOUSE_PRESS_BTN);
+		//return Input::Ref().IsMouseButtonPressed(IMGUI_MOUSE_PRESS_BTN);
 	}
 
 	inline bool ImGuiDidMouseJustGoUp() {
-		return Input::Ref().IsMouseButtonReleased(IMGUI_MOUSE_PRESS_BTN);
+		return Input::Ref().IsMouseButtonUp(IMGUI_MOUSE_PRESS_BTN);
 	}
 
 	inline bool ImGuiIsWidgetActive(int id) {
-		return ImGuiWorkingWindow() && id == ImGuiState().ActiveWidgetID;
+		return ImGuiIsWindowActive() && (id == ImGuiState().ActiveWidgetID);
 	}
 
 	inline Vec2i ImGuiGetScrollBarDimenOffset(StrongHandle<ImGuiWindow> & window) {
@@ -1210,6 +1216,128 @@ namespace prev {
 		barGraph.Draw(ToVec2(pos));
 
 		MoveDrawPosNextLine(dimen);
+	}
+
+	void ImGui::CubicSpline2D(StrongHandle<prev::CubicSpline2D> spline, Vec2 minPos, Vec2 maxPos, Vec2i dimen /*= Vec2i(300)*/) {
+		if (ImGuiIsMinimized()) return;
+		const int id = ImGuiGenWidgetId();
+
+		const Vec2i pos = ImGuiState().DrawPos;
+		const Vec2 posf = ToVec2(pos);
+		const Vec2 dimenf = ToVec2(dimen);
+		const bool isMouseOverWidget = ImGuiMouseOver(pos, dimen);
+
+		// drop box
+		ImGuiColor(Vec3(0.2f, 0.2f, 0.2f), 0.8f);
+		ImGuiDrawRect(pos, dimen);
+		ImGuiColor(Vec3(1.0f, 1.0f, 1.0f), isMouseOverWidget ? 1.0f : 0.6f);
+		ImGuiDrawRectWire(pos, dimen);
+
+		// calculate relative mouse pos, in spline space
+		const Vec2 mousePos = ToVec2(ImGuiGetMousePos());
+		Vec2 mouseAlpha = (mousePos - posf + Vec2(0.0f, dimenf.y)) / (dimenf);
+		mouseAlpha = Saturate(mouseAlpha);
+		float newX = Lerp(minPos.x, maxPos.x, mouseAlpha.x);
+		float newY = Lerp(minPos.y, maxPos.y, mouseAlpha.y);
+		const Vec2 mousePosSpline = Vec2(newX, newY);
+
+		// draw grid
+		int numLines = 9;
+		ImGuiColor(COLOR_WHITE, 0.1f);
+		const Vec2i boxMinPos = pos + Vec2i(0, -dimen.y);
+		const Vec2i boxMaxPos = boxMinPos + dimen;
+		for (int i = 0; i <= numLines + 1; ++i) {
+			float alpha = (float)i / (numLines + 1);
+
+			int x = Lerp(boxMinPos.x, boxMaxPos.x, alpha);
+			int y = Lerp(boxMinPos.y, boxMaxPos.y, alpha);
+
+			ImGuiDrawLine(Vec2i(x, boxMinPos.y), Vec2i(x, boxMaxPos.y));
+			ImGuiDrawLine(Vec2i(boxMinPos.x, y), Vec2i(boxMaxPos.x, y));
+		}
+
+		// draw curve
+		ImGuiColor(COLOR_WHITE, 0.3f);
+		const int numCurvePts = 128;
+		const float deltaT = 1.0f / numCurvePts;
+		for (int i = 0; i < numCurvePts - 1; ++i) {
+			float t0 = deltaT * i;
+			float t1 = deltaT * (i + 1);
+			const Vec2 pt0 = spline->CalculatePositionAt(t0);
+			const Vec2 pt1 = spline->CalculatePositionAt(t1);
+
+			// position in the widget
+			const Vec2 alpha0 = (pt0 - minPos) / (maxPos - minPos);
+			const Vec2 alpha1 = (pt1 - minPos) / (maxPos - minPos);
+			const Vec2 relPos0 = posf + dimenf * alpha0 - Vec2(0, dimenf.y);
+			const Vec2 relPos1 = posf + dimenf * alpha1 - Vec2(0, dimenf.y);
+
+			ImGuiDrawLine(ToVec2i(relPos0), ToVec2i(relPos1));
+		}
+
+		// draw control points
+		const int numControlPts = spline->NumControlPoints();
+		const int ptSize = 14;
+		int & selectedPtIndex = ImGuiState().Data.I;
+		int mouseOverPtIndex = -1;
+		for (int i = 0; i < numControlPts; ++i) {
+			const Vec2 pt = spline->GetControlPoint(i);
+			const Vec2 alpha = (pt - minPos) / (maxPos - minPos);
+			const Vec2 relPos = posf + dimenf * alpha - Vec2(0, dimenf.y);
+
+			const Vec2i ptPos = ToVec2i(relPos) + Vec2i(-ptSize >> 1, +ptSize >> 1);
+			const Vec2i ptDimen = Vec2i(ptSize);
+
+			bool isMouseOverPt = ImGuiMouseOver(ptPos, ptDimen);
+			mouseOverPtIndex = ImGuiIsWidgetActive(id) ? selectedPtIndex : mouseOverPtIndex != -1 ? mouseOverPtIndex : isMouseOverPt ? i : -1;
+
+			// draw box border around control pt
+			if (isMouseOverWidget) {
+				// select color
+				if (ImGuiIsWidgetActive(id) && selectedPtIndex == i) {
+					ImGuiColor(Vec3(1.0f, 1.0f, 1.0f));
+				} else if (isMouseOverPt) {
+					ImGuiColor(Vec3(1.0f, 0.7f, 0.0f));
+				} else {
+					ImGuiColor(Vec3(1.0f, 0.0f, 0.0f));
+				}
+
+				ImGuiDrawRectWire(ptPos, ptDimen);
+
+			}
+
+			ImGuiColor(Vec3(1.0f, 1.0f, 1.0f));
+			ImGuiDrawPoint(ToVec2i(relPos), 2.0f);
+
+			// handle mouse active
+			if (ImGuiIsWidgetActive(id)) {
+				// released
+				if (ImGuiDidMouseJustGoUp()) {
+					ImGuiSetActiveWidgetId(ImGuiManager::State::WIDGET_NULL);
+				} else if (i == selectedPtIndex) {
+					spline->SetControlPoint(i, mousePosSpline);
+				}
+			} else if (isMouseOverPt && ImGuiDidMouseJustGoDown()) // click down
+			{
+				ImGuiSetActiveWidgetId(id);
+				ImGuiState().Data.I = i;
+			}
+		}
+		MoveDrawPosNextLine(dimen);
+
+		char buffer[64];
+		ImGuiColor(COLOR_WHITE);
+
+		if (mouseOverPtIndex != -1) {
+			const Vec2 ptPos = spline->GetControlPoint(mouseOverPtIndex);
+
+			sprintf(buffer, "(%.3f, %.3f)", ptPos.x, ptPos.y);
+			ImGuiPrint(buffer, ImGuiGetMousePos() + Vec2i(-ImGui::FONT_WIDTH * 5, ImGui::FONT_HEIGHT * 2));
+		} else if (isMouseOverWidget) {
+			sprintf(buffer, "(%.3f, %.3f)", mousePosSpline.x, mousePosSpline.y);
+			ImGuiPrint(buffer, ImGuiGetMousePos() + Vec2i(-ImGui::FONT_WIDTH * 5, ImGui::FONT_HEIGHT * 2));
+			ImGuiDrawPoint(ImGuiGetMousePos(), 4.0f);
+		}
 	}
 
 	void ImGui::MoveDrawPosBy(Vec2i dimen) {
