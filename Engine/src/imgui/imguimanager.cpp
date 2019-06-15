@@ -239,7 +239,10 @@ namespace prev {
 		ActiveWindow = nullptr;
 		WorkingWindow = nullptr;
 
-		std::memset(&Data, 0, sizeof(Data));
+		Data.FVec[0] = 0.0f;
+		Data.FVec[1] = 0.0f;
+		Data.FVec[2] = 0.0f;
+		Data.FVec[3] = 0.0f;
 
 		ActiveWidgetID = WIDGET_NULL;
 		WidgetCount = 0;

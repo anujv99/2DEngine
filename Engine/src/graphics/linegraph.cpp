@@ -28,7 +28,6 @@ namespace prev {
 
 		ImmediateGFX & imm = ImmediateGFX::Ref();
 		imm.Color(1.0f, 1.0f, 0.0f);
-		//RenderState::Ref().SetLineWidth(1.0f);
 
 		ScissorBox sb;
 		sb.Left = minPos.x;
@@ -86,6 +85,8 @@ namespace prev {
 		imm.DrawRect(minPos, dimen);
 
 		imm.Color(Vec3(1.0f), 0.1f);
+		imm.PolygonBegin(PV_PRIM_LINELIST);
+
 		int numLines = 3;
 		for (int i = 0; i <= numLines + 1; ++i) {
 			float alpha = (float)i / (numLines + 1);
@@ -93,9 +94,13 @@ namespace prev {
 			float x = Lerp(minPos.x, maxPos.x, alpha);
 			float y = Lerp(minPos.y, maxPos.y, alpha);
 
-			imm.DrawLine(Vec2(x, minPos.y), Vec2(x, maxPos.y));
-			imm.DrawLine(Vec2(minPos.x, y), Vec2(maxPos.x, y));
+			imm.Vertex(Vec2(x, minPos.y));
+			imm.Vertex(Vec2(x, maxPos.y));
+			imm.Vertex(Vec2(minPos.x, y));
+			imm.Vertex(Vec2(maxPos.x, y));
 		}
+
+		imm.PolygonEnd();
 
 		imm.EndDraw();
 	}

@@ -13,7 +13,7 @@ namespace prev {
 
 	static const float TEXT_DIVISOR					= 16;
 
-	Font::Font() : m_IsInitialized(false), m_BufferIndex(0u), m_FontSize(0u) {}
+	Font::Font() : m_IsInitialized(false), m_BufferIndex(0u), m_FontSize(0u), m_CapitalLetterHeight(0.0f) {}
 
 	void Font::Init(const std::string & fileName, float fontSize, StrongHandle<VertexShader> vertexShader) {
 		if (m_IsInitialized) {
@@ -34,7 +34,6 @@ namespace prev {
 		}
 
 		std::string secondFile;
-		bool fileRead = false;
 
 		if (fileName.find(".png") != std::string::npos) {
 			secondFile = fileName.substr(0, fileName.find_last_of(".")) + ".fnt";
@@ -44,7 +43,7 @@ namespace prev {
 				return;
 			}
 			
-			fileRead = ReadFiles(fileName, secondFile);
+			ReadFiles(fileName, secondFile);
 		} else if (fileName.find(".fnt") != std::string::npos) {
 			secondFile = fileName.substr(0, fileName.find_last_of(".")) + ".png";
 
@@ -53,7 +52,7 @@ namespace prev {
 				return;
 			}
 
-			fileRead = ReadFiles(secondFile, fileName);
+			ReadFiles(secondFile, fileName);
 		} else {
 			LOG_ERROR("Unable to determine second file for font : " + fileName);
 			return;

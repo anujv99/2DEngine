@@ -14,6 +14,9 @@ namespace prev {
 		friend class Application;
 		friend class Singleton<Input>;
 	public:
+		static const char KEY_BACKSPACE = '\b';
+		static const char KEY_RETURN = '\r';
+	public:
 		bool IsKeyDown(unsigned short keyCode);
 		bool IsKeyPressed(unsigned short keyCode);
 		bool IsKeyUp(unsigned short keyCode);

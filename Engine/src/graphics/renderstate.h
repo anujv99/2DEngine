@@ -2,10 +2,12 @@
 
 #include "window.h"
 #include "viewport.h"
-#include "vertexshader.h"
-#include "pixelshader.h"
+#include "uniform.h"
+#include "math/mvp.h"
 
 namespace prev {
+
+	static const unsigned int RESERVED_MVP_UNIFORM_SLOT = 0;
 
 	enum PrimitiveTopology {
 		PV_PRIM_POINTLIST,
@@ -36,8 +38,14 @@ namespace prev {
 	class RenderState : public Singleton<RenderState> {
 		friend class Singleton<RenderState>;
 	protected:
-		RenderState() {}
+		RenderState() {
+			m_Uniform = Uniform::CreateUniform();
+			m_Uniform->Init(&MVP::Ref().Get(), sizeof(Mat4), RESERVED_MVP_UNIFORM_SLOT, VERTEX_SHADER);
+			m_Uniform->Bind();
+		}
 		virtual ~RenderState() {}
+	public:
+		StrongHandle<Uniform> & GetMVPUniform() { return m_Uniform; }
 	public:
 		//Primitive Topology
 		virtual void SetPrimitiveTopology(PrimitiveTopology prim) = 0;
@@ -51,11 +59,7 @@ namespace prev {
 		virtual ScissorBox GetScissorBox() = 0;
 		virtual void DisableScissors() = 0;
 	private:
-		friend PixelShader;
-		friend VertexShader;
-
-		StrongHandle<VertexShader> m_BoundVertexShader;
-		StrongHandle<PixelShader> m_BoundPixelShader;
+		StrongHandle<Uniform> m_Uniform;
 	private:
 		static RenderState * CreateRenderState();
 	protected:

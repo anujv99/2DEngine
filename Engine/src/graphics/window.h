@@ -34,7 +34,7 @@ namespace prev {
 	public:
 		DisplayMode GetDisplayMode() const { return m_DisplayMode; }
 		inline bool IsWindowReady() const { return m_IsWindowReady; }
-	protected:
+	public:
 		virtual void PollEvents() = 0;
 		virtual uintptr_t GetWindowRawPointer() = 0;
 	protected:

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "bindable.h"
-#include "uniform.h"
 
 namespace prev {
 
@@ -31,7 +30,6 @@ namespace prev {
 		static StrongHandle<VertexShader> CreateVertexShader(const std::string & shaderName);
 	private:
 		std::string m_ShaderName;
-		StrongHandle<Uniform> m_MVPUniform;
 	};
 
 }

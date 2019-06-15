@@ -5,7 +5,7 @@
 
 namespace prev {
 
-	const char * ReadFile(const std::string & fileName, unsigned int * fileSize /*= nullptr*/, bool isBinary /*= false*/) {
+	std::string ReadFile(const std::string & fileName, bool isBinary /*= false*/) {
 		std::ifstream inFile;
 		if (isBinary)
 			inFile.open(fileName, std::ios::binary | std::ios::app);
@@ -14,22 +14,16 @@ namespace prev {
 
 		if (!inFile) {
 			LOG_ERROR("Unable to open file : " + fileName);
-			return nullptr;
+			return "";
 		}
 
-		inFile.seekg(0, std::ios::end);
-		size_t size = (size_t)inFile.tellg();
-		inFile.seekg(0, std::ios::beg);
+		std::stringstream sstr;
 
-		char * data = new char[size + 1];
-		inFile.read(data, size);
+		sstr << inFile.rdbuf();
+
 		inFile.close();
 
-		data[size] = '\0';
-
-		if (fileSize) * fileSize = size;
-
-		return data;
+		return sstr.str();
 	}
 
 	bool FileExists(const std::string & fileName) {

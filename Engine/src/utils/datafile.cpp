@@ -5,26 +5,24 @@
 
 namespace prev {
 
-	DataFile::DataFile() : m_Data(nullptr), m_NumBytes(0u) {}
+	DataFile::DataFile() : m_Data("") {}
 
 	DataFile::~DataFile() {
 		Release();
 	}
 
 	void DataFile::Load(const std::string & fileName, bool isBinary /*= false*/) {
-		if (m_Data) Release();
+		if (m_Data.size() > 0) Release();
 
-		m_Data = (char *)ReadFile(fileName, &m_NumBytes, isBinary);
-		if (m_Data == nullptr)
+		m_Data = ReadFile(fileName, isBinary);
+		if (m_Data.size() == 0)
 			return;
 
 		m_Ext = GetFileExt(fileName);
 	}
 
 	void DataFile::Release() {
-		delete[] m_Data;
-		m_Data = nullptr;
-		m_NumBytes = 0u;
+		m_Data.clear();
 	}
 
 }

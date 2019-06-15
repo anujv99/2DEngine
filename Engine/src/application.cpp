@@ -22,19 +22,23 @@
 #include "graphics/linegraph.h"
 #include "imgui/imguimanager.h"
 #include "imgui/imgui.h"
+#include "graphics/bargraph.h"
 
 #include "math/mat4.h"
 
 namespace prev {
 
 	LineGraph lineGraph(0.0f, 50.0f);
+	BarGraph graph(0.0, 10.0);
 
 	Application::Application() {
 		Timer::FPSCounter(true);
 		EventHandler::CreateInst();
 
 		auto dis = GraphicsContext::GetDisplayModes();
-		Window::CreateInst(dis[5]);
+		unsigned int selectedDis = 0;
+		dis[selectedDis].SetWindowStyle(WindowStyle::BORDERLESS);
+		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
 		Input::CreateInst();
@@ -48,9 +52,14 @@ namespace prev {
 
 		ImGuiManager::CreateInst();
 
-		Mat4 projection = Ortho(0, 1280, 0, 720, -150, 150);
+		Mat4 projection = Ortho(0, dis[selectedDis].GetWindowSize().x, 0, dis[selectedDis].GetWindowSize().y, -150, 150);
 		MVP::Ref().Projection().Push();
 		MVP::Ref().Projection().Load(projection);
+
+		float arr[] = { 0, 1, 2, 3, 4, 5, 6 };
+		for (unsigned int i = 0; i < std::size(arr); i++) {
+			graph.PushValue(arr[i]);
+		}
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -87,13 +96,15 @@ namespace prev {
 			ImGuiManager::Ref().PreUpdate();
 			ImGuiManager::Ref().DetectConsumeInputs();
 
-			static bool ispressed = false;
+			static bool rip = false;
 			static float radius = 1.0f;
 			static int high = -1;
 
 			lineGraph.PushValue(Timer::GetDeltaTime() * 1000.0f);
 
-			ImmediateGFX::Ref().Color(0.5, 0.1, 0.8, 1);
+			static Vec4 color(0.5, 0.1, 0.8, 1.0f);
+
+			ImmediateGFX::Ref().Color(color);
 			ImmediateGFX::Ref().DrawRectRounded(Vec2(500, 300), Vec2(100, 100), 1.0f);
 
 			ImGui::Begin("Retarded Window");
@@ -107,11 +118,25 @@ namespace prev {
 
 			ImGui::Print("Hello World What are you doing");
 
-			float arr[] = {0, 1, 2, 3, 4, 5, 6, radius, 1, 3};
+			ImGui::CheckBox("Press to see bobs", rip);
 
-			ImGui::BarGraph(arr, 10, 0, 10, high);
+			if (rip)
+				ImGui::BarGraph(graph);
+
+			ImGui::Separator();
+
+			ImGui::SliderRGBA("BBC", color);
+
+			ImGui::Separator();
+
+			ImGui::FillBarInt("Hello Swift", color.x * 10, 0, 10);
+
+			ImGui::ColorBlockRGBA("", color);
 
 			ImGui::End();
+
+			graph.SetValueToHighlight(high);
+			graph.SetValue(radius, 3);
 
 			ImGuiManager::Ref().PostUpdate();
 

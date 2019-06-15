@@ -161,6 +161,10 @@ namespace prev {
 		ImGuiManager::Get()->SetActiveWidgetId(id);
 	}
 
+	inline bool ImGuiDidKeyJustGoDown(unsigned short keyCode) {
+		return Input::Ref().IsKeyPressed(keyCode);
+	}
+
 	inline bool ImGuiDidMouseJustGoDown() {
 		return Input::Ref().IsMouseButtonPressed(IMGUI_MOUSE_PRESS_BTN);
 	}
@@ -197,10 +201,8 @@ namespace prev {
 		if (ImGuiMouseOver(window->Position, dimen)) {
 			bgAlpha = ALPHA_HOVER;
 
-			StrongHandle<ImGuiWindow> & prevActiveWindow = ImGuiState().ActiveWindow;
-
 			if (!window->AutoSize) {
-				const int scrollDelta = MOUSEWHEEL_SCROLL_DELTA;
+				//const int scrollDelta = MOUSEWHEEL_SCROLL_DELTA;
 				LOG_ERROR("WINDOW SCROLL NOT IMLEMENTED");
 			}
 		}
@@ -216,6 +218,18 @@ namespace prev {
 			ImGuiDrawRectRoundedBot(window->Position - Vec2i(0, ImGui::TITLE_BAR_HEIGHT), window->Dimension - Vec2i(0, ImGui::TITLE_BAR_HEIGHT), ROUNDED_RADIUS);
 		}
 
+	}
+
+	void ImGuiFillBar(float percent) {
+		Vec2i pos = ImGuiState().DrawPos;
+		Vec2i dimen = Vec2i(FILLBAR_WIDTH, FILLBAR_HEIGHT);
+
+		ImGuiColor(COLOR_BAR);
+		ImGuiDrawRect(pos, dimen);
+		ImGuiColor(COLOR_BLACK, 0.5f);
+		ImGuiDrawRectWire(pos, dimen);
+		ImGuiColor(COLOR_FILLBAR);
+		ImGuiDrawRect(pos, Vec2i((int)(dimen.x * Saturate(percent)), dimen.y));
 	}
 
 	ButtonState ImGuiButton(const std::string & name, int padding = BUTTON_INSIDE_PADDING) {
@@ -239,10 +253,8 @@ namespace prev {
 			result = BUTTON_HOVER;
 
 			// mouse goes down on button
-			if (ImGuiDidMouseJustGoDown()) {
-				if (ImGuiIsWindowActive()) {
-					ImGuiSetActiveWidgetId(id);
-				}
+			if (ImGuiDidMouseJustGoDown() && ImGuiIsWindowActive()) {
+				ImGuiSetActiveWidgetId(id);
 			}
 			
 
@@ -628,9 +640,6 @@ namespace prev {
 		int translateY = window->ScrollPos.y;
 		ImGuiState().ScrollOffset = -Vec2i(translateX, translateY);
 
-		if (ImGuiState().ScrollOffset != Vec2i(0, 0))
-			int a = 0;
-
 		if (!begin)
 			MVP::Ref().Model().Pop();
 		MVP::Ref().Model().Push();
@@ -859,11 +868,12 @@ namespace prev {
 	}
 
 	void ImGui::Minimize() {
-
+		StrongHandle<ImGuiWindow> window = ImGuiWorkingWindow();
+		if (window->IsNewWindow) { window->Minimized = true; }
 	}
 
-	void ImGui::IsMinimized() {
-
+	bool ImGui::IsMinimized() {
+		return ImGuiWorkingWindow()->Minimized;
 	}
 
 	bool ImGui::Button(const std::string & name) {
@@ -871,39 +881,77 @@ namespace prev {
 	}
 
 	bool ImGui::ButtonDown(const std::string & name) {
-		return false;
+		return ImGuiButton(name) == BUTTON_DOWN;
 	}
 
 	bool ImGui::ButtonHover(const std::string & name) {
-		return false;
+		return ImGuiButton(name) == BUTTON_HOVER;
 	}
 
 	bool ImGui::ButtonNoPadding(const std::string & name) {
-		return false;
+		return ImGuiButton(name, 0) == BUTTON_PRESS;
 	}
 
 	bool ImGui::ButtonDownNoPadding(const std::string & name) {
-		return false;
+		return ImGuiButton(name, 0) == BUTTON_DOWN;
 	}
 
 	bool ImGui::ButtonHoverNoPadding(const std::string & name) {
-		return false;
+		return ImGuiButton(name, 0) == BUTTON_HOVER;
 	}
 
 	bool ImGui::CheckBox(const std::string & name, bool & val) {
-		return false;
+		if (ImGuiIsMinimized()) return val;
+
+		if (ImGuiButton(val ? "X" : " ", 2) == BUTTON_PRESS) {
+			val = !val;
+		}
+
+		SameLine();
+		Print(name);
+
+		return val;
 	}
 
-	int ImGui::Select(const std::string names[], int & val, int numChoices) {
-		return 0;
+	int ImGui::Select(const std::string names[], int & val, unsigned int numChoices) {
+		if (ImGuiIsMinimized()) return val;
+
+		for (unsigned int i = 0; i < numChoices; i++) {
+			if (ImGuiButton(i == val ? "*" : " ", 2) == BUTTON_PRESS) {
+				val = i;
+			}
+			SameLine();
+			Print(names[i]);
+		}
+
+		return val;
 	}
 
 	int ImGui::SelectCustom(const std::string names[], int values[], int & val, int numChoices) {
-		return 0;
+		if (ImGuiIsMinimized()) return val;
+
+		for (unsigned int i = 0; i < numChoices; i++) {
+			if (ImGuiButton(i == val ? "*" : " ", 2) == BUTTON_PRESS) {
+				val = values[i];
+			}
+			SameLine();
+			Print(names[i]);
+		}
+
+		return val;
 	}
 
 	int ImGui::DropDown(const std::string & name, bool & val) {
-		return 0;
+		if (ImGuiIsMinimized()) return val;
+
+		if (ImGuiButton(val ? " - " : " + ", 2) == BUTTON_PRESS) {
+			val = !val;
+		}
+
+		SameLine();
+		Print(name);
+
+		return val;
 	}
 
 	float ImGui::SliderFloat(const std::string & name, float & val, float min, float max) {
@@ -937,6 +985,200 @@ namespace prev {
 		return val;
 	}
 
+	Vec2 ImGui::SliderVec2(const std::string & name, Vec2 & val, Vec2 min, Vec2 max) {
+		if (ImGuiIsMinimized()) return val;
+		ImGuiGenWidgetId();
+
+		Print(name);
+
+		SliderFloat("", val.x, min.x, max.x);
+		SliderFloat("", val.y, min.y, max.y);
+
+		return val;
+	}
+
+	Vec2i ImGui::SliderVec2i(const std::string & name, Vec2i & val, Vec2i min, Vec2i max) {
+		if (ImGuiIsMinimized()) return val;
+		ImGuiGenWidgetId();
+
+		Print(name);
+
+		SliderInt("", val.x, min.x, max.x);
+		SliderInt("", val.y, min.y, max.y);
+
+		return val;
+	}
+
+	Vec3 ImGui::SliderVec3(const std::string & name, Vec3 & val, Vec3 min, Vec3 max) {
+		if (ImGuiIsMinimized()) return val;
+		ImGuiGenWidgetId();
+
+		Print(name);
+
+		SliderFloat("", val.x, min.x, max.x);
+		SliderFloat("", val.y, min.y, max.y);
+		SliderFloat("", val.z, min.z, max.z);
+
+		return val;
+	}
+
+	Vec3 ImGui::SliderRGB(const std::string & name, Vec3 & val) {
+		if (ImGuiIsMinimized()) return val;
+		ImGuiGenWidgetId();
+
+		Print(name);
+
+		// draw color block
+		SameLine();
+		Vec2i pos = ImGuiState().DrawPos;
+		Vec2i dimen = Vec2i(ImGui::FONT_HEIGHT * 2, ImGui::FONT_HEIGHT);
+		ImGuiColor(val);
+		ImGuiDrawRect(pos, dimen);
+		ImGuiColor(COLOR_BLACK);
+		ImGuiDrawRectWire(pos, dimen);
+		MoveDrawPosNextLine(dimen);
+
+		const Vec3 min(0.0f);
+		const Vec3 max(1.0f);
+
+		SliderFloat("", val.x, min.x, max.x);
+		SliderFloat("", val.y, min.y, max.y);
+		SliderFloat("", val.z, min.z, max.z);
+
+		return val;
+	}
+
+	prev::Vec4 ImGui::SliderRGBA(const std::string & name, Vec4 & val) {
+		if (ImGuiIsMinimized()) return val;
+		ImGuiGenWidgetId();
+
+		Print(name);
+
+		// draw color block
+		SameLine();
+		Vec2i pos = ImGuiState().DrawPos;
+		Vec2i dimen = Vec2i(ImGui::FONT_HEIGHT * 4, ImGui::FONT_HEIGHT * 2);
+		ImGuiColor(val.xyz(), val.w);
+		ImGuiDrawRect(pos, dimen);
+		ImGuiColor(COLOR_BLACK);
+		ImGuiDrawRectWire(pos, dimen);
+		MoveDrawPosNextLine(dimen);
+
+		const Vec4 min(0.0f);
+		const Vec4 max(1.0f);
+
+		SliderFloat("", val.x, min.x, max.x);
+		SliderFloat("", val.y, min.y, max.y);
+		SliderFloat("", val.z, min.z, max.z);
+		SliderFloat("", val.w, min.w, max.w);
+
+		return val;
+	}
+
+	void ImGui::FillBarFloat(const std::string & name, float val, float min, float max) {
+		if (ImGuiIsMinimized()) return;
+
+		// title
+		ImGui::Print(name);
+
+		// bar
+		float percent = (float)(val - min) / (max - min);
+		ImGuiFillBar(percent);
+
+		Vec2i pos = ImGuiState().DrawPos;
+		Vec2i dimen = Vec2i(FILLBAR_WIDTH, FILLBAR_HEIGHT);
+
+		// text on top
+		ImGuiColor(COLOR_WHITE);
+		ImGuiPrint(std::to_string(val), pos + Vec2i(FILLBAR_TEXT_BUFFER, -FILLBAR_TEXT_BUFFER));
+
+		MoveDrawPosNextLine(dimen);
+	}
+
+	void ImGui::FillBarInt(const std::string & name, int val, int min, int max) {
+		if (ImGuiIsMinimized()) return;
+
+		// title
+		ImGui::Print(name);
+
+		// bar
+		float percent = (float)(val - min) / (max - min);
+		ImGuiFillBar(percent);
+
+		Vec2i pos = ImGuiState().DrawPos;
+		Vec2i dimen = Vec2i(FILLBAR_WIDTH, FILLBAR_HEIGHT);
+
+		// text on top
+		ImGuiColor(COLOR_WHITE);
+		ImGuiPrint(std::to_string(val), pos + Vec2i(FILLBAR_TEXT_BUFFER, -FILLBAR_TEXT_BUFFER));
+
+		MoveDrawPosNextLine(dimen);
+	}
+
+	void ImGui::FillBarVec2(const std::string & name, Vec2 val, Vec2 min, Vec2 max) {
+		if (ImGuiIsMinimized()) return;
+
+		ImGui::Print(name);
+		ImGui::FillBarFloat("", val.x, min.x, max.x);
+		ImGui::FillBarFloat("", val.y, min.y, max.y);
+	}
+
+	void ImGui::FillBarVec2i(const std::string & name, Vec2i val, Vec2i min, Vec2i max) {
+		if (ImGuiIsMinimized()) return;
+
+		ImGui::Print(name);
+		ImGui::FillBarInt("", val.x, min.x, max.x);
+		ImGui::FillBarInt("", val.y, min.y, max.y);
+	}
+
+	void ImGui::FillBarVec3(const std::string & name, Vec3 val, Vec3 min, Vec3 max) {
+		if (ImGuiIsMinimized()) return;
+
+		ImGui::Print(name);
+		ImGui::FillBarFloat("", val.x, min.x, max.x);
+		ImGui::FillBarFloat("", val.y, min.y, max.y);
+		ImGui::FillBarFloat("", val.z, min.z, max.z);
+	}
+
+	void ImGui::FillBarVec4(const std::string & name, Vec4 val, Vec4 min, Vec4 max) {
+		if (ImGuiIsMinimized()) return;
+
+		ImGui::Print(name);
+		ImGui::FillBarFloat("", val.x, min.x, max.x);
+		ImGui::FillBarFloat("", val.y, min.y, max.y);
+		ImGui::FillBarFloat("", val.w, min.w, max.w);
+	}
+
+	void ImGui::ColorBlockRGB(const std::string & name, Vec3 val, Vec2i dimen /*= Vec2i(64)*/) {
+		if (ImGuiIsMinimized()) return;
+
+		if (name.size() > 0)
+			ImGui::Print(name);
+
+		// draw block
+		Vec2i pos = ImGuiState().DrawPos;
+		ImGuiColor(val);
+		ImGuiDrawRect(pos, dimen);
+		MoveDrawPosNextLine(dimen);
+	}
+
+	void ImGui::ColorBlockRGBA(const std::string & name, Vec4 val, Vec2i dimen /*= Vec2i(64)*/) {
+		if (ImGuiIsMinimized()) return;
+
+		if (name.size() > 0)
+			ImGui::Print(name);
+
+		// draw block
+		Vec2i pos = ImGuiState().DrawPos;
+		ImGuiColor(val.xyz(), val.w);
+		ImGuiDrawRect(pos, dimen);
+		MoveDrawPosNextLine(dimen);
+	}
+
+	int ImGui::TextInput(const std::string & name, std::string & buffer, int width) {
+		return 0;
+	}
+
 	void ImGui::Print(const std::string & text) {
 		if (ImGuiIsMinimized() || text.size() == 0) return;
 
@@ -944,10 +1186,6 @@ namespace prev {
 		ImGuiColor(COLOR_WHITE);
 		ImGuiPrint(text, ImGuiState().DrawPos);
 		MoveDrawPosNextLine(Vec2i(textWidth, ImGui::FONT_HEIGHT));
-	}
-
-	void ImGui::PrintParagraph(const std::string & text) {
-		
 	}
 
 	void ImGui::LineGraph(prev::LineGraph & lineGraph) {
@@ -962,55 +1200,14 @@ namespace prev {
 		MoveDrawPosNextLine(dimen);
 	}
 
-	void ImGui::BarGraph(float * data, int num_bins, float minVal /*= 0.0f*/, float maxVal /*= 1.0f*/, int hightlightBinIndex /*= -1*/) {
+	void ImGui::BarGraph(prev::BarGraph & barGraph) {
 		if (ImGuiIsMinimized()) return;
 
 		const Vec2i pos = ImGuiState().DrawPos;
-		int drawAreaWidth = ImGuiWorkingWindow()->Dimension.x;
-		const Vec2i dimen = Vec2i(250, 150);
+		const Vec2i dimen = barGraph.GetDimension();
 
-		const float inv_range = 1.0f / (maxVal - minVal);
-		float deltaX = dimen.x / (float)num_bins;
-
-		// draw background
-		ImGuiColor(Vec3(1.0f), 0.035f);
-		ImGuiDrawRect(pos, dimen);
-		ImGuiColor(Vec3(1.0f), 0.1f);
-		ImGuiDrawRectWire(pos, dimen);
-
-		// background grid lines
-		const int num_lines = 3;
-		const int deltaXLines = dimen.x >> 2;
-		const int deltaYLines = dimen.y >> 2;
-		for (int i = 1; i <= num_lines; ++i) {
-			const int offsetX = deltaXLines * i;
-			const int offsetY = -deltaYLines * i;
-			ImGuiDrawLine(pos + Vec2i(0, offsetY), pos + Vec2i(dimen.x, offsetY));
-			ImGuiDrawLine(pos + Vec2i(offsetX, 0), pos + Vec2i(offsetX, -dimen.y));
-		}
-
-		// draw bars
-		for (int i = 0; i < num_bins; ++i) {
-			float currVal = data[i];
-			float percent = Saturate((currVal - minVal) * inv_range);
-
-			float x0 = (float)pos.x + deltaX * i;
-			float x1 = x0 + deltaX;
-			float y0 = (float)pos.y - dimen.y;
-			float y1 = y0 + percent * dimen.y;
-
-			Vec2 barPos = Vec2(x0, y1);
-			Vec2 barDimen = Vec2(x1 - x0, y1 - y0);
-
-			ImGuiColor(Vec3(0.0f, 0.8f, 0.9f), 0.4f);
-			if (i == hightlightBinIndex) {
-				ImGuiColor(Vec3(1.0f), 0.1f);
-				ImGuiDrawRectWire(ToVec2i(barPos + Vec2(0, dimen.y - barDimen.y)), ToVec2i(Vec2(barDimen.x, dimen.y)));
-				ImGuiColor(Vec3(1.0f, 1.0f, 0.0f), 0.6f);
-			}
-
-			ImGuiDrawRect(ToVec2i(barPos) + Vec2i(1, 0), ToVec2i(barDimen) - Vec2i(1, 0));
-		}
+		barGraph.DrawBackground(ToVec2(pos));
+		barGraph.Draw(ToVec2(pos));
 
 		MoveDrawPosNextLine(dimen);
 	}
