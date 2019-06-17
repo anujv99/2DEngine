@@ -12,8 +12,10 @@ workspace "2DEngine"
 
     IncludeDirs = {}
     IncludeDirs["spdlog"] = "Engine/vendor/spdlog/include"
+	IncludeDirs["gmscript"] = "Engine/vendor/gmscript/gmsrc/src"
 
     include "Engine/vendor/spdlog"
+    include "Engine/vendor/gmscript"
 
     project "Engine"
         location "Engine"
@@ -33,11 +35,13 @@ workspace "2DEngine"
         links {
             "d3d11.lib",
             "dxgi.lib",
-            "d3dcompiler.lib"
+            "d3dcompiler.lib",
+            "gmscript"
         }
 
         includedirs {
             "%{IncludeDirs.spdlog}",
+            "%{IncludeDirs.gmscript}",
 			"%{prj.name}/src",
 			"%{prj.name}"
         }
@@ -105,4 +109,4 @@ workspace "2DEngine"
 	    filter "configurations:Distribute"
             defines {"ENGINE_DIST"}
             runtime "Release"
-		    optimize "On"
+			optimize "On"
