@@ -1,39 +1,46 @@
 #include "pch.h"
 #include "layerstack.h"
 
+#include "imgui/imguilayer.h"
+
 namespace prev {
 
 	LayerStack::LayerStack() {}
 
 	LayerStack::~LayerStack() {
-		for (Layer * layer : m_Layers)
-			delete layer;
-		for (Layer * layer : m_Overlays)
-			delete layer;
+		m_Layers.clear();
+		m_Overlays.clear();
 	}
 
-	void LayerStack::PushLayer(StrongHandle<Layer> layer) {
+	void LayerStack::PushLayer(Layer * layer) {
 		m_Layers.push_back(layer);
 		layer->OnAttach();
+
+		if (m_ImGuiLayer == nullptr && layer->GetName() == IMGUI_LAYER_NAME) {
+			m_ImGuiLayer = layer;
+		} else if (m_ImGuiLayer != nullptr) {
+			ImGuiLayer * guiLayer = dynamic_cast<ImGuiLayer *>(m_ImGuiLayer);
+			guiLayer->BindGuiFunction(std::bind(&Layer::OnImGuiUpdate, layer));
+		}
 	}
 
-	void LayerStack::PushOverlay(StrongHandle<Layer> layer) {
+	void LayerStack::PushOverlay(Layer * layer) {
 		m_Overlays.push_back(layer);
 		layer->OnAttach();
 	}
 
-	void LayerStack::PopLayer(StrongHandle<Layer> layer) {
+	void LayerStack::PopLayer(Layer * layer) {
 		for (int i = 0; i < m_Layers.size(); i++) {
-			if (m_Layers[i] == layer) {
+			if (m_Layers[i].Get() == layer) {
 				m_Layers.erase(m_Layers.begin() + i);
 				layer->OnDetach();
 			}
 		}
 	}
 
-	void LayerStack::PopOverlay(StrongHandle<Layer> layer) {
+	void LayerStack::PopOverlay(Layer * layer) {
 		for (int i = 0; i < m_Overlays.size(); i++) {
-			if (m_Overlays[i] == layer) {
+			if (m_Overlays[i].Get() == layer) {
 				m_Overlays.erase(m_Overlays.begin() + i);
 				layer->OnDetach();
 			}
@@ -65,13 +72,8 @@ namespace prev {
 	}
 
 	void LayerStack::OnImGuiUpdate() {
-		for (auto layer : m_Layers) {
-			layer->OnImGuiUpdate();
-		}
-
-		for (auto layer : m_Overlays) {
-			layer->OnImGuiUpdate();
-		}
+		if (m_ImGuiLayer)
+			m_ImGuiLayer->OnImGuiUpdate();
 	}
 
 }

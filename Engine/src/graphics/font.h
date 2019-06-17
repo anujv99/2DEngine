@@ -26,8 +26,6 @@ namespace prev {
 
 		float GetCharacterWidth(char c);
 		float GetCharacterHeight(char c);
-
-		void SetFontSize(float fontSize) { m_FontSize = fontSize; }
 	private:
 		void InitVertexBuffer(StrongHandle<VertexShader> vertexShader);
 		bool ReadFiles(const std::string & imageFile, const std::string & fontFile);

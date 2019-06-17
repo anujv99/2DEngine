@@ -11,8 +11,6 @@ namespace prev {
 	static const unsigned int MAX_STRING_LENGTH		= 4096;
 	static const unsigned int MAX_NUM_VERTICES		= MAX_STRING_LENGTH * MAX_VERTEX_PER_CHAR;
 
-	static const float TEXT_DIVISOR					= 16;
-
 	Font::Font() : m_IsInitialized(false), m_BufferIndex(0u), m_FontSize(0u), m_CapitalLetterHeight(0.0f) {}
 
 	void Font::Init(const std::string & fileName, float fontSize, StrongHandle<VertexShader> vertexShader) {
@@ -96,7 +94,7 @@ namespace prev {
 			int id = (int)text[i];
 
 			if (text[i] == ' ') {
-				cursorPos.x += (m_CharacterPositions[id].z * m_FontSize) / TEXT_DIVISOR;
+				cursorPos.x += (m_CharacterPositions[id].z);
 				continue;
 			}
 
@@ -112,14 +110,15 @@ namespace prev {
 			};
 
 			Vec2 charOffset = m_CharacterPositions[id].xy();
-			if (charOffset.y + charSize.y > m_CapitalLetterHeight) {
+			if (std::abs(charOffset.y + charSize.y > m_CapitalLetterHeight)) {
 				charOffset.y = m_CapitalLetterHeight - (charOffset.y + charSize.y);
 			} else {
 				charOffset.y = 0;
 			}
 
-			charOffset *= m_FontSize / TEXT_DIVISOR;
-			charSize *= m_FontSize / TEXT_DIVISOR;
+			if (text[i] == '-') {
+				charOffset.y += 3;
+			}
 
 			Vec2 pos[4] = {
 				cursorPos + charOffset + Vec2(0, charSize.y),					// BOTTOM LEFT
@@ -128,7 +127,7 @@ namespace prev {
 				cursorPos + charOffset,											// TOP LEFT
 			};
 
-			cursorPos.x += (m_CharacterPositions[id].z * m_FontSize) / TEXT_DIVISOR;
+			cursorPos.x += (m_CharacterPositions[id].z);
 
 			m_CharacterBuffer[vertex + 0].Position = pos[0];
 			m_CharacterBuffer[vertex + 1].Position = pos[1];
@@ -157,11 +156,11 @@ namespace prev {
 	}
 
 	float Font::GetCharacterWidth(char c) {
-		return (m_CharacterUV[(int)c].z * m_FontSize) / TEXT_DIVISOR;
+		return m_FontSize;
 	}
 
 	float Font::GetCharacterHeight(char c) {
-		return (m_CharacterUV[(int)c].w * m_FontSize) / TEXT_DIVISOR;
+		return (m_CharacterUV[(int)c].w);
 	}
 
 	void Font::InitVertexBuffer(StrongHandle<VertexShader> vertexShader) {
@@ -181,7 +180,7 @@ namespace prev {
 
 		m_FontSampler = Sampler2D::CreateSampler2D();
 		Sampler2DDesc s2d;
-		s2d.Filtering = PV_TEXTURE_FILTER_NEAREST;
+		s2d.Filtering = PV_TEXTURE_FILTER_DEFAULT;
 		s2d.Wrapping = PV_TEXTURE_WRAP_DEFAULT;
 		m_FontSampler->Init(s2d);
 

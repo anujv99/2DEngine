@@ -8,13 +8,13 @@
 namespace prev {
 
 	const int DEAD_WINDOW_NUM_FRAMES = 100000;
-
+	
 	ImGuiManager::ImGuiManager() {
-		
+
 		m_VertexShader = ShaderManager::Ref().LoadVertexShaderFromFile("FONT_DEFAULT_SHADER", "../Engine/res/shaders/fontDefaultVertex.hlsl");
 		m_PixelShader = ShaderManager::Ref().LoadPixelShaderFromFile("FONT_DEFAULT_SHADER", "../Engine/res/shaders/fontDefaultPixel.hlsl");
 
-		m_Font.Init("../Engine/res/font/coolville.png", 2.8f, m_VertexShader);
+		m_Font.Init("../Engine/res/font/consolas.png", 8, m_VertexShader);
 
 		ImGui::FONT_WIDTH = m_Font.GetCharacterWidth('M');
 		ImGui::FONT_HEIGHT = m_Font.GetCharacterHeight('M');
@@ -79,15 +79,9 @@ namespace prev {
 	}
 
 	int ImGuiManager::GetWindowOrderIndex(const std::string & name) const {
-		uint32_t hash = HashString(name);
-		const auto it = m_WindowMap.find(hash);
-		if (it == m_WindowMap.end()) return -1;
-
 		for (size_t i = 0; i < m_VisibleWindows.size(); i++) {
-			const auto window = m_VisibleWindows[i];
-
-			if (window == it->second) {
-				return (int)i;
+			if (m_VisibleWindows[i]->Name == name) {
+				return i;
 			}
 		}
 
@@ -102,8 +96,12 @@ namespace prev {
 				for (size_t j = i; j >= 1; j--) {
 					m_VisibleWindows[j] = m_VisibleWindows[j - 1];
 				}
+
+				break;
 			}
 		}
+
+		m_VisibleWindows[0] = window;
 	}
 
 	bool ImGuiManager::IsPosInWindow(Vec2i pos, StrongHandle<ImGuiWindow> window) const {

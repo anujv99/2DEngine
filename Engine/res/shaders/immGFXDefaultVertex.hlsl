@@ -1,5 +1,5 @@
 
-cbuffer MVP {
+cbuffer MVP : register(b0) {
 	matrix <float, 4, 4> projection;
 };
 

@@ -89,7 +89,7 @@ namespace prev {
 	}
 
 	void D3DContext::EndFrame() {
-		m_SwapChain->Present(1u, 0u);
+		m_SwapChain->Present(0u, 0u);
 	}
 
 	DXGI_MODE_DESC D3DContext::GetDisplayModeDesc(const DisplayMode & displayMode) {
@@ -217,7 +217,7 @@ namespace prev {
 		D3D11_DEPTH_STENCIL_DESC dsd;
 		ZeroMemory(&dsd, sizeof(dsd));
 
-		dsd.DepthEnable						= TRUE;
+		dsd.DepthEnable						= FALSE;
 		dsd.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
 		dsd.DepthFunc						= D3D11_COMPARISON_LESS_EQUAL;
 		dsd.StencilEnable					= FALSE;

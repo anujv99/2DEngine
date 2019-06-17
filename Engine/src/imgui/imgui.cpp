@@ -20,7 +20,7 @@ namespace prev {
 	const int WIDGET_PADDING							= 4;
 	const int WINDOW_INSIDE_PADDING						= 6;
 	const int TITLE_BAR_PADDING							= 7;
-	const int FONT_Y_OFFSET								= 8;
+	const int FONT_Y_OFFSET								= 10;
 	int ImGui::TITLE_BAR_HEIGHT							= ImGui::FONT_HEIGHT + TITLE_BAR_PADDING * 2;
 
 	const int SCROLL_BAR_SIZE							= 15;
@@ -78,6 +78,10 @@ namespace prev {
 
 	inline Vec2i ImGuiGetMousePos() {
 		return Input::Ref().GetMousePosition();
+	}
+
+	inline int ImGuiGetWindowOrder(const std::string & name) {
+		return ImGuiManager::Ref().GetWindowOrderIndex(name);
 	}
 
 	inline void ImGuiColor(Vec3 color, float alpha = 1.0f) {
@@ -638,7 +642,7 @@ namespace prev {
 		return percent;
 	}
 
-	void ImGuiRefreshScrollOffset(bool begin = false) {
+	void ImGuiRefreshScrollOffset() {
 		StrongHandle<ImGuiWindow> window = ImGuiWorkingWindow();
 
 		// figure out translation offset
@@ -646,8 +650,6 @@ namespace prev {
 		int translateY = window->ScrollPos.y;
 		ImGuiState().ScrollOffset = -Vec2i(translateX, translateY);
 
-		if (!begin)
-			MVP::Ref().Model().Pop();
 		MVP::Ref().Model().Push();
 		MVP::Ref().Model().Translate(Vec2((float)translateX, (float)translateY));
 	}
@@ -745,7 +747,7 @@ namespace prev {
 		
 		RenderState::Ref().SetScissorBox(box);
 
-		ImGuiRefreshScrollOffset(true);
+		ImGuiRefreshScrollOffset();
 
 		// where the mouse can interact
 		ImGuiState().MouseRegionStart = window->Position - Vec2i(0, ImGui::TITLE_BAR_HEIGHT);
@@ -819,7 +821,13 @@ namespace prev {
 		ImGuiState().DrawPos.y -= HEADER_TOP_PADDING;
 
 		Vec2i pos = ImGuiState().DrawPos;
-		Vec2i dimen = Vec2i(ImGuiWorkingWindow()->Dimension.x, HEADER_HEIGHT);
+
+		int xSize = ImGuiWorkingWindow()->Dimension.x;
+		if (xSize < ImGuiTextWidth(name)) {
+			xSize = ImGuiTextWidth(name);
+		}
+
+		Vec2i dimen = Vec2i(xSize, HEADER_HEIGHT);
 
 		//const v3 HEADER_COLOR = v3(0.1f, 0.25f, 0.29f );
 		ImGuiColor(COLOR_BAR_HOVER, ImGuiIsWindowActive() ? 1.0f : 0.7f);

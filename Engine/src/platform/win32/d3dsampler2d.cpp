@@ -28,6 +28,7 @@ namespace prev {
 		sd.AddressU			= GetTextureAdressMode(samplerDesc.Wrapping);
 		sd.AddressV			= GetTextureAdressMode(samplerDesc.Wrapping);
 		sd.AddressW			= GetTextureAdressMode(samplerDesc.Wrapping);
+		sd.MaxAnisotropy = 16;
 
 		HRESULT hr = GetDevice()->CreateSamplerState(&sd, m_SamplerState.GetAddressOf());
 		if (FAILED(hr)) {
@@ -40,7 +41,7 @@ namespace prev {
 
 	D3D11_FILTER D3DSampler2D::GetTextureFilter(TextureFilterType filerType) {
 		switch (filerType) {
-		case prev::PV_TEXTURE_FILTER_DEFAULT: return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		case prev::PV_TEXTURE_FILTER_DEFAULT: return D3D11_FILTER_MAXIMUM_ANISOTROPIC;
 		case prev::PV_TEXTURE_FILTER_NEAREST: return D3D11_FILTER_MIN_MAG_MIP_POINT;
 		default: return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		}

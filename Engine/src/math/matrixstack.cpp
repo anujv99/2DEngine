@@ -42,12 +42,12 @@ namespace prev {
 
 	void MatrixStack::Translate(const Vec2 & position) {
 		m_DirtyFlag = true;
-		Get() = prev::Translate(Identity(), position);
+		Get() *= prev::Translate(Identity(), position);
 	}
 
 	void MatrixStack::Translate(const Vec3 & position) {
 		m_DirtyFlag = true;
-		Get() = prev::Translate(Get(), position);
+		Get() *= prev::Translate(Identity(), position);
 	}
 
 	void MatrixStack::Rotate(const float angle, const Vec3 & axis) {

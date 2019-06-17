@@ -15,6 +15,7 @@ namespace prev {
 	public:
 		static void Update();
 		static float GetTime();
+		static float GetTimeMs();
 		static float GetDeltaTime();
 		static void FPSCounter(bool isVisible);
 		inline static bool IsLoggingFPSCounter() {return s_ShouldShowFPS; }

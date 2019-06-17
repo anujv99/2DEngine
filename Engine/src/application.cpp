@@ -9,22 +9,15 @@
 
 #include "graphics/renderstate.h"
 
-#include "graphics/uniform.h"
-#include "graphics/vertexlayout.h"
-#include "graphics/pixelshader.h"
-#include "graphics/vertexbufferbuilder.h"
 #include "graphics/immediategfx.h"
 #include "graphics/shadermanager.h"
 #include "math/mvp.h"
-#include "graphics/texture2d.h"
-#include "graphics/sampler2d.h"
-#include "graphics/font.h"
-#include "graphics/linegraph.h"
-#include "graphics/bargraph.h"
 #include "imgui/imguilayer.h"
 #include "imgui/Imgui.h"
 
 #include "math/mat4.h"
+
+#include "common/profiler.h"
 
 namespace prev {
 
@@ -44,10 +37,15 @@ namespace prev {
 		RenderState::CreateInst();
 		ShaderManager::CreateInst();
 		ImmediateGFX::CreateInst();
-		ImGuiLayer::CreateInst();
+		Profiler::CreateInst();
+		LayerStack::CreateInst();
+		//ImGui Layer
+		//LayerStack::Ref().PushLayer(new ImGuiLayer());
 
+		Profiler::Ref().PushGUILayer(); // Because profiler depends on imgui layer
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
+
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -56,7 +54,8 @@ namespace prev {
 	Application::~Application() {
 		MVP::Ref().Projection().Pop();
 
-		ImGuiLayer::DestroyInst();
+		Profiler::DestroyInst();
+		LayerStack::DestroyInst();
 		ImmediateGFX::DestroyInst();
 		ShaderManager::DestroyInst();
 		RenderState::DestroyInst();
@@ -70,38 +69,42 @@ namespace prev {
 	void Application::Run() {
 		srand(Timer::GetTime());
 
-		LineGraph lg(0.0f, 50.0f);
 		while (m_ApplicationRunning) {
-			Timer::Update();
+			PROFILER_ROOT_BEGIN;
 
-			Window::Ref().PollEvents();
+			Timer::Update();
 
 			GraphicsContext::Ref().BeginFrame();
 
+			LayerStack::Ref().OnUpdate();
+
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
-			m_LayerStack.OnUpdate();
-
-			ImGuiLayer::Ref().StartFrame();
-
-			m_LayerStack.OnImGuiUpdate();
-
-			ImGuiLayer::Ref().EndFrame();
+			PROFILER_BEGIN("App::Gui");
+			Gui();
+			PROFILER_END("App::Gui");
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
 			GraphicsContext::Ref().EndFrame();
 
+			Window::Ref().PollEvents();
 			Input::Ref().Update();
 			EventHandler::Ref().FlushEventQueue();
+
+			PROFILER_ROOT_END;
 		}
+	}
+
+	void Application::Gui() {
+		LayerStack::Ref().OnImGuiUpdate();
 	}
 
 	void Application::OnEvent(Event & e) {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::WindowClosed));
 
-		m_LayerStack.OnEvent(e);
+		LayerStack::Ref().OnEvent(e);
 	}
 
 	bool Application::WindowClosed(WindowCloseEvent & e) {

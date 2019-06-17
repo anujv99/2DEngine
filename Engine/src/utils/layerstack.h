@@ -4,15 +4,16 @@
 
 namespace prev {
 
-	class LayerStack {
-	public:
+	class LayerStack : public Singleton<LayerStack> {
+		friend class Singleton<LayerStack>;
+	private:
 		LayerStack();
 		~LayerStack();
-
-		void PushLayer(StrongHandle<Layer> layer);
-		void PushOverlay(StrongHandle<Layer> layer);
-		void PopLayer(StrongHandle<Layer> layer);
-		void PopOverlay(StrongHandle<Layer> layer);
+	public:
+		void PushLayer(Layer * layer);
+		void PushOverlay(Layer * layer);
+		void PopLayer(Layer * layer);
+		void PopOverlay(Layer * layer);
 
 	public:
 		void OnUpdate();
@@ -21,6 +22,8 @@ namespace prev {
 	private:
 		std::vector<StrongHandle<Layer>> m_Layers;
 		std::vector<StrongHandle<Layer>> m_Overlays;
+
+		Layer * m_ImGuiLayer = nullptr;
 	};
 
 }

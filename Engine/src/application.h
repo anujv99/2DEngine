@@ -11,11 +11,12 @@ namespace prev {
 
 		void Run();
 	private:
+		void Gui();
+	private:
 		void OnEvent(Event & e);
 		bool WindowClosed(WindowCloseEvent & e);
 	private:
 		bool m_ApplicationRunning = true;
-		LayerStack m_LayerStack;
 	};
 
 }
