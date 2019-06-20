@@ -1,9 +1,8 @@
-#define LOG_DETAILED
-#include "prev.h"
+#include "pch.h"
+
+#include "application.h"
 
 using namespace prev;
-
-#include <iostream>
 
 int main() {
 	//_CrtSetBreakAlloc(382);

@@ -40,7 +40,7 @@ namespace prev {
 		Profiler::CreateInst();
 		LayerStack::CreateInst();
 		//ImGui Layer
-		//LayerStack::Ref().PushLayer(new ImGuiLayer());
+		LayerStack::Ref().PushLayer(new ImGuiLayer());
 
 		Profiler::Ref().PushGUILayer(); // Because profiler depends on imgui layer
 
