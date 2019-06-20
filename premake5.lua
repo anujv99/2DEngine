@@ -46,11 +46,6 @@ workspace "2DEngine"
 			"USER_ENGINE",
 			"LOG_DETAILED",
 			--"LOG_DISABLED",
-			"WIN32",
-		}
-		
-		undefines {
-			"UNICODE"
 		}
 		
         pchsource "%{prj.name}/src/pch.cpp"

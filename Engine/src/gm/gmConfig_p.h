@@ -39,7 +39,7 @@
   #define GM_LITTLE_ENDIAN      0
   #define GM_DEFAULT_ALLOC_ALIGNMENT 4
 #endif //_XBOX
-#if defined(WIN32)
+#if defined(_WIN32)
   #define GM_LITTLE_ENDIAN      1
   #if defined(_M_X64) // 64bit target
     #define GM_DEFAULT_ALLOC_ALIGNMENT 16
@@ -111,7 +111,6 @@
 #define GM_MAX_PATH           256
 
 // basic types (compatibility and fixed size)
-typedef const char * LPCTSTR;
 typedef char gmint8;
 typedef unsigned char gmuint8;
 typedef short gmint16;

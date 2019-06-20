@@ -131,6 +131,10 @@ public:
   inline void PushNull();
   inline void PushInt(gmint a_value);
   inline void PushFloat(gmfloat a_value);
+  inline void PushVec4(prev::Vec4 a_value);
+  inline void PushVec3(prev::Vec3 a_value);
+  inline void PushVec2(prev::Vec2 a_value);
+  inline void PushVec2i(prev::Vec2i a_value);
   inline void PushString(gmStringObject * a_string);
   inline void PushTable(gmTableObject * a_table);
   inline void PushFunction(gmFunctionObject * a_function);
@@ -148,7 +152,15 @@ public:
   inline gmint ParamInt(int a_param, gmint a_default = 0) const;
   inline bool ParamInt(int a_param, gmint& a_value, gmint a_default = 0) const;
   inline gmfloat ParamFloat(int a_param, gmfloat a_default = 0.0f) const;
-  inline bool ParamFloat(int a_param, gmfloat& a_value, gmfloat a_default = 0.0f) const;
+  inline bool ParamFloat(int a_param, gmfloat & a_value, gmfloat a_default = 0.0f) const;
+  inline gmvec4 ParamVec4(int a_param, prev::Vec4 a_default = prev::Vec4(0.0f)) const;
+  inline bool ParamVec4(int a_param, prev::Vec4 & a_value, prev::Vec4 a_default = prev::Vec4(0.0f)) const;
+  inline gmvec3 ParamVec3(int a_param, prev::Vec3 a_default = prev::Vec3(0.0f)) const;
+  inline bool ParamVec3(int a_param, prev::Vec3 & a_value, prev::Vec3 a_default = prev::Vec3(0.0f)) const;
+  inline gmvec2 ParamVec2(int a_param, prev::Vec2 a_default = prev::Vec2(0.0f)) const;
+  inline bool ParamVec2(int a_param, prev::Vec2 & a_value, prev::Vec2 a_default = prev::Vec2(0.0f)) const;
+  inline gmvec2i ParamVec2i(int a_param, prev::Vec2i a_default = prev::Vec2i(0)) const;
+  inline bool ParamVec2i(int a_param, prev::Vec2i & a_value, prev::Vec2i a_default = prev::Vec2i(0)) const;
   inline gmfloat ParamFloatOrInt(int a_param, gmfloat a_default = 0.0f) const;
   inline bool ParamFloatOrInt(int a_param, gmfloat& a_value, gmfloat a_default = 0.0f) const;
   inline const char * ParamString(int a_param, const char * a_default = "") const;
@@ -177,6 +189,10 @@ public:
 
   inline gmptr ThisInt(gmptr a_default = 0);
   inline gmfloat ThisFloat(gmfloat a_default = 0.0f);
+  inline gmvec4 ThisVec4();
+  inline gmvec3 ThisVec3();
+  inline gmvec2 ThisVec2();
+  inline gmvec2i ThisVec2i();
   inline const char * ThisString(const char * a_default = "");
   inline gmTableObject * ThisTable();
   inline gmFunctionObject * ThisFunction();
@@ -290,6 +306,34 @@ inline void gmThread::PushFloat(gmfloat a_value)
 }
 
 
+inline void gmThread::PushVec4(prev::Vec4 a_value)
+{
+  m_stack[m_top].m_type = GM_VEC4;
+  m_stack[m_top++].m_value.m_vec4 = a_value.gmv;
+}
+
+
+inline void gmThread::PushVec3(prev::Vec3 a_value)
+{
+  m_stack[m_top].m_type = GM_VEC3;
+  m_stack[m_top++].m_value.m_vec3 = a_value.gmv;
+}
+
+
+inline void gmThread::PushVec2(prev::Vec2 a_value)
+{
+  m_stack[m_top].m_type = GM_VEC2;
+  m_stack[m_top++].m_value.m_vec2 = a_value.gmv;
+}
+
+
+inline void gmThread::PushVec2i(prev::Vec2i a_value)
+{
+  m_stack[m_top].m_type = GM_VEC2I;
+  m_stack[m_top++].m_value.m_vec2i = a_value.gmv;
+}
+
+
 inline void gmThread::PushString(gmStringObject * a_string)
 {
   m_stack[m_top].m_type = GM_STRING;
@@ -370,7 +414,6 @@ inline bool gmThread::ParamInt(int a_param, gmint& a_value, gmint a_default) con
   return false;
 }
 
-
 inline gmfloat gmThread::ParamFloat(int a_param, gmfloat a_default) const
 {
   if(a_param >= m_numParameters) return a_default;
@@ -393,6 +436,110 @@ inline bool gmThread::ParamFloat(int a_param, gmfloat& a_value, gmfloat a_defaul
   {
     a_value = var->m_value.m_float;
     return true;
+  }
+  // Invalid
+  a_value = a_default;
+  return false;
+}
+
+inline gmvec4 gmThread::ParamVec4(int a_param, prev::Vec4 a_default /* = prev::Vec4(0.0f) */) const
+{
+  if (a_param >= m_numParameters) return a_default.gmv;
+  gmVariable * var = m_stack + m_base + a_param;
+  if (var->m_type == GM_VEC4) return var->m_value.m_vec4;
+  return a_default.gmv;
+}
+
+inline bool gmThread::ParamVec4(int a_param, prev::Vec4 & a_value, prev::Vec4 a_default /* = prev::Vec4(0.0f) */) const
+{
+  // Out of range
+  if (a_param >= m_numParameters) {
+  	a_value = a_default;
+  	return true;
+  }
+  // Valid
+  gmVariable * var = m_stack + m_base + a_param;
+  if (var->m_type == GM_VEC4) {
+  	a_value = var->m_value.m_vec4;
+  	return true;
+  }
+  // Invalid
+  a_value = a_default;
+  return false;
+}
+
+inline gmvec3 gmThread::ParamVec3(int a_param, prev::Vec3 a_default /* = prev::Vec3(0.0f) */) const
+{
+  if (a_param >= m_numParameters) return a_default.gmv;
+  gmVariable * var = m_stack + m_base + a_param;
+  if (var->m_type == GM_VEC3) return var->m_value.m_vec3;
+  return a_default.gmv;
+}
+
+inline bool gmThread::ParamVec3(int a_param, prev::Vec3 & a_value, prev::Vec3 a_default /* = prev::Vec3(0.0f) */) const
+{
+  // Out of range
+  if (a_param >= m_numParameters) {
+  	a_value = a_default;
+  	return true;
+  }
+  // Valid
+  gmVariable * var = m_stack + m_base + a_param;
+  if (var->m_type == GM_VEC3) {
+  	a_value = var->m_value.m_vec3;
+  	return true;
+  }
+  // Invalid
+  a_value = a_default;
+  return false;
+}
+
+inline gmvec2 gmThread::ParamVec2(int a_param, prev::Vec2 a_default /* = prev::Vec2(0.0f) */) const
+{
+  if (a_param >= m_numParameters) return a_default.gmv;
+  gmVariable * var = m_stack + m_base + a_param;
+  if (var->m_type == GM_VEC2) return var->m_value.m_vec2;
+  return a_default.gmv;
+}
+
+inline bool gmThread::ParamVec2(int a_param, prev::Vec2 & a_value, prev::Vec2 a_default /* = prev::Vec2(0.0f) */) const
+{
+  // Out of range
+  if (a_param >= m_numParameters) {
+  	a_value = a_default;
+  	return true;
+  }
+  // Valid
+  gmVariable * var = m_stack + m_base + a_param;
+  if (var->m_type == GM_VEC2) {
+  	a_value = var->m_value.m_vec2;
+  	return true;
+  }
+  // Invalid
+  a_value = a_default;
+  return false;
+}
+
+inline gmvec2i gmThread::ParamVec2i(int a_param, prev::Vec2i a_default /* = prev::Vec2i(0) */) const
+{
+  if (a_param >= m_numParameters) return a_default.gmv;
+  gmVariable * var = m_stack + m_base + a_param;
+  if (var->m_type == GM_VEC2I) return var->m_value.m_vec2i;
+  return a_default.gmv;
+}
+
+inline bool gmThread::ParamVec2i(int a_param, prev::Vec2i & a_value, prev::Vec2i a_default /* = prev::Vec2i(0) */) const
+{
+  // Out of range
+  if (a_param >= m_numParameters) {
+  	a_value = a_default;
+  	return true;
+  }
+  // Valid
+  gmVariable * var = m_stack + m_base + a_param;
+  if (var->m_type == GM_VEC2I) {
+  	a_value = var->m_value.m_vec2i;
+  	return true;
   }
   // Invalid
   a_value = a_default;
@@ -714,6 +861,46 @@ inline gmfloat gmThread::ThisFloat(gmfloat a_default)
 }
 
 
+inline gmvec4 gmThread::ThisVec4()
+{
+  const gmvec4 defaultVal = { 0.0f, 0.0f, 0.0f, 0.0f };
+  
+  const gmVariable * var = GetThis();
+  if (var->m_type == GM_VEC4) return var->m_value.m_vec4;
+  return defaultVal;
+}
+
+
+inline gmvec3 gmThread::ThisVec3()
+{
+  const gmvec3 defaultVal = { 0.0f, 0.0f, 0.0f };
+  
+  const gmVariable * var = GetThis();
+  if (var->m_type == GM_VEC3) return var->m_value.m_vec3;
+  return defaultVal;
+}
+
+
+inline gmvec2 gmThread::ThisVec2()
+{
+  const gmvec2 defaultVal = { 0.0f, 0.0f };
+  
+  const gmVariable * var = GetThis();
+  if (var->m_type == GM_VEC2) return var->m_value.m_vec2;
+  return defaultVal;
+}
+
+
+inline gmvec2i gmThread::ThisVec2i()
+{
+  const gmvec2i defaultVal = { 0, 0 };
+  
+  const gmVariable * var = GetThis();
+  if (var->m_type == GM_VEC2I) return var->m_value.m_vec2i;
+  return defaultVal;
+}
+
+
 inline const char * gmThread::ThisString(const char * a_default)
 {
   const gmVariable * var = GetThis();
@@ -817,6 +1004,10 @@ inline gmUserObject * gmThread::ThisUserObject()
 #if 1 // These macros only exception if param is present but type does not match
   #define GM_INT_PARAM(VAR, PARAM, DEFAULT) gmint VAR; if( !GM_THREAD_ARG->ParamInt((PARAM), (VAR), (DEFAULT)) ) { return GM_EXCEPTION; }
   #define GM_FLOAT_PARAM(VAR, PARAM, DEFAULT) gmfloat VAR; if( !GM_THREAD_ARG->ParamFloat((PARAM), (VAR), (DEFAULT)) )  { return GM_EXCEPTION; }
+  #define GM_VEC4_PARAM(VAR, PARAM) prev::Vec4 VAR; if (!GM_THREAD_ARG->ParamVec4((PARAM), (VAR), prev::Vec4(0.0f))) { return GM_EXCEPTION; }
+  #define GM_VEC3_PARAM(VAR, PARAM) prev::Vec3 VAR; if (!GM_THREAD_ARG->ParamVec3((PARAM), (VAR), prev::Vec3(0.0f))) { return GM_EXCEPTION; }
+  #define GM_VEC2_PARAM(VAR, PARAM) prev::Vec2 VAR; if (!GM_THREAD_ARG->ParamVec2((PARAM), (VAR), prev::Vec2(0.0f))) { return GM_EXCEPTION; }
+  #define GM_VEC2I_PARAM(VAR, PARAM) prev::Vec2i VAR; if (!GM_THREAD_ARG->ParamVec2i((PARAM), (VAR), prev::Vec2i(0.0f))) { return GM_EXCEPTION; }
   #define GM_STRING_PARAM(VAR, PARAM, DEFAULT) const char * VAR; if( !GM_THREAD_ARG->ParamString((PARAM), (VAR), (DEFAULT)) )  { return GM_EXCEPTION; }
   #define GM_FUNCTION_PARAM(VAR, PARAM) gmFunctionObject * VAR; if( !GM_THREAD_ARG->ParamFunction((PARAM), (VAR)) )  { return GM_EXCEPTION; }
   #define GM_TABLE_PARAM(VAR, PARAM) gmTableObject * VAR; if( !GM_THREAD_ARG->ParamTable((PARAM), (VAR))  )  { return GM_EXCEPTION; }
@@ -831,6 +1022,30 @@ inline gmUserObject * gmThread::ThisUserObject()
   #define GM_USER_PARAM(OBJECT, VAR, PARAM) OBJECT VAR = (OBJECT) GM_THREAD_ARG->ParamUser((PARAM));
   #define GM_FLOAT_OR_INT_PARAM(VAR, PARAM, DEFAULT) gmfloat VAR = GM_THREAD_ARG->ParamFloatOrInt((PARAM), (DEFAULT))
 #endif
+
+//
+// OPERATORS
+//
+
+#define GM_OP_STR_PTR(CHAR_PTR, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_STRING, "string");\
+									   const char * CHAR_PTR = (static_cast<gmStringObject *>(GM_OBJECT(a_operands[INDEX].m_value.m_ref)))->GetString();
+
+#define GM_OP_VEC4(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_VEC4, "vec4");\
+	                           gmvec4 & VAL = a_operands[INDEX].m_value.m_vec4;
+#define GM_OP_VEC3(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_VEC3, "vec3");\
+	                           gmvec3 & VAL = a_operands[INDEX].m_value.m_vec3;
+#define GM_OP_VEC2(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_VEC2, "vec2");\
+	                           gmvec2 & VAL = a_operands[INDEX].m_value.m_vec2;
+#define GM_OP_VEC2I(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_VEC2I, "vec2i");\
+	                            gmvec2i & VAL = a_operands[INDEX].m_value.m_vec2i;
+#define GM_OP_FLOAT(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_FLOAT, "float");\
+                                float VAL = a_operands[INDEX].m_type.m_float;
+#define GM_OP_INT(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_INT, "int");\
+                                int VAL = a_operands[INDEX].m_type.m_int;
+#define GM_OP_FLOAT_OR_INT(VAL, INDEX) float VAL = 0.0f;\
+		                               if (a_operands[INDEX].m_type == GM_INT) VAL = (float)a_operands[INDEX].m_vale.m_int;\
+									   else if (a_operands[INDEX].m_type == GM_FLOAT) VAL = a_operands[INDEX].m_vale.m_float;\
+		                               else { GM_OP_ASSERT(false, "float/int"); }
 
 //
 // EXCEPTION VERSIONS
@@ -850,6 +1065,26 @@ inline gmUserObject * gmThread::ThisUserObject()
   { GM_EXCEPTION_MSG("expecting param %d as float", (PARAM)); return GM_EXCEPTION; } \
   gmfloat VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_float;
 
+#define GM_CHECK_VEC4_PARAM(VAR, PARAM)\
+  if (GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC4)\
+  { GM_EXCEPTION_MSG("expecting param %d as Vec4", (PARAM)); return GM_EXCEPTION; } \
+  gmVec4 VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec4;
+
+#define GM_CHECK_VEC3_PARAM(VAR, PARAM)\
+  if (GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC3)\
+  { GM_EXCEPTION_MSG("expecting param %d as Vec3", (PARAM)); return GM_EXCEPTION; } \
+  gmVec3 VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec3;
+
+#define GM_CHECK_VEC2_PARAM(VAR, PARAM)\
+  if (GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC2)\
+  { GM_EXCEPTION_MSG("expecting param %d as Vec2", (PARAM)); return GM_EXCEPTION; } \
+  gmVec2 VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec2;
+
+#define GM_CHECK_VEC2I_PARAM(VAR, PARAM)\
+  if (GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC2I)\
+  { GM_EXCEPTION_MSG("expecting param %d as Vec2i", (PARAM)); return GM_EXCEPTION; } \
+  gmVec2i VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec2i;
+
 #define GM_CHECK_STRING_PARAM(VAR, PARAM) \
   if(GM_THREAD_ARG->ParamType((PARAM)) != GM_STRING) { GM_EXCEPTION_MSG("expecting param %d as string", (PARAM)); return GM_EXCEPTION; } \
   const char * VAR = (const char *) *((gmStringObject *) GM_OBJECT(GM_THREAD_ARG->ParamRef((PARAM))));
@@ -865,6 +1100,17 @@ inline gmUserObject * gmThread::ThisUserObject()
 #define GM_CHECK_USER_PARAM(OBJECT, TYPE, VAR, PARAM) \
   if(GM_THREAD_ARG->ParamType((PARAM)) != (TYPE)) { GM_EXCEPTION_MSG("expecting param %d as user type %d", (PARAM), (TYPE)); return GM_EXCEPTION; } \
   OBJECT VAR = (OBJECT) GM_THREAD_ARG->ParamUser_NoCheckTypeOrParam((PARAM));
+
+
+#define GM_IS_PARAM_VEC4(PARAM) ( GM_THREAD_ARG->Param(PARAM).m_type == GM_VEC4 )
+#define GM_IS_PARAM_VEC3(PARAM) ( GM_THREAD_ARG->Param(PARAM).m_type == GM_VEC3 )
+#define GM_IS_PARAM_VEC2(PARAM) ( GM_THREAD_ARG->Param(PARAM).m_type == GM_VEC2 )
+#define GM_IS_PARAM_VEC2I(PARAM) ( GM_THREAD_ARG->Param(PARAM).m_type == GM_VEC2I )
+#define GM_IS_PARAM_STRING(PARAM) ( GM_THREAD_ARG->Param(PARAM).m_type == GM_STRING )
+#define GM_IS_PARAM_TABLE(PARAM) ( GM_THREAD_ARG->Param(PARAM).m_type == GM_TABLE )
+#define GM_IS_PARAM_FLOAT(PARAM) ( GM_THREAD_ARG->Param(PARAM).m_type == GM_FLOAT )
+#define GM_IS_PARAM_INT(PARAM) ( GM_THREAD_ARG->Param(PARAM).m_type == GM_INT )
+
 
 #define GM_CHECK_THIS_NULL \
     if(GM_THREAD_ARG->GetThis()->m_type != GM_NULL) { GM_EXCEPTION_MSG("expecting this as null"); return GM_EXCEPTION; }
@@ -896,5 +1142,11 @@ inline gmUserObject * gmThread::ThisUserObject()
     { VAR = (gmfloat)GM_THREAD_ARG->Param((PARAM)).m_value.m_int; } \
   else \
     { GM_EXCEPTION_MSG("expecting param %d as float or int", (PARAM)); return GM_EXCEPTION; }
+
+
+#define GM_OP_ASSERT(COND, EXPECTED) do { gmOpAssert((COND), EXPECTED, a_thread, a_operands); } while(0)
+
+void gmDumpThreadCallstack(gmThread * a_thread, int steps = 16);
+void gmOpAssert(bool cond, const char * expected, gmThread * a_thread, gmVariable * a_operands);
 
 #endif // _GMTHREAD_H_

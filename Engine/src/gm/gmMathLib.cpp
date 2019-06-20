@@ -16,6 +16,7 @@
 #include "gmHelpers.h"
 #include "gmUtil.h"
 #include <math.h>
+#include "math/vecconversion.h"
 
 
 //
@@ -651,6 +652,110 @@ static int GM_CDECL gmfClamp(gmThread * a_thread)
   }
 }
 
+static int GM_CDECL gmfCreateVec4(gmThread * a_thread) {
+	int numParams = a_thread->GetNumParams();
+
+	if (numParams == 0) {
+		a_thread->PushVec4(prev::Vec4());
+	} else if (numParams == 1) {
+		if (GM_IS_PARAM_VEC4(0)) {
+			GM_VEC4_PARAM(vec, 0);
+			a_thread->PushVec4(vec);
+		} else {
+			GM_CHECK_FLOAT_OR_INT_PARAM(val, 0);
+			a_thread->PushVec4(prev::Vec4(val));
+		}
+	} else if (numParams == 4) {
+		GM_CHECK_FLOAT_OR_INT_PARAM(val0, 0);
+		GM_CHECK_FLOAT_OR_INT_PARAM(val1, 1);
+		GM_CHECK_FLOAT_OR_INT_PARAM(val2, 2);
+		GM_CHECK_FLOAT_OR_INT_PARAM(val3, 3);
+		a_thread->PushVec4(prev::Vec4(val0, val1, val2, val3));
+	} else {
+		return GM_EXCEPTION;
+	}
+
+	return GM_OK;
+}
+
+static int GM_CDECL gmfCreateVec3(gmThread * a_thread) {
+	int numParams = a_thread->GetNumParams();
+
+	if (numParams == 0) {
+		a_thread->PushVec3(prev::Vec3());
+	} else if (numParams == 1) {
+		if (GM_IS_PARAM_VEC3(0)) {
+			GM_VEC3_PARAM(vec, 0);
+			a_thread->PushVec3(vec);
+		} else {
+			GM_CHECK_FLOAT_OR_INT_PARAM(val, 0);
+			a_thread->PushVec3(prev::Vec3(val));
+		}
+	} else if (numParams == 3) {
+		GM_CHECK_FLOAT_OR_INT_PARAM(val0, 0);
+		GM_CHECK_FLOAT_OR_INT_PARAM(val1, 1);
+		GM_CHECK_FLOAT_OR_INT_PARAM(val2, 2);
+		a_thread->PushVec3(prev::Vec3(val0, val1, val2));
+	} else {
+		return GM_EXCEPTION;
+	}
+
+	return GM_OK;
+}
+
+static int GM_CDECL gmfCreateVec2(gmThread * a_thread) {
+	int numParams = a_thread->GetNumParams();
+
+	if (numParams == 0) {
+		a_thread->PushVec2(prev::Vec2());
+	} else if (numParams == 1) {
+		if (GM_IS_PARAM_VEC2(0)) {
+			GM_VEC2_PARAM(vec, 0);
+			a_thread->PushVec2(vec);
+		} else if (GM_IS_PARAM_VEC2I(0)) {
+			GM_VEC2I_PARAM(vec, 0);
+			a_thread->PushVec2(ToVec2(vec));
+		} else {
+			GM_CHECK_FLOAT_OR_INT_PARAM(val, 0);
+			a_thread->PushVec2(prev::Vec2(val));
+		}
+	} else if (numParams == 2) {
+		GM_CHECK_FLOAT_OR_INT_PARAM(val0, 0);
+		GM_CHECK_FLOAT_OR_INT_PARAM(val1, 1);
+		a_thread->PushVec2(prev::Vec2(val0, val1));
+	} else {
+		return GM_EXCEPTION;
+	}
+
+	return GM_OK;
+}
+
+static int GM_CDECL gmfCreateVec2i(gmThread * a_thread) {
+	int numParams = a_thread->GetNumParams();
+
+	if (numParams == 0) {
+		a_thread->PushVec2i(prev::Vec2i());
+	} else if (numParams == 1) {
+		if (GM_IS_PARAM_VEC2(0)) {
+			GM_VEC2_PARAM(vec, 0);
+			a_thread->PushVec2i(ToVec2i(vec));
+		} else if (GM_IS_PARAM_VEC2I(0)) {
+			GM_VEC2I_PARAM(vec, 0);
+			a_thread->PushVec2i(vec);
+		} else {
+			GM_CHECK_FLOAT_OR_INT_PARAM(val, 0);
+			a_thread->PushVec2i(prev::Vec2i(val));
+		}
+	} else if (numParams == 2) {
+		GM_CHECK_FLOAT_OR_INT_PARAM(val0, 0);
+		GM_CHECK_FLOAT_OR_INT_PARAM(val1, 1);
+		a_thread->PushVec2i(prev::Vec2i((int)val0, (int)val1));
+	} else {
+		return GM_EXCEPTION;
+	}
+
+	return GM_OK;
+}
 
 //
 // Libs and bindings
@@ -824,6 +929,12 @@ static gmFunctionEntry s_mathLib[] =
     \param int seed
   */
   {"randseed", gmfRandSeed},
+
+  {"Vec4", gmfCreateVec4},
+  {"Vec3", gmfCreateVec3},
+  {"Vec2", gmfCreateVec2},
+  {"Vec2i", gmfCreateVec2i},
+
 };
 
 

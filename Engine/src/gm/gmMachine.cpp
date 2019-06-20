@@ -1729,6 +1729,10 @@ void gmMachine::ResetDefaultTypes()
   m_types[GM_NULL].m_name = AllocPermanantStringObject("null");
   m_types[GM_INT].m_name = AllocPermanantStringObject("int");
   m_types[GM_FLOAT].m_name = AllocPermanantStringObject("float");
+  m_types[GM_VEC4].m_name = AllocPermanantStringObject("Vec4");
+  m_types[GM_VEC3].m_name = AllocPermanantStringObject("Vec3");
+  m_types[GM_VEC2].m_name = AllocPermanantStringObject("Vec2");
+  m_types[GM_VEC2I].m_name = AllocPermanantStringObject("Vec2i");
   m_types[GM_STRING].m_name = AllocPermanantStringObject("string");
   m_types[GM_TABLE].m_name = AllocPermanantStringObject("table");
   m_types[GM_FUNCTION].m_name = AllocPermanantStringObject("function");
@@ -1737,6 +1741,10 @@ void gmMachine::ResetDefaultTypes()
   gmInitBasicType(GM_NULL, m_types[GM_NULL].m_nativeOperators);
   gmInitBasicType(GM_INT, m_types[GM_INT].m_nativeOperators);
   gmInitBasicType(GM_FLOAT, m_types[GM_FLOAT].m_nativeOperators);
+  gmInitBasicType(GM_VEC4, m_types[GM_VEC4].m_nativeOperators);
+  gmInitBasicType(GM_VEC3, m_types[GM_VEC3].m_nativeOperators);
+  gmInitBasicType(GM_VEC2, m_types[GM_VEC2].m_nativeOperators);
+  gmInitBasicType(GM_VEC2I, m_types[GM_VEC2I].m_nativeOperators);
   gmInitBasicType(GM_STRING, m_types[GM_STRING].m_nativeOperators);
   gmInitBasicType(GM_TABLE, m_types[GM_TABLE].m_nativeOperators);
   gmInitBasicType(GM_FUNCTION, m_types[GM_FUNCTION].m_nativeOperators);

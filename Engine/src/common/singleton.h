@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/error.h"
+#include "common/assert.h"
 
 namespace prev {
 

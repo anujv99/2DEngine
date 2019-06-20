@@ -9,6 +9,7 @@ inline bool CheckVec4(const Vec4 & _vec) {
 
 inline Vec4::Vec4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 inline Vec4::Vec4(float _v) : x(_v), y(_v), z(_v), w(_v) {}
+inline Vec4::Vec4(gmvec4 _vec) : x(_vec.x), y(_vec.y), z(_vec.z), w(_vec.w) {}
 inline Vec4::Vec4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
 inline Vec4::Vec4(const Vec2 & _vec) : x(_vec.x), y(_vec.y), z(0.0f), w(0.0f) {}
 inline Vec4::Vec4(const Vec3 & _vec) : x(_vec.x), y(_vec.y), z(_vec.z), w(0.0f) {}

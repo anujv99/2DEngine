@@ -13,6 +13,7 @@
 #include "gmOperators.h"
 #include "gmThread.h"
 #include "gmStringObject.h"
+#include "math/vecconversion.h"
 
 
 const char * gmGetOperatorName(gmOperator a_operator)
@@ -336,6 +337,1077 @@ void GM_CDECL gmFloatOpNOT(gmThread * a_thread, gmVariable * a_operands)
 }
 
 //
+// GM_VEC4
+//
+
+void GM_CDECL gmvec4OpAdd(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC4(vec, 0);
+  prev::Vec4 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result += prev::Vec4(val);
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result += prev::Vec4(val);
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  case GM_VEC4:
+  {
+	prev::Vec4 val = a_operands[1].GetVec4();
+	result += val;
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec4OpSub(gmThread * a_thread, gmVariable * a_operands)
+{
+  
+  GM_OP_VEC4(vec, 0);
+  prev::Vec4 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result -= prev::Vec4(val);
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result -= prev::Vec4(val);
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  case GM_VEC4:
+  {
+	prev::Vec4 val = a_operands[1].GetVec4();
+	result -= val;
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec4OpMul(gmThread * a_thread, gmVariable * a_operands)
+{
+  
+  GM_OP_VEC4(vec, 0);
+  prev::Vec4 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result *= prev::Vec4(val);
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result *= prev::Vec4(val);
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  case GM_VEC4:
+  {
+	prev::Vec4 val = a_operands[1].GetVec4();
+	result *= val;
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec4OpDiv(gmThread * a_thread, gmVariable * a_operands)
+{
+
+  GM_OP_VEC4(vec, 0);
+  prev::Vec4 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result /= prev::Vec4(val);
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result /= prev::Vec4(val);
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  case GM_VEC4:
+  {
+	prev::Vec4 val = a_operands[1].GetVec4();
+	result /= val;
+	a_operands[0].SetVec4(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  } 
+
+}
+
+void GM_CDECL gmvec4OpEQ(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC4(v0, 0);
+  GM_OP_VEC4(v1, 1);
+  int res = v0.x == v1.x && v0.y == v1.y && v0.z == v1.z && v0.w == v1.w;
+  a_operands[0].SetInt(res);
+}
+
+void GM_CDECL gmvec4OpNEQ(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC4(v0, 0);
+  GM_OP_VEC4(v1, 1);
+  int res = (v0.x != v1.x) || (v0.y != v1.y) || (v0.z != v1.z) || (v0.w != v1.w);
+  a_operands[0].SetInt(res);
+}
+
+void GM_CDECL gmvec4OpNEG(gmThread * a_thread, gmVariable * a_operands)
+{
+  a_operands[0].SetVec4( -prev::Vec4(a_operands[0].m_value.m_vec4 ) );
+}
+
+void GM_CDECL gmvec4OpPOS(gmThread * a_thread, gmVariable * a_operands) 
+{
+}
+
+void GM_CDECL gmvec4GetDot(gmThread * a_thread, gmVariable * a_operands) {
+  GM_OP_VEC4(thisVal, 0);
+  GM_OP_STR_PTR(memberStr, 1);
+  
+  const int elements = strlen(memberStr);
+  
+  char members[4] = { '0', '0', '0', '0' };
+  memcpy(members, memberStr, elements);
+  
+  const float thisx = float(thisVal.x);
+  const float thisy = float(thisVal.y);
+  const float thisz = float(thisVal.z);
+  const float thisw = float(thisVal.w);
+  
+  prev::Vec4 result = prev::Vec4(0.0f);
+  
+  // NOTE: further optimized version
+  //const int map_char_to_index[4] = { 48, 49, 120, 121 }; // need to map ascii value to 0..3
+  //const float values[4] = { thisx, thisy, float( 0.0f ), float( 1.0f ), } // then read from these
+  //result.x = values[ mapping[ memberStr[0] ] ];
+  //result.y = values[ mapping[ memberStr[1] ] ];
+  //result.z = values[ mapping[ memberStr[2] ] ];
+  
+  switch (memberStr[0]) {
+  case 'x': result.x = thisx; break;
+  case 'y': result.x = thisy; break;
+  case 'z': result.x = thisz; break;
+  case 'w': result.x = thisw; break;
+  case '0': result.x = 0.0f; break;
+  case '1': result.x = 1.0f; break;
+  }
+  
+  switch (memberStr[1]) {
+  case 'x': result.y = thisx; break;
+  case 'y': result.y = thisy; break;
+  case 'z': result.y = thisz; break;
+  case 'w': result.y = thisw; break;
+  case '0': result.y = 0.0f; break;
+  case '1': result.y = 1.0f; break;
+  }
+  
+  switch (memberStr[2]) {
+  case 'x': result.z = thisx; break;
+  case 'y': result.z = thisy; break;
+  case 'z': result.z = thisz; break;
+  case 'w': result.z = thisw; break;
+  case '0': result.z = 0.0f; break;
+  case '1': result.z = 1.0f; break;
+  }
+  
+  switch (memberStr[3]) {
+  case 'x': result.w = thisx; break;
+  case 'y': result.w = thisy; break;
+  case 'z': result.w = thisz; break;
+  case 'w': result.w = thisw; break;
+  case '0': result.w = 0.0f; break;
+  case '1': result.w = 1.0f; break;
+  }
+  
+  switch (elements) {
+  case 4:
+  	a_operands[0].SetVec4(result);
+  case 3:
+  	a_operands[0].SetVec3(result.xyz());
+  	break;
+  case 2:
+  	a_operands[0].SetVec2(result.xy());
+  	break;
+  case 1:
+  	a_operands[0].SetFloat(result.x);
+  	break;
+  default:
+  	a_operands[0].Nullify();
+  	break;
+  }
+}
+
+void GM_CDECL gmvec4SetDot(gmThread * a_thread, gmVariable * a_operands) 
+{
+  a_thread->GetMachine()->GetLog().LogEntry("Vec4 is immutable because it is a stack variable, therefore you cannot use Vec4.x = a");
+  a_operands[0].Nullify();
+}
+
+//
+// GM_VEC3
+//
+
+void GM_CDECL gmvec3OpAdd(gmThread * a_thread, gmVariable * a_operands)
+{
+
+  GM_OP_VEC3(vec, 0);
+  prev::Vec3 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result += prev::Vec3(val);
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result += prev::Vec3(val);
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  case GM_VEC3:
+  {
+	prev::Vec3 val = a_operands[1].GetVec3();
+	result += val;
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec3OpSub(gmThread * a_thread, gmVariable * a_operands)
+{
+  
+  GM_OP_VEC3(vec, 0);
+  prev::Vec3 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result -= prev::Vec3(val);
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result -= prev::Vec3(val);
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  case GM_VEC3:
+  {
+	prev::Vec3 val = a_operands[1].GetVec3();
+	result -= val;
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec3OpMul(gmThread * a_thread, gmVariable * a_operands)
+{
+  
+  GM_OP_VEC3(vec, 0);
+  prev::Vec3 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result *= prev::Vec3(val);
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result *= prev::Vec3(val);
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  case GM_VEC3:
+  {
+	prev::Vec3 val = a_operands[1].GetVec3();
+	result *= val;
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec3OpDiv(gmThread * a_thread, gmVariable * a_operands)
+{
+
+  GM_OP_VEC3(vec, 0);
+  prev::Vec3 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result /= prev::Vec3(val);
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result /= prev::Vec3(val);
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  case GM_VEC3:
+  {
+	prev::Vec3 val = a_operands[1].GetVec3();
+	result /= val;
+	a_operands[0].SetVec3(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec3OpEQ(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC3(v0, 0);
+  GM_OP_VEC3(v1, 1);
+  int res = v0.x == v1.x && v0.y == v1.y && v0.z == v1.z;
+  a_operands[0].SetInt(res);
+}
+
+void GM_CDECL gmvec3OpNEQ(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC3(v0, 0);
+  GM_OP_VEC3(v1, 1);
+  int res = (v0.x != v1.x) || (v0.y != v1.y) || (v0.z != v1.z);
+  a_operands[0].SetInt(res);
+}
+
+void GM_CDECL gmvec3OpNEG(gmThread * a_thread, gmVariable * a_operands)
+{
+  a_operands[0].SetVec3( -prev::Vec3(a_operands[0].m_value.m_vec3 ) );
+}
+
+void GM_CDECL gmvec3OpPOS(gmThread * a_thread, gmVariable * a_operands) 
+{
+}
+
+void GM_CDECL gmvec3GetDot(gmThread * a_thread, gmVariable * a_operands) {
+  GM_OP_VEC3(thisVal, 0);
+  GM_OP_STR_PTR(memberStr, 1);
+  
+  const int elements = strlen(memberStr);
+  
+  char members[4] = { '0', '0', '0', '0' };
+  memcpy(members, memberStr, elements);
+  
+  const float thisx = float(thisVal.x);
+  const float thisy = float(thisVal.y);
+  const float thisz = float(thisVal.z);
+  
+  prev::Vec4 result = prev::Vec4(0.0f);
+  
+  // NOTE: further optimized version
+  //const int map_char_to_index[4] = { 48, 49, 120, 121 }; // need to map ascii value to 0..3
+  //const float values[4] = { thisx, thisy, float( 0.0f ), float( 1.0f ), } // then read from these
+  //result.x = values[ mapping[ memberStr[0] ] ];
+  //result.y = values[ mapping[ memberStr[1] ] ];
+  //result.z = values[ mapping[ memberStr[2] ] ];
+  
+  switch (memberStr[0]) {
+  case 'x': result.x = thisx; break;
+  case 'y': result.x = thisy; break;
+  case 'z': result.x = thisz; break;
+  case '0': result.x = 0.0f; break;
+  case '1': result.x = 1.0f; break;
+  }
+  
+  switch (memberStr[1]) {
+  case 'x': result.y = thisx; break;
+  case 'y': result.y = thisy; break;
+  case 'z': result.y = thisz; break;
+  case '0': result.y = 0.0f; break;
+  case '1': result.y = 1.0f; break;
+  }
+  
+  switch (memberStr[2]) {
+  case 'x': result.z = thisx; break;
+  case 'y': result.z = thisy; break;
+  case 'z': result.z = thisz; break;
+  case '0': result.z = 0.0f; break;
+  case '1': result.z = 1.0f; break;
+  }
+  
+  switch (memberStr[3]) {
+  case 'x': result.w = thisx; break;
+  case 'y': result.w = thisy; break;
+  case 'z': result.w = thisz; break;
+  case '0': result.w = 0.0f; break;
+  case '1': result.w = 1.0f; break;
+  }
+  
+  switch (elements) {
+  case 4:
+  	a_operands[0].SetVec4(result);
+  case 3:
+  	a_operands[0].SetVec3(result.xyz());
+  	break;
+  case 2:
+  	a_operands[0].SetVec2(result.xy());
+  	break;
+  case 1:
+  	a_operands[0].SetFloat(result.x);
+  	break;
+  default:
+  	a_operands[0].Nullify();
+  	break;
+  }
+}
+
+void GM_CDECL gmvec3SetDot(gmThread * a_thread, gmVariable * a_operands) 
+{
+  a_thread->GetMachine()->GetLog().LogEntry("Vec3 is immutable because it is a stack variable, therefore you cannot use Vec3.x = a");
+  a_operands[0].Nullify();
+}
+
+//
+// GM_VEC2
+//
+
+void GM_CDECL gmvec2OpAdd(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2(vec, 0);
+  prev::Vec2 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result += prev::Vec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result += prev::Vec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_VEC2:
+  {
+	prev::Vec2 val = a_operands[1].GetVec2();
+	result += val;
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_VEC2I:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result += ToVec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec2OpSub(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2(vec, 0);
+  prev::Vec2 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result -= prev::Vec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result -= prev::Vec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_VEC2:
+  {
+	prev::Vec2 val = a_operands[1].GetVec2();
+	result -= val;
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_VEC2I:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result -= ToVec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec2OpMul(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2(vec, 0);
+  prev::Vec2 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result *= prev::Vec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result *= prev::Vec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_VEC2:
+  {
+	prev::Vec2 val = a_operands[1].GetVec2();
+	result *= val;
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_VEC2I:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result *= ToVec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec2OpDiv(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2(vec, 0);
+  prev::Vec2 result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	float val = a_operands[1].GetFloat();
+	result /= prev::Vec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_INT:
+  {
+	float val = (float)a_operands[1].GetInt();
+	result /= prev::Vec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_VEC2:
+  {
+	prev::Vec2 val = a_operands[1].GetVec2();
+	result /= val;
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  case GM_VEC2I:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result /= ToVec2(val);
+	a_operands[0].SetVec2(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec2OpEQ(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2(v0, 0);
+  GM_OP_VEC2(v1, 1);
+  int res = v0.x == v1.x && v0.y == v1.y;
+  a_operands[0].SetInt(res);
+}
+
+void GM_CDECL gmvec2OpNEQ(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2(v0, 0);
+  GM_OP_VEC2(v1, 1);
+  int res = (v0.x != v1.x) || (v0.y != v1.y);
+  a_operands[0].SetInt(res);
+}
+
+void GM_CDECL gmvec2OpNEG(gmThread * a_thread, gmVariable * a_operands)
+{
+  a_operands[0].SetVec2( -prev::Vec2(a_operands[0].m_value.m_vec2 ) );
+}
+
+void GM_CDECL gmvec2OpPOS(gmThread * a_thread, gmVariable * a_operands) 
+{
+}
+
+void GM_CDECL gmvec2GetDot(gmThread * a_thread, gmVariable * a_operands) {
+  GM_OP_VEC2(thisVal, 0);
+  GM_OP_STR_PTR(memberStr, 1);
+  
+  const int elements = strlen(memberStr);
+  
+  char members[4] = { '0', '0', '0', '0' };
+  memcpy(members, memberStr, elements);
+  
+  const float thisx = float(thisVal.x);
+  const float thisy = float(thisVal.y);
+  
+  prev::Vec4 result = prev::Vec4(0.0f);
+  
+  // NOTE: further optimized version
+  //const int map_char_to_index[4] = { 48, 49, 120, 121 }; // need to map ascii value to 0..3
+  //const float values[4] = { thisx, thisy, float( 0.0f ), float( 1.0f ), } // then read from these
+  //result.x = values[ mapping[ memberStr[0] ] ];
+  //result.y = values[ mapping[ memberStr[1] ] ];
+  //result.z = values[ mapping[ memberStr[2] ] ];
+  
+  switch (memberStr[0]) {
+  case 'x': result.x = thisx; break;
+  case 'y': result.x = thisy; break;
+  case '0': result.x = 0.0f; break;
+  case '1': result.x = 1.0f; break;
+  }
+  
+  switch (memberStr[1]) {
+  case 'x': result.y = thisx; break;
+  case 'y': result.y = thisy; break;
+  case '0': result.y = 0.0f; break;
+  case '1': result.y = 1.0f; break;
+  }
+  
+  switch (memberStr[2]) {
+  case 'x': result.z = thisx; break;
+  case 'y': result.z = thisy; break;
+  case '0': result.z = 0.0f; break;
+  case '1': result.z = 1.0f; break;
+  }
+  
+  switch (memberStr[3]) {
+  case 'x': result.w = thisx; break;
+  case 'y': result.w = thisy; break;
+  case '0': result.w = 0.0f; break;
+  case '1': result.w = 1.0f; break;
+  }
+  
+  switch (elements) {
+  case 4:
+  	a_operands[0].SetVec4(result);
+  case 3:
+  	a_operands[0].SetVec3(result.xyz());
+  	break;
+  case 2:
+  	a_operands[0].SetVec2(result.xy());
+  	break;
+  case 1:
+  	a_operands[0].SetFloat(result.x);
+  	break;
+  default:
+  	a_operands[0].Nullify();
+  	break;
+  }
+}
+
+void GM_CDECL gmvec2SetDot(gmThread * a_thread, gmVariable * a_operands) 
+{
+  a_thread->GetMachine()->GetLog().LogEntry("Vec2 is immutable because it is a stack variable, therefore you cannot use Vec2.x = a");
+  a_operands[0].Nullify();
+}
+
+//
+// GM_VEC2I
+//
+
+void GM_CDECL gmvec2iOpAdd(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2I(vec, 0);
+  prev::Vec2i result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	int val = (float)a_operands[1].GetFloat();
+	result += prev::Vec2i(val);
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  case GM_INT:
+  {
+	int val = a_operands[1].GetInt();
+	result += prev::Vec2i(val);
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  case GM_VEC2:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result += val;
+	a_operands[0].SetVec2(ToVec2(result));
+	break;
+  }
+  case GM_VEC2I:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result += val;
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec2iOpSub(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2I(vec, 0);
+  prev::Vec2i result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	int val = (float)a_operands[1].GetFloat();
+	result -= prev::Vec2i(val);
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  case GM_INT:
+  {
+	int val = a_operands[1].GetInt();
+	result -= prev::Vec2i(val);
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  case GM_VEC2:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result -= val;
+	a_operands[0].SetVec2(ToVec2(result));
+	break;
+  }
+  case GM_VEC2I:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result -= val;
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec2iOpMul(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2I(vec, 0);
+  prev::Vec2i result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	int val = (float)a_operands[1].GetFloat();
+	result *= prev::Vec2i(val);
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  case GM_INT:
+  {
+	int val = a_operands[1].GetInt();
+	result *= prev::Vec2i(val);
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  case GM_VEC2:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result *= val;
+	a_operands[0].SetVec2(ToVec2(result));
+	break;
+  }
+  case GM_VEC2I:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result *= val;
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec2iOpDiv(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2I(vec, 0);
+  prev::Vec2i result = vec;
+
+  gmType type = a_operands[1].m_type;
+
+  switch (type) {
+  case GM_FLOAT:
+  {
+	int val = (float)a_operands[1].GetFloat();
+	result /= prev::Vec2i(val);
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  case GM_INT:
+  {
+	int val = a_operands[1].GetInt();
+	result /= prev::Vec2i(val);
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  case GM_VEC2I:
+  {
+	prev::Vec2i val = a_operands[1].GetVec2i();
+	result /= val;
+	a_operands[0].SetVec2i(result);
+	break;
+  }
+  default:
+  {
+	a_operands[0].Nullify();
+  }
+  }
+
+}
+
+void GM_CDECL gmvec2iOpEQ(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2I(v0, 0);
+  GM_OP_VEC2I(v1, 1);
+  int res = v0.x == v1.x && v0.y == v1.y;
+  a_operands[0].SetInt(res);
+}
+
+void GM_CDECL gmvec2iOpNEQ(gmThread * a_thread, gmVariable * a_operands)
+{
+  GM_OP_VEC2I(v0, 0);
+  GM_OP_VEC2I(v1, 1);
+  int res = (v0.x != v1.x) || (v0.y != v1.y);
+  a_operands[0].SetInt(res);
+}
+
+void GM_CDECL gmvec2iOpNEG(gmThread * a_thread, gmVariable * a_operands)
+{
+  a_operands[0].SetVec2i( -prev::Vec2i(a_operands[0].m_value.m_vec2i ) );
+}
+
+void GM_CDECL gmvec2iOpPOS(gmThread * a_thread, gmVariable * a_operands) 
+{
+}
+
+void GM_CDECL gmvec2iGetDot(gmThread * a_thread, gmVariable * a_operands) {
+  GM_OP_VEC2I(thisVal, 0);
+  GM_OP_STR_PTR(memberStr, 1);
+  
+  const int elements = strlen(memberStr);
+  
+  char members[4] = { '0', '0', '0', '0' };
+  memcpy(members, memberStr, elements);
+  
+  const float thisx = float(thisVal.x);
+  const float thisy = float(thisVal.y);
+  
+  prev::Vec4 result = prev::Vec4(0.0f);
+  
+  // NOTE: further optimized version
+  //const int map_char_to_index[4] = { 48, 49, 120, 121 }; // need to map ascii value to 0..3
+  //const float values[4] = { thisx, thisy, float( 0.0f ), float( 1.0f ), } // then read from these
+  //result.x = values[ mapping[ memberStr[0] ] ];
+  //result.y = values[ mapping[ memberStr[1] ] ];
+  //result.z = values[ mapping[ memberStr[2] ] ];
+  
+  switch (memberStr[0]) {
+  case 'x': result.x = thisx; break;
+  case 'y': result.x = thisy; break;
+  case '0': result.x = 0.0f; break;
+  case '1': result.x = 1.0f; break;
+  }
+  
+  switch (memberStr[1]) {
+  case 'x': result.y = thisx; break;
+  case 'y': result.y = thisy; break;
+  case '0': result.y = 0.0f; break;
+  case '1': result.y = 1.0f; break;
+  }
+  
+  switch (memberStr[2]) {
+  case 'x': result.z = thisx; break;
+  case 'y': result.z = thisy; break;
+  case '0': result.z = 0.0f; break;
+  case '1': result.z = 1.0f; break;
+  }
+  
+  switch (memberStr[3]) {
+  case 'x': result.w = thisx; break;
+  case 'y': result.w = thisy; break;
+  case '0': result.w = 0.0f; break;
+  case '1': result.w = 1.0f; break;
+  }
+  
+  switch (elements) {
+  case 4:
+  	a_operands[0].SetVec4(result);
+  case 3:
+  	a_operands[0].SetVec3(result.xyz());
+  	break;
+  case 2:
+  	a_operands[0].SetVec2i(ToVec2i(result.xy()));
+  	break;
+  case 1:
+  	a_operands[0].SetInt((int)result.x);
+  	break;
+  default:
+  	a_operands[0].Nullify();
+  	break;
+  }
+}
+
+void GM_CDECL gmvec2iSetDot(gmThread * a_thread, gmVariable * a_operands) 
+{
+  a_thread->GetMachine()->GetLog().LogEntry("Vec2i is immutable because it is a stack variable, therefore you cannot use Vec2i.x = a");
+  a_operands[0].Nullify();
+}
+
+//
 // GM_STRING
 //
 
@@ -587,6 +1659,58 @@ void gmInitBasicType(gmType a_type, gmOperatorFunction * a_operators)
     a_operators[O_NEG]    = gmFloatOpNEG;
     a_operators[O_POS]    = gmFloatOpPOS;
     a_operators[O_NOT]    = gmFloatOpNOT;
+  }
+  else if(a_type == GM_VEC4)
+  {
+	a_operators[O_ADD]    = gmvec4OpAdd;
+	a_operators[O_SUB]    = gmvec4OpSub;
+	a_operators[O_MUL]    = gmvec4OpMul;
+	a_operators[O_DIV]    = gmvec4OpDiv;
+	a_operators[O_EQ]     = gmvec4OpEQ;
+	a_operators[O_NEQ]    = gmvec4OpNEQ;
+	a_operators[O_NEG]    = gmvec4OpNEG;
+	a_operators[O_POS]    = gmvec4OpPOS;
+	a_operators[O_GETDOT] = gmvec4GetDot;
+	a_operators[O_SETDOT] = gmvec4SetDot;
+  }
+  else if(a_type == GM_VEC3)
+  {
+	a_operators[O_ADD]    = gmvec3OpAdd;
+	a_operators[O_SUB]    = gmvec3OpSub;
+	a_operators[O_MUL]    = gmvec3OpMul;
+	a_operators[O_DIV]    = gmvec3OpDiv;
+	a_operators[O_EQ]     = gmvec3OpEQ;
+	a_operators[O_NEQ]    = gmvec3OpNEQ;
+	a_operators[O_NEG]    = gmvec3OpNEG;
+	a_operators[O_POS]    = gmvec3OpPOS;
+	a_operators[O_GETDOT] = gmvec3GetDot;
+	a_operators[O_SETDOT] = gmvec3SetDot;
+  }
+  else if(a_type == GM_VEC2)
+  {
+	a_operators[O_ADD]    = gmvec2OpAdd;
+	a_operators[O_SUB]    = gmvec2OpSub;
+	a_operators[O_MUL]    = gmvec2OpMul;
+	a_operators[O_DIV]    = gmvec2OpDiv;
+	a_operators[O_EQ]     = gmvec2OpEQ;
+	a_operators[O_NEQ]    = gmvec2OpNEQ;
+	a_operators[O_NEG]    = gmvec2OpNEG;
+	a_operators[O_POS]    = gmvec2OpPOS;
+	a_operators[O_GETDOT] = gmvec2GetDot;
+	a_operators[O_SETDOT] = gmvec2SetDot;
+  }
+  else if(a_type == GM_VEC2I)
+  {
+	a_operators[O_ADD]    = gmvec2iOpAdd;
+	a_operators[O_SUB]    = gmvec2iOpSub;
+	a_operators[O_MUL]    = gmvec2iOpMul;
+	a_operators[O_DIV]    = gmvec2iOpDiv;
+	a_operators[O_EQ]     = gmvec2iOpEQ;
+	a_operators[O_NEQ]    = gmvec2iOpNEQ;
+	a_operators[O_NEG]    = gmvec2iOpNEG;
+	a_operators[O_POS]    = gmvec2iOpPOS;
+	a_operators[O_GETDOT] = gmvec2iGetDot;
+	a_operators[O_SETDOT] = gmvec2iSetDot;
   }
   else if(a_type == GM_STRING)
   {

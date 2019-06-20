@@ -1,0 +1,25 @@
+
+CreateDrawManager = function() {
+	
+	DrawManager = {};
+
+	DrawManager.Init = function() {
+		a = Vec4(1, 2, 3, 4);
+		b = Vec3(0, 7, 9);
+		print(b.xyy1);
+		print("Init Draw Manager");
+	};
+
+	DrawManager.Draw = function() {
+	};
+
+	DrawManager.Clear = function() {
+		print("Clear Draw Manager");
+	};
+
+	return DrawManager;
+
+};
+
+global g_DrawManager = CreateDrawManager();
+g_DrawManager.Init();

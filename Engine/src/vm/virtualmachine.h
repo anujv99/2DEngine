@@ -4,7 +4,7 @@
 
 namespace prev {
 
-	class VirtualMachine : Singleton<VirtualMachine> {
+	class VirtualMachine : public Singleton<VirtualMachine> {
 		friend Singleton<VirtualMachine>;
 	private:
 		VirtualMachine();
@@ -30,6 +30,7 @@ namespace prev {
 
 		float m_UpdateMs;
 		float m_DrawMs;
+		unsigned int m_LastCallTime;
 	};
 
 }

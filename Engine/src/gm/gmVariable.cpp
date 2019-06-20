@@ -30,12 +30,32 @@ const char * gmVariable::AsString(gmMachine * a_machine, char * a_buffer, int a_
     }
     case GM_INT :
     {
-      _gmsnprintf(a_buffer, a_len, "%lld", (gmint64)m_value.m_int);
+      _gmsnprintf(a_buffer, a_len, "%d", m_value.m_int);
       break;
     }
     case GM_FLOAT :
     {
-      _gmsnprintf(a_buffer, a_len, "%g", m_value.m_float);
+      _gmsnprintf(a_buffer, a_len, "%f", m_value.m_float);
+      break;
+    }
+	case GM_VEC4 :
+    {
+      _gmsnprintf(a_buffer, a_len, "Vec4[%.5f, %.5f, %.5f, %.5f]", m_value.m_vec4.x, m_value.m_vec4.y, m_value.m_vec4.z, m_value.m_vec4.w);
+      break;
+    }
+	case GM_VEC3 :
+    {
+      _gmsnprintf(a_buffer, a_len, "Vec3[%.5f, %.5f, %.5f]", m_value.m_vec3.x, m_value.m_vec3.y, m_value.m_vec3.z);
+      break;
+    }
+	case GM_VEC2 :
+    {
+      _gmsnprintf(a_buffer, a_len, "Vec2[%.5f, %.5f]", m_value.m_vec2.x, m_value.m_vec2.y);
+      break;
+    }
+	case GM_VEC2I :
+    {
+      _gmsnprintf(a_buffer, a_len, "Vec2[%d, %d]", m_value.m_vec2i.x, m_value.m_vec2i.y);
       break;
     }
     case GM_STRING :

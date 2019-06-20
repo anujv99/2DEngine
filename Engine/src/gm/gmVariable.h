@@ -31,6 +31,13 @@ class gmUserObject;
 /// \brief gmType is an enum of the possible scripting types.
 typedef int gmType;
 
+#include "gmMathVector.h"
+
+#include "math/vec4.h"
+#include "math/vec3.h"
+#include "math/vec2.h"
+#include "math/vec2i.h"
+
 enum
 {
   GM_INVALID_TYPE = -1, // Represent invalid typeIds returned by a query, not stored or used otherwise.   
@@ -38,6 +45,10 @@ enum
   GM_NULL = 0, // GM_NULL must be 0 as i have relied on this in expression testing.
   GM_INT,
   GM_FLOAT,
+  GM_VEC4,
+  GM_VEC3,
+  GM_VEC2,
+  GM_VEC2I,
 
   GM_STRING,
   GM_TABLE,
@@ -62,6 +73,10 @@ struct gmVariable
   {
     gmint m_int;
     gmfloat m_float;
+	gmvec4 m_vec4;
+	gmvec3 m_vec3;
+	gmvec2 m_vec2;
+	gmvec2i m_vec2i;
     gmptr m_ref;
   } m_value;
 
@@ -75,6 +90,10 @@ struct gmVariable
 
   explicit inline gmVariable(gmint a_val) : m_type(GM_INT) { m_value.m_int = a_val; }
   explicit inline gmVariable(gmfloat a_val) : m_type(GM_FLOAT) { m_value.m_float = a_val; }
+  explicit inline gmVariable(prev::Vec4 a_val) : m_type(GM_VEC4) { m_value.m_vec4 = a_val.gmv; }
+  explicit inline gmVariable(prev::Vec3 a_val) : m_type(GM_VEC3) { m_value.m_vec3 = a_val.gmv; }
+  explicit inline gmVariable(prev::Vec2 a_val) : m_type(GM_VEC2) { m_value.m_vec2 = a_val.gmv; }
+  explicit inline gmVariable(prev::Vec2i a_val) : m_type(GM_VEC2I) { m_value.m_vec2i = a_val.gmv; }
   explicit inline gmVariable(gmStringObject * a_string) { SetString(a_string); }
   explicit inline gmVariable(gmTableObject * a_table) { SetTable(a_table); }
   explicit inline gmVariable(gmFunctionObject * a_func) { SetFunction(a_func); }
@@ -82,6 +101,10 @@ struct gmVariable
 
   inline void SetInt(gmint a_value) { m_type = GM_INT; m_value.m_int = a_value; }
   inline void SetFloat(gmfloat a_value) { m_type = GM_FLOAT; m_value.m_float = a_value; }
+  inline void SetVec4(prev::Vec4 a_value) { m_type = GM_VEC4; m_value.m_vec4 = a_value.gmv; }
+  inline void SetVec3(prev::Vec3 a_value) { m_type = GM_VEC3; m_value.m_vec3 = a_value.gmv; }
+  inline void SetVec2(prev::Vec2 a_value) { m_type = GM_VEC2; m_value.m_vec2 = a_value.gmv; }
+  inline void SetVec2i(prev::Vec2i a_value) { m_type = GM_VEC2I; m_value.m_vec2i = a_value.gmv; }
   inline void SetString(gmStringObject * a_string);
   void SetString(gmMachine * a_machine, const char * a_cString);
   inline void SetTable(gmTableObject * a_table);
@@ -95,6 +118,10 @@ struct gmVariable
   inline bool IsReference() const { return m_type > GM_FLOAT; }
   inline bool IsInt() const { return m_type == GM_INT; }
   inline bool IsFloat() const { return m_type == GM_FLOAT; }
+  inline bool IsVec4() const { return m_type == GM_VEC4; }
+  inline bool IsVec3() const { return m_type == GM_VEC3; }
+  inline bool IsVec2() const { return m_type == GM_VEC2; }
+  inline bool IsVec2i() const { return m_type == GM_VEC2I; }
   inline bool IsNumber() const { return IsInt() || IsFloat(); }
   inline bool IsString() const { return m_type == GM_STRING; }
   inline bool IsFunction() const { return m_type == GM_FUNCTION; }
@@ -104,6 +131,10 @@ struct gmVariable
   inline bool GetInt(gmint& a_value, gmint a_default);
   inline gmint GetInt(gmint a_default);
   inline gmfloat GetFloat() const { return m_value.m_float; }
+  inline prev::Vec4 GetVec4() const { return m_value.m_vec4; }
+  inline prev::Vec3 GetVec3() const { return m_value.m_vec3; }
+  inline prev::Vec2 GetVec2() const { return m_value.m_vec2; }
+  inline prev::Vec2i GetVec2i() const { return m_value.m_vec2i; }
   inline bool GetFloat(gmfloat& a_value, gmfloat a_default);
   inline gmfloat GetFloat(gmfloat a_default);
 

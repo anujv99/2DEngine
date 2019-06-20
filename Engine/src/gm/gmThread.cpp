@@ -1331,3 +1331,60 @@ void gmThread::LogCallStack()
   m_machine->GetLog().LogEntry("");
 }
 
+
+
+void gmDumpThreadCallstack(gmThread * a_thread, int steps) 
+{
+  const int Limit = 128;
+  if (steps >= Limit)
+  	steps = Limit;
+  
+  char callstack[Limit][256];
+  memset(callstack, 0, sizeof(callstack));
+  
+  gmMachine * machine = a_thread->GetMachine();
+  const gmStackFrame * frame = a_thread->GetFrame();
+  
+  int base = a_thread->GetIntBase();
+  const gmuint8 * ip = a_thread->GetInstruction();
+  int index = 0;
+  
+  while (frame != NULL && index < steps) {
+  	// get the function object
+  	gmVariable * bottom = a_thread->GetBottom();
+  	gmVariable * fnVar = &bottom[base - 1];
+  	if (fnVar->m_type == GM_FUNCTION) {
+  	  gmFunctionObject * fn = (gmFunctionObject *)GM_MOBJECT(machine, fnVar->m_value.m_ref);
+  	  gmuint32 sourceId = fn->GetSourceId();
+  	  const char * source = "unknown";
+  	  const char * filename = "unknown";
+  	  machine->GetSourceCode(sourceId, source, filename);
+  	  sprintf(callstack[index++], "%s:%d: %s", filename, fn->GetLine(ip), fn->GetDebugName());
+  	  GM_PRINTF("%s\n", callstack[index - 1]);
+  	}
+  
+  	base = frame->m_returnBase;
+  	ip = frame->m_returnAddress;
+  	frame = frame->m_prev;
+  }
+}
+void gmOpAssert(bool cond, const char * expected, gmThread * a_thread, gmVariable * a_operands) 
+{
+  if (cond)
+  	return;
+  
+  // TODO: dump operand info
+  gmMachine * machine = a_thread->GetMachine();
+  char buffer[2][256] = { 0 };
+  
+  a_operands[0].AsStringWithType(machine, buffer[0], 256);
+  a_operands[1].AsStringWithType(machine, buffer[1], 256);
+  
+  GM_PRINTF("gmOpAssert(): error: operator expected '%s'\n", expected);
+  GM_PRINTF("gmOpAssert():        operand-0: %s\n", buffer[0]);
+  GM_PRINTF("gmOpAssert():        operand-1: %s\n", buffer[1]);
+  
+  gmDumpThreadCallstack(a_thread);
+  
+  a_thread->Sys_SetState(gmThread::EXCEPTION);
+}

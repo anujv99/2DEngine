@@ -2,6 +2,7 @@
 
 inline Vec2::Vec2() : x(0.0f), y(0.0f) {}
 inline Vec2::Vec2(float _v) : x(_v), y(_v) {}
+inline Vec2::Vec2(gmvec2 _vec) : x(_vec.x), y(_vec.y) {}
 inline Vec2::Vec2(float _x, float _y) : x(_x), y(_y) {}
 
 inline bool CheckVec2(const Vec2 & _vec) {
