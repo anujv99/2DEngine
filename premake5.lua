@@ -29,7 +29,7 @@ workspace "2DEngine"
             "%{prj.name}/src/**.h",
             "%{prj.name}/src/**.cpp"
         }
-
+		
         links {
             "d3d11.lib",
             "dxgi.lib",
@@ -45,12 +45,20 @@ workspace "2DEngine"
 		defines {
 			"USER_ENGINE",
 			"LOG_DETAILED",
-			--"LOG_DISABLED"
+			--"LOG_DISABLED",
+			"WIN32",
 		}
-
+		
+		undefines {
+			"UNICODE"
+		}
+		
         pchsource "%{prj.name}/src/pch.cpp"
         pchheader "pch.h"
-
+		
+		filter "files:Engine/src/gm/**.cpp"
+			flags { "NoPCH" }
+		
         filter "configurations:Debug"
             defines {"ENGINE_DEBUG"}
             runtime "Debug"
