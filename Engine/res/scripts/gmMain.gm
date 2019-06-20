@@ -6,7 +6,7 @@ CreateDrawManager = function() {
 	DrawManager.Init = function() {
 		a = Vec4(1, 2, 3, 4);
 		b = Vec3(0, 7, 9);
-		print(b.xyy1);
+		print(a - b.xyy1);
 		print("Init Draw Manager");
 	};
 

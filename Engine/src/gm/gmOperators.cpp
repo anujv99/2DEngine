@@ -578,6 +578,7 @@ void GM_CDECL gmvec4GetDot(gmThread * a_thread, gmVariable * a_operands) {
   switch (elements) {
   case 4:
   	a_operands[0].SetVec4(result);
+	break;
   case 3:
   	a_operands[0].SetVec3(result.xyz());
   	break;
@@ -837,6 +838,7 @@ void GM_CDECL gmvec3GetDot(gmThread * a_thread, gmVariable * a_operands) {
   switch (elements) {
   case 4:
   	a_operands[0].SetVec4(result);
+	break;
   case 3:
   	a_operands[0].SetVec3(result.xyz());
   	break;
@@ -1115,6 +1117,7 @@ void GM_CDECL gmvec2GetDot(gmThread * a_thread, gmVariable * a_operands) {
   switch (elements) {
   case 4:
   	a_operands[0].SetVec4(result);
+	break;
   case 3:
   	a_operands[0].SetVec3(result.xyz());
   	break;
@@ -1386,6 +1389,7 @@ void GM_CDECL gmvec2iGetDot(gmThread * a_thread, gmVariable * a_operands) {
   switch (elements) {
   case 4:
   	a_operands[0].SetVec4(result);
+	break;
   case 3:
   	a_operands[0].SetVec3(result.xyz());
   	break;
