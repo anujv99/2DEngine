@@ -35,6 +35,10 @@ namespace prev {
 		return !m_MouseButtons[keyCode] && m_PrevMouseButtons[keyCode];
 	}
 
+	bool Input::IsCharacterPressed() {
+		return !m_CharacterPressedBuffer.empty();
+	}
+
 	Input::Input() {
 		EventHandler::Ref().RegisterEventFunction(BIND_EVENT_FN(Input::OnEvent));
 
@@ -57,6 +61,7 @@ namespace prev {
 		dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(Input::MouseScrolled));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(Input::MousePressed));
 		dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN(Input::MouseReleased));
+		dispatcher.Dispatch<CharacterEvent>(BIND_EVENT_FN(Input::CharacterPressed));
 	}
 
 	bool Input::KeyPressed(KeyPressedEvent & e) {
@@ -89,11 +94,19 @@ namespace prev {
 		return false;
 	}
 
+	bool Input::CharacterPressed(CharacterEvent & e) {
+		m_CharacterPressedBuffer.push_back(e.GetPressedChar());
+		return false;
+	}
+
 	void Input::Update() {
 		m_PrevMousePos = m_MousePos;
 		m_MouseScrollDelta = Vec2i(0);
 		std::memcpy(m_PrevKeys, m_Keys, sizeof(m_Keys));
 		std::memcpy(m_PrevMouseButtons, m_MouseButtons, sizeof(m_MouseButtons));
+
+		m_CharacterPressedBuffer.clear();
+		m_CharacterPressedBuffer.reserve(MAX_CHARACTER_PER_FRAME);
 	}
 
 }

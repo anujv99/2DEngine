@@ -5,12 +5,20 @@
 
 #include "timer.h"
 
+#include "imgui/imguilayer.h"
+
 namespace prev {
 
 	static const char PROFILER_ROOT_NAME[] = "[ROOT]";
 	static const char PROFILER_IMGUI_WINDOW_NAME[] = "Profiler";
+	static const char PROFILER_GRAPHS_IMGUI_WINDOW_NAME[] = "Profiler Graphs";
 
-	Profiler::Profiler() : m_ActiveEntry(nullptr), m_RootEntry(PROFILER_ROOT_NAME, nullptr), m_IsPaused(false), m_PlotGraph(false) {}
+	Profiler::Profiler() : m_ActiveEntry(nullptr), m_RootEntry(PROFILER_ROOT_NAME, nullptr), m_IsPaused(false), m_PlotGraph(false) {
+		ImGuiLayer * imguiLayer = dynamic_cast<ImGuiLayer *>(LayerStack::Ref().GetImGuiLayer());
+		if (imguiLayer == nullptr) return;
+		imguiLayer->BindGuiFunction(std::bind(&Profiler::Gui, this));
+		imguiLayer->BindGuiFunction(std::bind(&Profiler::GuiGraphs, this));
+	}
 
 	Profiler::~Profiler() {
 
@@ -62,10 +70,6 @@ namespace prev {
 		m_ActiveEntry = m_ActiveEntry->Parent;
 	}
 
-	void Profiler::PushGUILayer() {
-		LayerStack::Ref().PushLayer(new ProfilerGuiLayer());
-	}
-
 	Profiler::EntryKey Profiler::GetKey(const std::string & name) {
 		return HashString(name);
 	}
@@ -86,7 +90,7 @@ namespace prev {
 		return newEntry;
 	}
 
-	void Profiler::Gui() {
+	std::string Profiler::Gui() {
 		ImGui::Begin(PROFILER_IMGUI_WINDOW_NAME);
 
 		ImGui::Header("Help");
@@ -100,10 +104,7 @@ namespace prev {
 		GuiEntry(&m_RootEntry, 0);
 		ImGui::End();
 
-		if (!m_PlotGraph) return;
-		ImGui::Begin("Profiler Graphs");
-		GuiGraph(&m_RootEntry);
-		ImGui::End();
+		return PROFILER_IMGUI_WINDOW_NAME;
 	}
 
 	void Profiler::GuiEntry(Entry * entry, unsigned int level) {
@@ -137,6 +138,7 @@ namespace prev {
 	}
 
 	void Profiler::GuiGraph(Entry * entry) {
+		
 		if (entry->DrawLineGraph) {
 			ImGui::Print(entry->Name);
 			ImGui::LineGraph(entry->Graph);
@@ -145,6 +147,19 @@ namespace prev {
 		for (auto & child : entry->Children) {
 			GuiGraph(&child.second);
 		}
+		
+	}
+
+	std::string Profiler::GuiGraphs() {
+		if (!m_PlotGraph) return PROFILER_GRAPHS_IMGUI_WINDOW_NAME;
+
+		ImGui::Begin(PROFILER_GRAPHS_IMGUI_WINDOW_NAME);
+
+		GuiGraph(&m_RootEntry);
+
+		ImGui::End();
+
+		return PROFILER_GRAPHS_IMGUI_WINDOW_NAME;
 	}
 
 	std::string Profiler::ProfilerGuiLayer::OnImGuiUpdate() {

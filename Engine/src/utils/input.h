@@ -4,9 +4,9 @@
 #include "src/graphics/window.h"
 #include "src/events/event.h"
 
-
 #define MAX_KEYS 0xFF
 #define MAX_MOUSE_BUTTONS 5
+#define MAX_CHARACTER_PER_FRAME 16
 
 namespace prev {
 
@@ -27,6 +27,10 @@ namespace prev {
 		bool IsMouseButtonUp(unsigned short keyCode);
 		bool IsMouseButtonReleased(unsigned short keyCode);
 
+		bool IsCharacterPressed();
+
+		inline const std::vector<char> & GetPressedCharacterBuffer() const { return m_CharacterPressedBuffer; }
+
 		inline Vec2i GetMousePosition() const { return Vec2i(m_MousePos.x, m_WindowSize.y - m_MousePos.y); }
 		inline Vec2i GetMouseDeltaPosition() const { return m_MousePos - m_PrevMousePos; }
 		inline Vec2i GetMouseScrollDelta() const { return m_MouseScrollDelta; }
@@ -40,6 +44,7 @@ namespace prev {
 		bool MouseScrolled(MouseScrolledEvent & e);
 		bool MousePressed(MouseButtonPressedEvent & e);
 		bool MouseReleased(MouseButtonReleasedEvent & e);
+		bool CharacterPressed(CharacterEvent & e);
 
 		void Update();
 	private:
@@ -53,6 +58,8 @@ namespace prev {
 		Vec2i m_PrevMousePos = Vec2i(0);
 		Vec2i m_MouseScrollDelta = Vec2i(0);
 		Vec2i m_WindowSize = Vec2i(0);
+
+		std::vector<char> m_CharacterPressedBuffer;
 	};
 
 }

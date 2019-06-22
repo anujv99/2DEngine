@@ -21,8 +21,6 @@ namespace prev {
 		void End();
 		void BeginEntry(const std::string & name);
 		void EndEntry(const std::string & name);
-
-		void PushGUILayer();
 	private:
 		typedef uint32_t EntryKey;
 
@@ -51,7 +49,8 @@ namespace prev {
 		Entry * GetChildEntry(Entry & parent, const std::string & name);
 		void GuiEntry(Entry * entry, unsigned int level);
 		void GuiGraph(Entry * entry);
-		void Gui();
+		std::string GuiGraphs();
+		std::string Gui();
 
 		Entry m_RootEntry;
 		Entry * m_ActiveEntry;

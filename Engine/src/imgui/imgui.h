@@ -61,6 +61,7 @@ namespace prev {
 
 		static int TextInput(const std::string & name, std::string & buffer, int width);
 		static void Print(const std::string & text);
+		static void PrintParagraph(const std::string & text);
 
 		static void LineGraph(prev::LineGraph & lineGraph);
 		static void BarGraph(prev::BarGraph & barGraph);
@@ -68,6 +69,12 @@ namespace prev {
 
 		static void MoveDrawPosBy(Vec2i dimen);
 		static void MoveDrawPosNextLine(Vec2i dimen);
+		static void SetActiveWidgetId(int Id); 
+		static void SetScrollRatioY(float ry);
+
+		static int GetPrevWidgetId();
+		static bool IsWorkingWindowNew();
+		static bool IsWindowActive();
 
 		static int FONT_WIDTH;
 		static int FONT_HEIGHT;

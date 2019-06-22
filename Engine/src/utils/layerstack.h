@@ -15,6 +15,7 @@ namespace prev {
 		void PopLayer(Layer * layer);
 		void PopOverlay(Layer * layer);
 
+		Layer * GetImGuiLayer() { return m_ImGuiLayer; }
 	public:
 		void OnUpdate();
 		void OnEvent(Event & e);

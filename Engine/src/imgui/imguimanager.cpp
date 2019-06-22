@@ -155,10 +155,6 @@ namespace prev {
 			ClearActiveWindow();
 		}
 
-		// if the widget consumes input, check to see if user is typing in widget
-		if (state.DoesWidgetConsumeTextInput) {
-			LOG_ERROR("Not imlemented");
-		}
 	}
 
 	bool ImGuiManager::DidMouseButtonGoDown(int button) {

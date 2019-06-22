@@ -40,7 +40,7 @@ namespace prev {
 			if (index >= 0 && index < guiFuncs.size()) {
 				guiFuncs[guiFuncs.size() - index - 1] = guiFunc.second;
 			} else {
-				LOG_ERROR("Invalid ImGui window name : {}", guiFunc.first);
+				guiFunc.second();
 			}
 		}
 
@@ -66,6 +66,10 @@ namespace prev {
 	std::string ImGuiLayer::ImGuiDemoWindow() {
 		ImGui::Begin("ImGui Demo Window");
 		ImGui::Print("This is the demo window");
+		ImGui::PrintParagraph("Hello\nWorld\nMy\nLife\nSux.");
+		ImGui::Separator();
+		static std::string buffer;
+		ImGui::TextInput("Random Input", buffer, 200);
 		ImGui::End();
 
 		return "ImGui Demo Window";

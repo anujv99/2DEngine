@@ -28,8 +28,8 @@ namespace prev {
 		EventHandler::CreateInst();
 
 		auto dis = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 5;
-		dis[selectedDis].SetWindowStyle(WindowStyle::WINDOWED);
+		unsigned int selectedDis = 0;
+		dis[selectedDis].SetWindowStyle(WindowStyle::FULLSCREEN);
 		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
@@ -39,12 +39,11 @@ namespace prev {
 		RenderState::CreateInst();
 		ShaderManager::CreateInst();
 		ImmediateGFX::CreateInst();
-		Profiler::CreateInst();
 		LayerStack::CreateInst();
 		//ImGui Layer
 		LayerStack::Ref().PushLayer(new ImGuiLayer());
 
-		Profiler::Ref().PushGUILayer(); // Because profiler depends on imgui layer
+		Profiler::CreateInst(); // Because profiler use imguilayer
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 

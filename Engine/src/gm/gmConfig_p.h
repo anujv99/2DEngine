@@ -71,6 +71,7 @@
 #define GM_PRINTF             printf
 
 #define GM_CHECK_USER_BREAK_CALLBACK // Enable this only if a user break callback is set
+#define GMMACHINE_TRACK_THREAD_ALLOC_COUNTS
 
 #define GM_NEW( alloc_params ) new alloc_params
 #define GM_PLACEMENT_NEW( alloc_params, address ) new(address) alloc_params

@@ -23,7 +23,7 @@ namespace prev {
 	const int FONT_Y_OFFSET								= 10;
 	int ImGui::TITLE_BAR_HEIGHT							= ImGui::FONT_HEIGHT + TITLE_BAR_PADDING * 2;
 
-	const int SCROLL_BAR_SIZE							= 15;
+	const int SCROLL_BAR_SIZE = 15;
 
 	const int FILLBAR_WIDTH								= 150;
 	const int FILLBAR_TEXT_BUFFER						= 2;
@@ -170,6 +170,10 @@ namespace prev {
 		ImGuiManager::Get()->SetActiveWidgetId(id);
 	}
 
+	inline bool ImGuiIsKeyDown(unsigned short keyCode) {
+		return Input::Ref().IsKeyDown(keyCode);
+	}
+
 	inline bool ImGuiDidKeyJustGoDown(unsigned short keyCode) {
 		return Input::Ref().IsKeyPressed(keyCode);
 	}
@@ -181,6 +185,10 @@ namespace prev {
 
 	inline bool ImGuiDidMouseJustGoUp() {
 		return Input::Ref().IsMouseButtonUp(IMGUI_MOUSE_PRESS_BTN);
+	}
+
+	inline const std::vector<char> ImGuiGetKeyPressed() {
+		return Input::Ref().GetPressedCharacterBuffer();
 	}
 
 	inline bool ImGuiIsWidgetActive(int id) {
@@ -213,7 +221,7 @@ namespace prev {
 
 			if (!window->AutoSize) {
 				//const int scrollDelta = MOUSEWHEEL_SCROLL_DELTA;
-				LOG_ERROR("WINDOW SCROLL NOT IMLEMENTED");
+				//LOG_ERROR("WINDOW SCROLL NOT IMLEMENTED");
 			}
 		}
 
@@ -1190,6 +1198,158 @@ namespace prev {
 	}
 
 	int ImGui::TextInput(const std::string & name, std::string & buffer, int width) {
+		const float KEYPRESS_COOLDOWN = 0.4f;
+		const float KEYHOLD_COOLDOWN = 0.04f;
+
+		if (ImGuiIsMinimized()) return 0;
+		const int id = ImGuiGenWidgetId();
+
+		ImGui::Print(name);
+
+		Vec2i pos = ImGuiState().DrawPos;
+		Vec2i dimen = Vec2i(width, FILLBAR_HEIGHT);
+		Vec3 colorBar = COLOR_BAR;
+		Vec3 colorBorder = COLOR_BLACK;
+		int numCharSlots = (dimen.x - FILLBAR_TEXT_BUFFER * 2) / ImGui::FONT_WIDTH;
+
+		int & caretStart = ImGuiState().Data.IVec[0];
+		int & caretPos = ImGuiState().Data.IVec[1];
+
+		if (ImGuiIsWidgetActive(id)) {
+			caretStart = Clamp(caretStart, 0, std::max(0, (int)buffer.size() - 1));
+			caretPos = Clamp(caretPos, caretStart, caretStart + std::min(numCharSlots - 1, (int)buffer.size()));
+		}
+
+		float & heldKeyCooldown = ImGuiState().Data.FVec[2];
+
+		if (ImGuiMouseOver(pos, dimen)) {
+			colorBar = COLOR_BAR_HOVER;
+
+			if (ImGuiDidMouseJustGoDown() && !ImGuiIsWidgetActive(id) && ImGuiIsWindowActive()) {
+				ImGuiSetActiveWidgetId(id);
+				ImGuiState().DoesWidgetConsumeTextInput = true;
+
+				caretStart = std::max((int)buffer.size() - numCharSlots + 1, 0);
+				caretPos = caretStart + std::min(numCharSlots - 1, (int)buffer.size());
+				heldKeyCooldown = 0.0f;
+			}
+		}
+
+		if (ImGuiIsWidgetActive(id)) {
+			colorBorder = COLOR_WHITE;
+
+			int caretDelta = 0;
+
+			if (ImGuiDidKeyJustGoDown(0x0D)) {
+				return 1;
+			}
+
+			const std::vector<char> charBuffer = ImGuiGetKeyPressed();
+
+			for (size_t i = 0; i < charBuffer.size(); i++) {
+				char c = charBuffer[i];
+				if (c != 0 && c != Input::KEY_BACKSPACE && c != Input::KEY_RETURN) {
+					buffer.insert(caretPos, 1, c);
+					++caretDelta;
+				}
+			}
+
+			short heldkey = -1;
+			unsigned short holdableKeys[] = { 0x25, 0x27, 0x2E, 0x08 };
+			for (int i = 0; i < sizeof(holdableKeys) / sizeof(holdableKeys[0]); i++) {
+				if (ImGuiDidKeyJustGoDown(holdableKeys[i])) {
+					heldKeyCooldown = KEYPRESS_COOLDOWN;
+					heldkey = holdableKeys[i];
+					break;
+				} else if (ImGuiIsKeyDown(holdableKeys[i])) {
+					heldKeyCooldown -= Timer::GetDeltaTime();
+					if (heldKeyCooldown <= 0.0f) {
+						heldKeyCooldown = KEYHOLD_COOLDOWN;
+						heldkey = holdableKeys[i];
+						break;
+					}
+				}
+			}
+
+			if (heldkey != -1) {
+				if (heldkey == 0x25) {
+					caretDelta--;
+				} else if (heldkey == 0x27) {
+					caretDelta++;
+				} else if (heldkey == 0x2E) {
+					if (caretPos < (int)buffer.size()) {
+						buffer.erase(caretPos, 1);
+					}
+				} else if (heldkey == 0x08) {
+					if (!buffer.empty() && caretPos - 1 >= 0) {
+						buffer.erase(caretPos - 1, 1);
+						caretDelta--;
+					}
+				}
+			} else if (ImGuiDidKeyJustGoDown(0x24)) {
+				caretPos = caretStart = 0;
+			} else if (ImGuiDidKeyJustGoDown(0x23)) {
+				caretStart = std::max((int)buffer.size() - numCharSlots + 1, 0);
+				caretPos = caretStart + std::min(numCharSlots - 1, (int)buffer.size());
+			}
+
+			// move caret left
+			if (caretDelta == -1) {
+				caretPos = std::max(caretPos - 1, 0);
+				if (caretPos < caretStart) caretStart -= 1;
+
+				// handle case where deleting
+				if (caretStart > 0 && caretPos >= (int)buffer.size() && (caretStart - caretPos) < numCharSlots) {
+					--caretStart;
+				}
+			}
+
+			// move caret right
+			else if (caretDelta == 1) {
+				if ((int)buffer.size() > numCharSlots) // if str is longer than num slots
+				{
+					if (caretPos < (int)buffer.size()) ++caretPos;
+				} else if (caretPos < (int)buffer.size()) {
+					++caretPos;
+				}
+
+				if (caretPos - caretStart >= numCharSlots) {
+					++caretStart;
+				}
+			}
+
+		}
+
+		// draw rect
+		ImGuiColor(colorBar);
+		ImGuiDrawRect(pos, dimen);
+		ImGuiColor(colorBorder, 0.5f);
+		ImGuiDrawRectWire(pos, dimen);
+
+		// tex position
+		Vec2i textPos = pos + Vec2i(FILLBAR_TEXT_BUFFER, -FILLBAR_TEXT_BUFFER);
+		int characterStart = 0;
+		int characterEnd = std::min((int)buffer.size(), numCharSlots);
+
+		// substr with caret positions
+		if (ImGuiIsWidgetActive(id)) {
+			characterStart = caretStart;
+			characterEnd = caretStart + numCharSlots;
+		}
+
+		// draw text
+		int numCharsPrint = std::min(characterEnd - characterStart, numCharSlots);
+		ImGuiColor(COLOR_WHITE);
+		ImGuiPrint(buffer.substr(characterStart, numCharsPrint).c_str(), textPos);
+
+		// do "text_" blinking
+		if (ImGuiIsWidgetActive(id) && fmod(Timer::GetTime(), 1.0f) < 0.5f) {
+			Vec2i underlinePos = textPos + ImGui::FONT_WIDTH * Vec2i(caretPos - caretStart, 0);
+			ImGuiPrint("|", underlinePos - Vec2i(3, 1));
+		}
+
+		MoveDrawPosNextLine(dimen);
+
 		return 0;
 	}
 
@@ -1200,6 +1360,32 @@ namespace prev {
 		ImGuiColor(COLOR_WHITE);
 		ImGuiPrint(text, ImGuiState().DrawPos);
 		MoveDrawPosNextLine(Vec2i(textWidth, ImGui::FONT_HEIGHT));
+	}
+
+	void ImGui::PrintParagraph(const std::string & text) {
+		if (ImGuiIsMinimized() || text.empty()) return;
+
+		unsigned int offset = 0;
+		unsigned int index = 0;
+
+		while (index < text.size()) {
+			offset = 0;
+			std::string buffer;
+
+			offset = text.find_first_of("\n", index);
+			if (offset > text.size()) {
+				ImGui::Print(text.substr(index));
+				index = text.size();
+				break;
+			}
+			offset -= index;
+
+			buffer = text.substr(index, offset);
+
+			index += offset + 1;
+
+			ImGui::Print(buffer);
+		}
 	}
 
 	void ImGui::LineGraph(prev::LineGraph & lineGraph) {
@@ -1364,6 +1550,38 @@ namespace prev {
 
 		ImGui::MoveDrawPosBy(dimen + Vec2i(0, WIDGET_PADDING));
 		ImGuiState().DrawPos.x = window->Position.x + WINDOW_INSIDE_PADDING + TAB_WIDTH * ImGuiState().NumTabs;
+	}
+
+	void ImGui::SetActiveWidgetId(int Id) {
+		ASSERT(ImGuiState().WorkingWindow != nullptr);
+		ASSERT(Id > 0);
+
+		ImGuiState().ActiveWidgetID = Id;
+		ImGuiState().ActiveWindow = ImGuiState().WorkingWindow;
+	}
+
+	void ImGui::SetScrollRatioY(float ry) {
+		if (ImGuiIsMinimized()) return;
+
+		StrongHandle<ImGuiWindow> & window = ImGuiWorkingWindow();
+
+		ImGuiWorkingWindow()->ScrollPos.y = 
+			(int)(ry * (std::max(window->DimensionAutoSize.y, window->DimensionAutoSizePrev.y) - window->Dimension.y));
+		ImGuiRefreshScrollOffset();
+	}
+
+	int ImGui::GetPrevWidgetId() {
+		ASSERT(ImGuiState().WorkingWindow != nullptr);
+		return ImGuiState().WidgetCount;
+	}
+
+	bool ImGui::IsWorkingWindowNew() {
+		ASSERT(ImGuiState().WorkingWindow != nullptr);
+		return ImGuiState().WorkingWindow->IsNewWindow;
+	}
+
+	bool ImGui::IsWindowActive() {
+		return ImGuiWorkingWindow() && (ImGuiWorkingWindow() == ImGuiState().ActiveWindow);
 	}
 
 }

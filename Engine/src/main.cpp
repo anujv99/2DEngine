@@ -13,8 +13,9 @@ int main() {
 
 	LOG_WARN("This is the application!");
 
-	StrongHandle<Application> app = new Application();
+	Application * app = new Application();
 	app->Run();
+	delete app;
 
 	Logger::DestroyInst();
 
