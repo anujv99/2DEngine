@@ -12,8 +12,10 @@ workspace "2DEngine"
 
     IncludeDirs = {}
     IncludeDirs["spdlog"] = "Engine/vendor/spdlog/include"
+	IncludeDirs["imgui"] = "Engine/vendor/imgui"
 
     include "Engine/vendor/spdlog"
+	include "Engine/vendor/imgui"
 
     project "Engine"
         location "Engine"
@@ -31,6 +33,7 @@ workspace "2DEngine"
         }
 		
         links {
+			"ImGui",
             "d3d11.lib",
             "dxgi.lib",
             "d3dcompiler.lib",
@@ -38,6 +41,7 @@ workspace "2DEngine"
 
         includedirs {
             "%{IncludeDirs.spdlog}",
+            "%{IncludeDirs.imgui}",
 			"%{prj.name}/src",
 			"%{prj.name}"
         }
@@ -46,6 +50,7 @@ workspace "2DEngine"
 			"USER_ENGINE",
 			"LOG_DETAILED",
 			--"LOG_DISABLED",
+			"PREVMATH",
 		}
 		
         pchsource "%{prj.name}/src/pch.cpp"

@@ -12,14 +12,16 @@
 #include "graphics/immediategfx.h"
 #include "graphics/shadermanager.h"
 #include "math/mvp.h"
-#include "imgui/imguilayer.h"
-#include "imgui/Imgui.h"
 
 #include "math/mat4.h"
 
 #include "common/profiler.h"
 
 #include "vm/virtualmachine.h"
+
+#include <imgui.h>
+
+extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
@@ -41,7 +43,10 @@ namespace prev {
 		ImmediateGFX::CreateInst();
 		LayerStack::CreateInst();
 		//ImGui Layer
-		LayerStack::Ref().PushLayer(new ImGuiLayer());
+
+		m_ImGuiLayer = new ImGuiLayer();
+
+		LayerStack::Ref().PushLayer(m_ImGuiLayer);
 
 		Profiler::CreateInst(); // Because profiler use imguilayer
 
@@ -79,6 +84,7 @@ namespace prev {
 			Timer::Update();
 
 			GraphicsContext::Ref().BeginFrame();
+			LayerStack::Ref().GetImGuiLayer()->StartFrame();
 
 			LayerStack::Ref().OnUpdate();
 
@@ -91,8 +97,17 @@ namespace prev {
 			Gui();
 			PROFILER_END("App::Gui");
 
+			static LineGraph graph(0.0f, 30.0f);
+
+			ImGui::Begin("Test");
+			graph.DrawImGui();
+			ImGui::End();
+
+			graph.PushValue(Timer::GetDeltaTime() * 1000.0f);
+
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
+			LayerStack::Ref().GetImGuiLayer()->EndFrame();
 			GraphicsContext::Ref().EndFrame();
 
 			Window::Ref().PollEvents();

@@ -7,8 +7,9 @@
 #include "virtualmachinelibs.h"
 #include "utils/layerstack.h"
 #include "imgui/imguilayer.h"
-#include "imgui/Imgui.h"
 #include "graphics/window.h"
+
+#include <imgui.h>
 
 namespace prev {
 
@@ -20,16 +21,12 @@ namespace prev {
 		m_FreezThreadAllocationGui(false), m_ShowThreadAllocationGui(false), m_ShowSettingsGui(false) {
 
 		m_VM = new gmMachine();
-		m_VM->SetAutoMemoryUsage(false);
+		m_VM->SetAutoMemoryUsage(true);
 
 		InitGuiSettings();
 		InitGuiThreadAllocations();
 
-		ImGuiLayer * imguilayer = dynamic_cast<ImGuiLayer *>(LayerStack::Ref().GetImGuiLayer());
-		if (imguilayer == nullptr) return;
-
-		imguilayer->BindGuiFunction(std::bind(&VirtualConsole::Gui, &m_Console));
-		imguilayer->BindGuiFunction(std::bind(&VirtualMachine::GuiSettings, this));
+		LayerStack::Ref().GetImGuiLayer()->AddGuiFunction(std::bind(&VirtualMachine::GuiSettings, this));
 	}
 
 	VirtualMachine::~VirtualMachine() {
@@ -86,7 +83,7 @@ namespace prev {
 		const char * msg = compileLog.GetEntry(firstErr);
 
 		if (msg) {
-			const char * textHeader = "\n[GameMonkey Run-time Error]:";
+			const char * textHeader = "[GameMonkey Run-time Error]:";
 			LOG_ERROR("{}", textHeader);
 		}
 
@@ -125,7 +122,7 @@ namespace prev {
 		const float minVal = 0.0f;
 		const float maxVal = 16.0f;
 		const float width = 200;
-		const float height = 100;
+		const float height = 150;
 		const int numVals = 128;
 
 		m_LineGraphUpdate	= new LineGraph(minVal, maxVal, Vec2i(width, height), numVals);
@@ -145,26 +142,28 @@ namespace prev {
 		int memUsageSoft = m_VM->GetDesiredByteMemoryUsageSoft();
 		int memUsageHard = m_VM->GetDesiredByteMemoryUsageHard();
 
-		const Vec2i pos = Vec2i(300, Window::Get()->GetDisplayMode().GetWindowSize().y - 20);
-
-		ImGui::Begin("GameMonkey Settings", pos);
-		ImGui::Print("Update");
-		ImGui::LineGraph(m_LineGraphUpdate.Ref());
-		ImGui::Print("Draw");
-		ImGui::LineGraph(m_LineGraphDraw.Ref());
-		ImGui::Print("Memory");
-		ImGui::LineGraph(m_LineGraphMemory.Ref());
-		ImGui::FillBarInt("Memory Usage (Bytes)", m_VM->GetCurrentMemoryUsage(), 0, m_VM->GetDesiredByteMemoryUsageHard());
-		ImGui::Header("Garbage Collector");
+		ImGui::Begin("GameMonkey Settings", (bool *)0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Text("Update");
+		m_LineGraphUpdate->DrawImGui();
+		ImGui::Text("Draw");
+		m_LineGraphDraw->DrawImGui();
+		ImGui::Text("Memory");
+		m_LineGraphMemory->DrawImGui();
+		ImGui::ProgressBar((float)m_VM->GetCurrentMemoryUsage() / (float)m_VM->GetDesiredByteMemoryUsageHard(), Vec2(-1, 0),
+			std::to_string(m_VM->GetCurrentMemoryUsage()).c_str());
+		ImGui::Text("Garbage Collector");
 		if (ImGui::Button("Force Full Collect")) { m_VM->CollectGarbage(true); }
-		ImGui::SliderInt("Work Per Increment", workPerIncrement, 1, 600);
-		ImGui::SliderInt("Destructs Per Increment", destructPerIncrement, 1, 600);
-		ImGui::SliderInt("Memory Usage Soft", memUsageSoft, 200000, memUsageHard);
-		ImGui::SliderInt("Memory Usage Hard", memUsageHard, memUsageSoft + 500, memUsageSoft + 200000);
+		ImGui::SliderInt("Work Per Increment", &workPerIncrement, 1, 600);
+		ImGui::SliderInt("Destructs Per Increment", &destructPerIncrement, 1, 600);
+		ImGui::SliderInt("Memory Usage Soft", &memUsageSoft, 200000, memUsageHard);
+		ImGui::SliderInt("Memory Usage Hard", &memUsageHard, memUsageSoft + 500, memUsageSoft + 200000);
 		ImGui::Separator();
-		ImGui::FillBarInt("GC Warnings", m_VM->GetStatsGCNumWarnings(), 0, 200);
-		ImGui::FillBarInt("GC Full Collects", m_VM->GetStatsGCNumFullCollects(), 0, 200);
-		ImGui::FillBarInt("GC Inc Collects", m_VM->GetStatsGCNumIncCollects(), 0, 200);
+
+		int gcWarning = m_VM->GetStatsGCNumWarnings();
+
+		ImGui::ProgressBar(gcWarning == 0 ? 0 : 200.0f / gcWarning, Vec2(-1, 0), std::to_string(gcWarning).c_str());
+		ImGui::ProgressBar(100.0f / (float)m_VM->GetStatsGCNumFullCollects());
+		ImGui::ProgressBar(100.0f / (float)m_VM->GetStatsGCNumIncCollects());
 		ImGui::End();
 
 		m_VM->SetDesiredByteMemoryUsageSoft(memUsageSoft);

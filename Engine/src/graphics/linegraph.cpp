@@ -5,7 +5,13 @@
 #include "math/mvp.h"
 #include "math/vecconversion.h"
 
+#include "imgui.h"
+
 namespace prev {
+
+	static float ImGuiGetData(void * data, int index) {
+		return (reinterpret_cast<LineGraph *>(data)->GetData(index));
+	}
 
 	LineGraph::LineGraph(float minValue /*= 0.0f*/, float maxValue /*= 1.0f*/, Vec2i dimen /*= Vec2i(200)*/, int numValuesMax /*= 128*/) {
 		m_IndexFront = 0;
@@ -121,6 +127,19 @@ namespace prev {
 	void LineGraph::Clear() {
 		m_IndexFront = 0;
 		m_Vaues.clear();
+	}
+
+	float LineGraph::GetData(int index) {
+		index += m_IndexFront;
+		index %= m_NumMaxValue;
+
+		if (index >= m_Vaues.size()) return 0;
+
+		return m_Vaues[index];
+	}
+
+	void LineGraph::DrawImGui() {
+		ImGui::PlotLines("", ImGuiGetData, this, m_NumMaxValue, 0, (const char *)0, m_MinValue, m_MaxValue, m_Dimension);
 	}
 
 }

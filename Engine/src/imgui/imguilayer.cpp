@@ -1,78 +1,46 @@
 #include "pch.h"
-#include "imguilayer.h"
+#include "imguilayer.h" 
 
-#include "imguimanager.h"
 #include "imgui.h"
 
 namespace prev {
 
 	ImGuiLayer::ImGuiLayer() : Layer(IMGUI_LAYER_NAME) {
-		ImGuiManager::CreateInst();
-		BindGuiFunction(std::bind(&ImGuiLayer::ImGuiDemoWindow, this));
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO & io = ImGui::GetIO(); (void)io;
+		ImGui::StyleColorsDark();
+		InitImGui();
+
+		LOG_TRACE("ImGui Initialized");
 	}
 
 	ImGuiLayer::~ImGuiLayer() {
-		ImGuiManager::DestroyInst();
-	}
 
-	void ImGuiLayer::BindGuiFunction(std::function<std::string(void)> guiFunc) {
-		if (!guiFunc) {
-			LOG_ERROR("Inavid Gui Function Passed");
-			return;
-		}
-
-		auto windowName = guiFunc();
-		m_GUIFuncs.insert(std::make_pair(windowName, guiFunc));
-	}
-
-	void ImGuiLayer::OnUpdate() {
-		
-	}
-
-	std::string ImGuiLayer::OnImGuiUpdate() {
-		StartFrame();
-
-		std::vector<std::function<std::string(void)>> guiFuncs;
-		guiFuncs.resize(ImGuiManager::Ref().GetWindowList().size());
-
-		for (auto & guiFunc : m_GUIFuncs) {
-			auto index = ImGuiManager::Ref().GetWindowOrderIndex(guiFunc.first);
-			if (index >= 0 && index < guiFuncs.size()) {
-				guiFuncs[guiFuncs.size() - index - 1] = guiFunc.second;
-			} else {
-				guiFunc.second();
-			}
-		}
-
-		for (auto & func : guiFuncs) {
-			if (func)
-				func();
-		}
-
-		EndFrame();
-
-		return "";
 	}
 
 	void ImGuiLayer::StartFrame() {
-		ImGuiManager::Ref().PreUpdate();
+		Start();
+		ImGui::NewFrame();
 	}
 
 	void ImGuiLayer::EndFrame() {
-		ImGuiManager::Ref().PostUpdate();
-		ImGuiManager::Ref().DetectConsumeInputs();
+		ImGui::Render();
+		End();
 	}
 
-	std::string ImGuiLayer::ImGuiDemoWindow() {
-		ImGui::Begin("ImGui Demo Window");
-		ImGui::Print("This is the demo window");
-		ImGui::PrintParagraph("Hello\nWorld\nMy\nLife\nSux.");
-		ImGui::Separator();
-		static std::string buffer;
-		ImGui::TextInput("Random Input", buffer, 200);
-		ImGui::End();
+	void ImGuiLayer::AddGuiFunction(GuiFunc func) {
+		if (func)
+			m_GuiFunctions.push_back(func);
+		else {
+			LOG_ERROR("Inavlid gui function");
+		}
+	}
 
-		return "ImGui Demo Window";
+	void ImGuiLayer::OnImGuiUpdate() {
+		ImGui::ShowDemoWindow();
+		for (auto & func : m_GuiFunctions)
+			func();
 	}
 
 }

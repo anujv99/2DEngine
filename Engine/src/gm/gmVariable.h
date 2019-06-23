@@ -43,13 +43,17 @@ enum
   GM_INVALID_TYPE = -1, // Represent invalid typeIds returned by a query, not stored or used otherwise.   
 
   GM_NULL = 0, // GM_NULL must be 0 as i have relied on this in expression testing.
+
+  //Stack Type
   GM_INT,
   GM_FLOAT,
-  GM_VEC4,
-  GM_VEC3,
-  GM_VEC2,
   GM_VEC2I,
+  GM_VEC2,
+  GM_VEC3,
+  GM_VEC4,
 
+
+  //Reference Type
   GM_STRING,
   GM_TABLE,
   GM_FUNCTION,
@@ -58,7 +62,7 @@ enum
   GM_FORCEINT = GM_MAX_INT,
 };
 
-
+const int GM_MAX_STACK_TYPE = GM_VEC4;
 
 /// \struct gmVariable
 /// \brief a variable is the basic type passed around on the stack, and used as storage in the symbol tables.
@@ -115,7 +119,7 @@ struct gmVariable
 
   inline void Nullify() { m_type = GM_NULL; m_value.m_ref = 0; }
   inline bool IsNull() const { return m_type == GM_NULL; }
-  inline bool IsReference() const { return m_type > GM_FLOAT; }
+  inline bool IsReference() const { return m_type > GM_MAX_STACK_TYPE; }
   inline bool IsInt() const { return m_type == GM_INT; }
   inline bool IsFloat() const { return m_type == GM_FLOAT; }
   inline bool IsVec4() const { return m_type == GM_VEC4; }

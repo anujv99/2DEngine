@@ -55,7 +55,7 @@ const char * gmVariable::AsString(gmMachine * a_machine, char * a_buffer, int a_
     }
 	case GM_VEC2I :
     {
-      _gmsnprintf(a_buffer, a_len, "Vec2[%d, %d]", m_value.m_vec2i.x, m_value.m_vec2i.y);
+      _gmsnprintf(a_buffer, a_len, "Vec2i[%d, %d]", m_value.m_vec2i.x, m_value.m_vec2i.y);
       break;
     }
     case GM_STRING :

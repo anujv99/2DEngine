@@ -16,9 +16,8 @@ namespace prev {
 		int GetLastCmdThread() const { return m_LastCmdThread; }
 		void ClearText();
 	private:
-		void ScrollToBottom();
 		void RunCommand(const std::string & cmd);
-		std::string Gui();
+		void Gui();
 	private:
 		bool m_Enabled;
 		bool m_QueueScrollToBottom;

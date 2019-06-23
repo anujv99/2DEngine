@@ -4,15 +4,13 @@ CreateDrawManager = function() {
 	DrawManager = {};
 
 	DrawManager.Init = function() {
-		a = Vec4(1, 2, 3, 4);
-		b = Vec3(0, 7, 9);
-		print(b.xyy0 / a);
+		global a = Vec4(1, 2, 3, 4);
+		global b = Vec3(0, 7, 9);
+		print(b.xyya / a);
 		print("Init Draw Manager");
 	};
 
 	DrawManager.Draw = function() {
-		Gui.Begin("Hello World");
-		Gui.End();
 	};
 
 	DrawManager.Clear = function() {

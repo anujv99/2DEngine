@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "windowswindow.h"
 
+#include "imgui.h"
+#include "examples/imgui_impl_win32.h"
+
 #include <comdef.h>
 
 #define DEFAULT_WINDOW_TITLE "Retarded Window"
@@ -15,6 +18,10 @@
 namespace prev {
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam) != 0)
+			return 0;
+
 		switch (msg) {
 			case WM_MOUSEWHEEL:
 			{

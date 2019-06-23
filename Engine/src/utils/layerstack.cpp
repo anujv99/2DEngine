@@ -1,11 +1,9 @@
 #include "pch.h"
 #include "layerstack.h"
 
-#include "imgui/imguilayer.h"
-
 namespace prev {
 
-	LayerStack::LayerStack() {}
+	LayerStack::LayerStack() : m_ImGuiLayer(nullptr) {}
 
 	LayerStack::~LayerStack() {
 		m_Layers.clear();
@@ -13,20 +11,33 @@ namespace prev {
 	}
 
 	void LayerStack::PushLayer(Layer * layer) {
+		if (layer == nullptr) return;
+
 		m_Layers.push_back(layer);
 		layer->OnAttach();
 
-		if (m_ImGuiLayer == nullptr && layer->GetName() == IMGUI_LAYER_NAME) {
-			m_ImGuiLayer = layer;
-		} else if (m_ImGuiLayer != nullptr) {
-			ImGuiLayer * guiLayer = dynamic_cast<ImGuiLayer *>(m_ImGuiLayer);
-			guiLayer->BindGuiFunction(std::bind(&Layer::OnImGuiUpdate, layer));
+		if (m_ImGuiLayer != nullptr) {
+			m_ImGuiLayer->AddGuiFunction(std::bind(&Layer::OnImGuiUpdate, layer));
+		}
+
+		if (layer->GetName() == IMGUI_LAYER_NAME && m_ImGuiLayer == nullptr) {
+			m_ImGuiLayer = dynamic_cast<ImGuiLayer *>(layer);
 		}
 	}
 
 	void LayerStack::PushOverlay(Layer * layer) {
+		if (layer == nullptr) return;
+
 		m_Overlays.push_back(layer);
 		layer->OnAttach();
+
+		if (m_ImGuiLayer != nullptr) {
+			m_ImGuiLayer->AddGuiFunction(std::bind(&Layer::OnImGuiUpdate, layer));
+		}
+
+		if (layer->GetName() == IMGUI_LAYER_NAME && m_ImGuiLayer == nullptr) {
+			m_ImGuiLayer = dynamic_cast<ImGuiLayer *>(layer);
+		}
 	}
 
 	void LayerStack::PopLayer(Layer * layer) {
@@ -57,6 +68,11 @@ namespace prev {
 		}
 	}
 
+	void LayerStack::OnImGuiUpdate() {
+		if (m_ImGuiLayer != nullptr)
+			m_ImGuiLayer->OnImGuiUpdate();
+	}
+
 	void LayerStack::OnEvent(Event & e) {
 		for (auto layer : m_Layers) {
 			layer->OnEvent(e);
@@ -69,11 +85,6 @@ namespace prev {
 			if (e.Handled())
 				break;
 		}
-	}
-
-	void LayerStack::OnImGuiUpdate() {
-		if (m_ImGuiLayer)
-			m_ImGuiLayer->OnImGuiUpdate();
 	}
 
 }

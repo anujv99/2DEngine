@@ -2,7 +2,6 @@
 #include "virtualmachinelibs.h"
 
 #include "gm/gmMathLib.h"
-#include "imgui/imguigm.h"
 
 namespace prev {
 
@@ -12,8 +11,6 @@ namespace prev {
 		gmBindMathLib(vm);
 
 		//CustomLibs
-		gmBindImGuiLib(vm);
-
 	}
 
 }

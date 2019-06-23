@@ -2,26 +2,29 @@
 
 #include "utils/layer.h"
 
+#define IMGUI_LAYER_NAME "IMGUI_PREV_LAYER"
+
 namespace prev {
 
-	static const std::string IMGUI_LAYER_NAME = "IMGUI_LAYER";
+	typedef std::function<void(void)> GuiFunc;
 
-	class ImGuiLayer : public Layer, public HandledObject<ImGuiLayer> {
+	class ImGuiLayer : public Layer {
 	public:
 		ImGuiLayer();
 		~ImGuiLayer();
 
-		void BindGuiFunction(std::function<std::string(void)> guiFunc);
-
-		virtual void OnUpdate() override;
-		virtual std::string OnImGuiUpdate() override;
-	private:
 		void StartFrame();
 		void EndFrame();
 
-		std::string ImGuiDemoWindow();
+		void AddGuiFunction(GuiFunc func);
+
+		virtual void OnImGuiUpdate() override;
 	private:
-		std::unordered_map<std::string, std::function<std::string(void)>> m_GUIFuncs;
+		std::vector<GuiFunc> m_GuiFunctions;
+	private:
+		static void InitImGui();
+		static void Start();
+		static void End();
 	};
 
 }

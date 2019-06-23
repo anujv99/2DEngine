@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "d3dvertexbuffer.h"
 
+unsigned int GLOBAL_DRAW_CALL_COUNT = 0;
+
 namespace prev {
 
 	StrongHandle<VertexBuffer> VertexBuffer::CreateVertexBuffer() {
@@ -77,6 +79,7 @@ namespace prev {
 	}
 
 	void D3DVertexBuffer::Draw(unsigned int numVertices, unsigned int vertexOffset) {
+		GLOBAL_DRAW_CALL_COUNT++;
 		GetDeviceContext()->Draw(numVertices, vertexOffset);
 	}
 

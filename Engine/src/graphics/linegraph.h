@@ -19,7 +19,14 @@ namespace prev {
 		void SetMinVal(float minVal) { m_MinValue = minVal; }
 		void SetMaxVal(float maxVal) { m_MaxValue = maxVal; }
 
+		int GetMaxNumValues() const { return m_NumMaxValue; }
+
 		Vec2i GetDimension() const { return m_Dimension; }
+
+		//Use this to get imgui PlotLine function
+		float GetData(int index);
+
+		void DrawImGui();
 	private:
 		float m_MinValue;
 		float m_MaxValue;

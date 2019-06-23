@@ -2,6 +2,8 @@
 
 #include "layer.h"
 
+#include "imgui/imguilayer.h"
+
 namespace prev {
 
 	class LayerStack : public Singleton<LayerStack> {
@@ -15,16 +17,16 @@ namespace prev {
 		void PopLayer(Layer * layer);
 		void PopOverlay(Layer * layer);
 
-		Layer * GetImGuiLayer() { return m_ImGuiLayer; }
+		inline ImGuiLayer * GetImGuiLayer() { return m_ImGuiLayer; }
 	public:
 		void OnUpdate();
-		void OnEvent(Event & e);
 		void OnImGuiUpdate();
+		void OnEvent(Event & e);
 	private:
 		std::vector<StrongHandle<Layer>> m_Layers;
 		std::vector<StrongHandle<Layer>> m_Overlays;
 
-		Layer * m_ImGuiLayer = nullptr;
+		ImGuiLayer * m_ImGuiLayer;
 	};
 
 }

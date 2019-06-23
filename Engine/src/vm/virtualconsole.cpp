@@ -1,11 +1,22 @@
 #include "pch.h"
+
+#include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
+
 #include "virtualconsole.h"
 #include "graphics/window.h"
-#include "imgui/Imgui.h"
 #include "utils/input.h"
 #include "gm/gmMachine.h"
 #include "virtualmachine.h"
 #include "gm/gmThread.h"
+#include "utils/layerstack.h"
+
+#include "virtualconsole.inl"
+
+static void GM_CDECL printCallback(gmMachine * a_machine, const char * str) {
+	std::string log = "[GM] > " + std::string(str);
+	vmConsole.AddLog(log.c_str());
+}
 
 namespace prev {
 
@@ -21,6 +32,14 @@ namespace prev {
 		m_CmdIndex = 0;
 		m_Text.reserve(1024 * 1024);
 
+		LayerStack::Ref().GetImGuiLayer()->AddGuiFunction(std::bind(&VirtualConsole::Gui, this));
+
+		vmConsole.CommandCallbackFunction = [this](const char * command) -> void {
+			this->RunCommand(command);
+		};
+
+		gmMachine::s_printCallback = printCallback;
+
 		LOG_TRACE("Virtual Console Initialized");
 	}
 
@@ -33,10 +52,7 @@ namespace prev {
 
 		LOG_TRACE("[GM] {}", text);
 
-		m_Text += text;
-		if (newLine) m_Text += "\n";
-
-		ScrollToBottom();
+		vmConsole.AddLog("[GM] > %s", text.c_str());
 	}
 
 	void VirtualConsole::Enable(bool enable) {
@@ -45,10 +61,6 @@ namespace prev {
 
 	void VirtualConsole::ClearText() {
 		m_Text.clear();
-	}
-
-	void VirtualConsole::ScrollToBottom() {
-
 	}
 
 	void VirtualConsole::RunCommand(const std::string & cmd) {
@@ -97,47 +109,8 @@ namespace prev {
 		}
 	}
 
-	std::string VirtualConsole::Gui() {
-		if (!m_Enabled) return "";
-
-		const Vec2i windowDimen = Window::Ref().GetDisplayMode().GetWindowSize();
-		const int width = (int)windowDimen.x * CONSOLE_WIDTH;
-		const int height = (int)windowDimen.y * CONSOLE_HEIGHT;
-
-		ImGui::Begin("Console", Vec2i(windowDimen.x / 2 - width / 2, windowDimen.y - CONSOLE_PADDING), Vec2i(width, height));
-		ImGui::PrintParagraph(m_Text);
-		ImGui::Print(">");
-		ImGui::SameLine();
-
-		if (ImGui::TextInput("", m_Command, width - CONSOELE_INPUT_PADDING) == 1) {
-			if (m_Command == "clear") {
-				m_Text.clear();
-				m_Command = "";
-			} else {
-				Log("> " + m_Command);
-				RunCommand(m_Command);
-
-				m_Command = "";
-			}
-		}
-
-		if (ImGui::IsWindowActive()) {
-			int deltaIndex = 0;
-
-			if (!m_OldCmds.empty()) {
-				if (Input::Get()->IsKeyPressed(0x26)) deltaIndex = -1;
-				if (Input::Get()->IsKeyPressed(0x28)) deltaIndex = +1;
-			}
-
-			if (deltaIndex != 0) {
-				m_CmdIndex = Clamp(m_CmdIndex + deltaIndex, 0, (int)m_OldCmds.size() - 1);
-				m_Command = m_OldCmds[m_CmdIndex];
-			}
-		}
-
-		ImGui::End();
-
-		return "Console";
+	void VirtualConsole::Gui() {
+		vmConsole.Draw("Console", &m_Enabled);
 	}
 
 }
