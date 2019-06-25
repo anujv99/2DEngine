@@ -16,6 +16,7 @@
 #include "gmFunctionObject.h"
 #include "gmOperators.h"
 #include "gmMachineLib.h"
+#include "vm/vmexceptionhandler.h"
 
 // helper macros
 
@@ -995,6 +996,8 @@ LabelException:
   // spit out error info
   LogLineFile();
   LogCallStack();
+
+  prev::OnGmException();
 
   // call machine exception handler
   if(gmMachine::s_machineCallback)

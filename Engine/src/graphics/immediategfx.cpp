@@ -6,6 +6,8 @@ static const int IMMEDIATEGFX_MAX_VERTS = 8192;
 namespace prev {
 
 	void ImmediateGFX::BeginDefaultShaders() {
+		m_VertexShader->Bind();
+		m_PixelShader->Bind();
 		m_VertexShader->UpdateMVP();
 	}
 
@@ -13,6 +15,8 @@ namespace prev {
 	}
 
 	void ImmediateGFX::BeginDraw() {
+		m_VertexBuffer->Bind();
+		m_VertexLayout->Bind();
 	}
 
 	void ImmediateGFX::EndDraw() {
@@ -64,11 +68,7 @@ namespace prev {
 	}
 
 	void ImmediateGFX::DrawCurrentPrimitive() {
-		m_VertexBuffer->Bind();
-		m_VertexShader->Bind();
-		m_VertexLayout->Bind();
-		m_PixelShader->Bind();
-
+		
 		if (m_BufferIndex + GetVertexBatch().size() >= IMMEDIATEGFX_MAX_VERTS) {
 			m_BufferIndex = 0;
 		}

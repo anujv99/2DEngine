@@ -5,8 +5,6 @@
 using namespace prev;
 
 int main() {
-	//_CrtSetBreakAlloc(382);
-
 	PrevMemoryInit();
 
 	Logger::CreateInst();

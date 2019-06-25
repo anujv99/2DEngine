@@ -3,6 +3,7 @@
 #include "src/common/singleton.h"
 #include "src/graphics/window.h"
 #include "src/events/event.h"
+#include "pvkeycodes.h" // Contains defines for buttons
 
 #define MAX_KEYS 0xFF
 #define MAX_MOUSE_BUTTONS 5

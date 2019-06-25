@@ -13,6 +13,8 @@
 #define _GMUTIL_H_
 
 #include "gmConfig.h"
+#include "gmTableObject.h"
+#include <vector>
 
 template <class T>
 T gmMin(const T &a_a, const T &a_b)
@@ -69,5 +71,8 @@ inline char gmIsLittleEndian()
   return *((unsigned char*)&fourBytes);
 }
 
+
+void gmSortTableKeys(gmTableObject * table, std::vector<gmVariable *> & result);
+void gmSortTableKeysRaw(gmTableObject * table, gmVariable ** result);
 
 #endif

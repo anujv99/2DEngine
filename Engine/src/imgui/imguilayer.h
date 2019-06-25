@@ -20,9 +20,12 @@ namespace prev {
 
 		virtual void OnImGuiUpdate() override;
 	private:
+		void SetupImGuiStyle(bool bStyleDark_ = true, float alpha_ = 1.0f);
+	private:
 		std::vector<GuiFunc> m_GuiFunctions;
 	private:
 		static void InitImGui();
+		static void DeleteImGui();
 		static void Start();
 		static void End();
 	};

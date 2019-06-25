@@ -49,3 +49,55 @@ char * gmItoa(int a_val, char * a_dst, int a_radix)
   return a_dst;
 }
 
+bool gmVariableCmp(const gmVariable & v0, const gmVariable & v1) {
+	if (v0.m_type == v1.m_type) {
+		gmType type = v0.m_type;
+
+		switch (type) {
+		case GM_INT: return v0.GetInt() < v1.GetInt();
+		case GM_FLOAT: return v0.GetFloat() < v1.GetFloat();
+		case GM_STRING: return strcmp(v0.GetCStringSafe(), v1.GetCStringSafe()) < 0;
+		default: return true;
+		}
+	} else {
+		return v0.m_type < v1.m_type;
+	}
+
+	GM_ASSERT(false);
+	return false;
+}
+
+void gmSortTableKeys(gmTableObject * table, std::vector<gmVariable *> & result) {
+	int tableSize = table->Count();
+
+	result.clear();
+
+	if (tableSize > 0) {
+		result.resize(tableSize);
+		gmSortTableKeysRaw(table, &result[0]);
+	}
+}
+
+void gmSortTableKeysRaw(gmTableObject * table, gmVariable ** result) {
+	int tableSize = table->Count();
+
+	gmTableIterator it;
+	gmTableNode * node = table->GetFirst(it);
+	int index = 0;
+	while (!table->IsNull(it)) {
+		result[index++] = &(node->m_key);
+		node = table->GetNext(it);
+	}
+
+	// sort keys
+	for (int i = 0; i < tableSize - 1; ++i) {
+		for (int j = i + 1; j < tableSize; ++j) {
+			if (!gmVariableCmp(*result[i], *result[j])) {
+				gmVariable * temp = result[i];
+				result[i] = result[j];
+				result[j] = temp;
+			}
+		}
+	}
+}
+

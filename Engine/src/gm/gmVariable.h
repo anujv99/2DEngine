@@ -37,6 +37,7 @@ typedef int gmType;
 #include "math/vec3.h"
 #include "math/vec2.h"
 #include "math/vec2i.h"
+#include "math/vecconversion.h"
 
 enum
 {
@@ -129,6 +130,8 @@ struct gmVariable
   inline bool IsNumber() const { return IsInt() || IsFloat(); }
   inline bool IsString() const { return m_type == GM_STRING; }
   inline bool IsFunction() const { return m_type == GM_FUNCTION; }
+  inline bool IsTable() const { return m_type == GM_TABLE; }
+  inline bool IsUser() const { return m_type == GM_USER; }
 
   // GetInt and GetFloat are not protected. User should verify the type before calling this.
   inline gmint GetInt() const  { return m_value.m_int; }

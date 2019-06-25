@@ -1,18 +1,15 @@
 #include "pch.h"
 #include "application.h"
 
-#include "common/log.h"
+#include "utils/input.h"
 
 #include "graphics/window.h"
 #include "graphics/graphicscontext.h"
-#include "utils/input.h"
-
 #include "graphics/renderstate.h"
-
 #include "graphics/immediategfx.h"
 #include "graphics/shadermanager.h"
-#include "math/mvp.h"
 
+#include "math/mvp.h"
 #include "math/mat4.h"
 
 #include "common/profiler.h"
@@ -20,6 +17,8 @@
 #include "vm/virtualmachine.h"
 
 #include <imgui.h>
+
+#include "renderer/spriterenderer.h"
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
@@ -48,12 +47,19 @@ namespace prev {
 
 		LayerStack::Ref().PushLayer(m_ImGuiLayer);
 
-		Profiler::CreateInst(); // Because profiler use imguilayer
+		Profiler::CreateInst(); // Because profiler use imgui layer
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
+		RenderState::Ref().DisableScissors();
+
 		VirtualMachine::CreateInst();
 		VirtualMachine::Ref().RunMain();
+
+		MVP::Ref().Projection().Push();
+		MVP::Ref().Projection().Load(Ortho(0, dis[selectedDis].GetWindowSize().x, 0, dis[selectedDis].GetWindowSize().y, -150.0f, 150.0f));
+
+		SpriteRenderer::CreateInst();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -62,6 +68,7 @@ namespace prev {
 	Application::~Application() {
 		MVP::Ref().Projection().Pop();
 
+		SpriteRenderer::DestroyInst();
 		VirtualMachine::DestroyInst();
 		Profiler::DestroyInst();
 		LayerStack::DestroyInst();
@@ -97,13 +104,19 @@ namespace prev {
 			Gui();
 			PROFILER_END("App::Gui");
 
-			static LineGraph graph(0.0f, 30.0f);
+			PROFILER_BEGIN("App::Draw");
+			Sprite sprite;
+			sprite.Position = Vec2(0);
+			sprite.Color = SpriteColor(Vec4(0, 0, 0, 1));
+			sprite.Dimension = Vec2(100);
 
-			ImGui::Begin("Test");
-			graph.DrawImGui();
-			ImGui::End();
+			for (unsigned int i = 0; i < 1024; i++) {
+				sprite.Position += Vec2(1);
+				SpriteRenderer::Ref().Submit(sprite);
+			}
 
-			graph.PushValue(Timer::GetDeltaTime() * 1000.0f);
+			SpriteRenderer::Ref().Render();
+			PROFILER_END("App::Draw");
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 

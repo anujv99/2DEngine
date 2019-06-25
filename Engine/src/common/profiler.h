@@ -56,6 +56,7 @@ namespace prev {
 		Entry * m_ActiveEntry;
 		bool m_IsPaused;
 		bool m_PlotGraph;
+		bool m_DrawGui;
 	};
 
 }

@@ -18,6 +18,7 @@
 
 class gmMachine;
 class gmDebugSession;
+class gmDebuggerFunk;
 
 // bind debug lib
 void gmBindDebugLib(gmMachine * a_machine);
@@ -51,6 +52,8 @@ public:
   gmSendDebuggerMessage m_sendMessage;
   gmPumpDebuggerMessage m_pumpMessage;
   void * m_user;
+
+  gmDebuggerFunk * m_owner;
 
   // send message helpers
   gmDebugSession &Pack(int a_val);

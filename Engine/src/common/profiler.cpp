@@ -5,6 +5,7 @@
 
 #include <imgui.h>
 #include "imgui/imguilayer.h"
+#include "utils/input.h"
 
 namespace prev {
 
@@ -12,8 +13,9 @@ namespace prev {
 	static const char PROFILER_IMGUI_WINDOW_NAME[] = "Profiler";
 	static const char PROFILER_GRAPHS_IMGUI_WINDOW_NAME[] = "Profiler Graphs";
 
-	Profiler::Profiler() : m_ActiveEntry(nullptr), m_RootEntry(PROFILER_ROOT_NAME, nullptr), m_IsPaused(false), m_PlotGraph(false) {
+	Profiler::Profiler() : m_ActiveEntry(nullptr), m_RootEntry(PROFILER_ROOT_NAME, nullptr), m_IsPaused(false), m_PlotGraph(false), m_DrawGui(false) {
 		auto imguilayer = LayerStack::Ref().GetImGuiLayer();
+		if (imguilayer == nullptr) return;
 		imguilayer->AddGuiFunction(std::bind(&Profiler::Gui, this));
 		imguilayer->AddGuiFunction(std::bind(&Profiler::GuiGraphs, this));
 	}
@@ -89,7 +91,14 @@ namespace prev {
 	}
 
 	void Profiler::Gui() {
-		ImGui::Begin(PROFILER_IMGUI_WINDOW_NAME, (bool *)0, ImGuiWindowFlags_AlwaysAutoResize);
+		if (Input::Ref().IsKeyPressed(PV_KEY_F3)) {
+			m_DrawGui = !m_DrawGui;
+		}
+
+		if (!m_DrawGui)
+			return;
+
+		ImGui::Begin(PROFILER_IMGUI_WINDOW_NAME, &m_DrawGui, ImGuiWindowFlags_AlwaysAutoResize);
 
 		ImGui::Text("Help");
 		ImGui::Separator();
@@ -141,14 +150,11 @@ namespace prev {
 	}
 
 	void Profiler::GuiGraphs() {
-		if (!m_PlotGraph) return;
+		if (!m_PlotGraph || !m_DrawGui) return;
 
 		ImGui::Begin(PROFILER_GRAPHS_IMGUI_WINDOW_NAME, (bool *)0, ImGuiWindowFlags_AlwaysAutoResize);
-
 		GuiGraph(&m_RootEntry);
-
 		ImGui::End();
-
 	}
 
 }

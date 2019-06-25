@@ -1056,6 +1056,9 @@ inline gmUserObject * gmThread::ThisUserObject()
 #define GM_CHECK_NUM_PARAMS(A) \
   if(GM_THREAD_ARG->GetNumParams() < (A)) { GM_EXCEPTION_MSG("expecting %d param(s)", (A)); return GM_EXCEPTION; }
 
+#define GM_CHECK_NUM_PARAMS_RANGE(MIN, MAX) \
+  if(GM_THREAD_ARG->GetNumParams() < (MIN) || GM_THREAD_ARG->GetNumParams() > (MAX)) { GM_EXCEPTION_MSG("expecting %d-%d param(s)", (MIN), (MAX)); return GM_EXCEPTION; }
+
 #define GM_CHECK_INT_PARAM(VAR, PARAM) \
   if(GM_THREAD_ARG->ParamType((PARAM)) != GM_INT) { GM_EXCEPTION_MSG("expecting param %d as int", (PARAM)); return GM_EXCEPTION; } \
   gmint VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_int;
@@ -1068,22 +1071,22 @@ inline gmUserObject * gmThread::ThisUserObject()
 #define GM_CHECK_VEC4_PARAM(VAR, PARAM)\
   if (GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC4)\
   { GM_EXCEPTION_MSG("expecting param %d as Vec4", (PARAM)); return GM_EXCEPTION; } \
-  gmVec4 VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec4;
+  gmvec4 VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec4;
 
 #define GM_CHECK_VEC3_PARAM(VAR, PARAM)\
   if (GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC3)\
   { GM_EXCEPTION_MSG("expecting param %d as Vec3", (PARAM)); return GM_EXCEPTION; } \
-  gmVec3 VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec3;
+  gmvec3 VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec3;
 
 #define GM_CHECK_VEC2_PARAM(VAR, PARAM)\
   if (GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC2)\
   { GM_EXCEPTION_MSG("expecting param %d as Vec2", (PARAM)); return GM_EXCEPTION; } \
-  gmVec2 VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec2;
+  gmvec2 VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec2;
 
 #define GM_CHECK_VEC2I_PARAM(VAR, PARAM)\
   if (GM_THREAD_ARG->ParamType((PARAM)) != GM_VEC2I)\
   { GM_EXCEPTION_MSG("expecting param %d as Vec2i", (PARAM)); return GM_EXCEPTION; } \
-  gmVec2i VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec2i;
+  gmvec2i VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec2i;
 
 #define GM_CHECK_STRING_PARAM(VAR, PARAM) \
   if(GM_THREAD_ARG->ParamType((PARAM)) != GM_STRING) { GM_EXCEPTION_MSG("expecting param %d as string", (PARAM)); return GM_EXCEPTION; } \
@@ -1143,6 +1146,15 @@ inline gmUserObject * gmThread::ThisUserObject()
   else \
     { GM_EXCEPTION_MSG("expecting param %d as float or int", (PARAM)); return GM_EXCEPTION; }
 
+
+#define GM_CHECK_VEC2_OR_VEC2I_PARAM(VAR, PARAM)\
+	Vec2 VAR;\
+	if (GM_THREAD_ARG->ParamType((PARAM)) == GM_VEC2)\
+		{ VAR = GM_THREAD_ARG->Param((PARAM)).m_value.m_vec2; }\
+	else if (GM_THREAD_ARG->ParamType((PARAM)) == GM_VEC2I)\
+		{ VAR = prev::ToVec2(GM_THREAD_ARG->Param((PARAM)).m_value.m_vec2i); }\
+	else\
+		{ GM_EXCEPTION_MSG("expecting param %d as vec2 or vec2i", (PARAM)); return GM_EXCEPTION; }
 
 #define GM_OP_ASSERT(COND, EXPECTED) do { gmOpAssert((COND), EXPECTED, a_thread, a_operands); } while(0)
 

@@ -45,20 +45,21 @@ namespace prev {
 		virtual void flush_() override { }
 	};
 
-	std::shared_ptr<CustomSink<spdlog::details::null_mutex>> s_CustomSink;
+	CustomSink<spdlog::details::null_mutex> * s_CustomSink;
 
 	void Logger::Initialize() {
-		s_CustomSink = std::make_shared<CustomSink<spdlog::details::null_mutex>>();
+		s_CustomSink = new CustomSink<spdlog::details::null_mutex>();
+		std::shared_ptr<CustomSink<spdlog::details::null_mutex>> sinkPtr(s_CustomSink);
 
 		spdlog::set_pattern("%^[%T] %n: %v%$");
 
 		s_CoreLogger = spdlog::stderr_color_st("ENGINE");
 		s_CoreLogger->set_level(spdlog::level::trace);
-		s_CoreLogger->sinks().push_back(s_CustomSink);
+		s_CoreLogger->sinks().push_back(sinkPtr);
 
 		s_ClinetLogger = spdlog::stderr_color_st("APP");
 		s_ClinetLogger->set_level(spdlog::level::trace);
-		s_ClinetLogger->sinks().push_back(s_CustomSink);
+		s_ClinetLogger->sinks().push_back(sinkPtr);
 	}
 	
 	void Logger::AddLogCallback(LogCallbackFunc callbackFunction) {
@@ -67,6 +68,9 @@ namespace prev {
 
 	Logger::Logger() {
 		Initialize();
+	}
+
+	Logger::~Logger() {
 	}
 
 }

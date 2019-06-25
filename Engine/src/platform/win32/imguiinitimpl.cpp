@@ -19,6 +19,11 @@ namespace prev {
 		ImGui_ImplDX11_Init(GetDevice(), GetDeviceContext());
 	}
 
+	void ImGuiLayer::DeleteImGui() {
+		ImGui_ImplDX11_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+	}
+
 	void ImGuiLayer::Start() {
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();

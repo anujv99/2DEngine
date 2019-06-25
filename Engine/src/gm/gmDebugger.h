@@ -12,12 +12,13 @@
 #ifndef _GMDEBUGGER_H_
 #define _GMDEBUGGER_H_
 
+#if 0
+
 //
 // Please note that gmDebugger.c/.h are for implementing
 // a debugger application and should not be included
 // in an normal GM application build.
 //
-
 
 class gmDebuggerSession;
 
@@ -112,3 +113,4 @@ void gmMachineQuit(gmDebuggerSession * a_session);
 
 #endif
 
+#endif

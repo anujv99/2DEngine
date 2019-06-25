@@ -4,6 +4,8 @@
 #include "virtualconsole.h"
 #include "graphics/linegraph.h"
 
+#include "virtualmachinedebugger.h"
+
 namespace prev {
 
 	class VirtualMachine : public Singleton<VirtualMachine> {
@@ -17,6 +19,7 @@ namespace prev {
 		void RunMain();
 
 		gmMachine & GetVM() { return *m_VM; }
+		VirtualConsole & GetConsole() { return m_Console; }
 	private:
 		void HandleErrors();
 
@@ -24,10 +27,10 @@ namespace prev {
 		void InitGlobals();
 
 		void InitGuiSettings();
-		std::string GuiSettings();
+		void GuiSettings();
 
 		void InitGuiThreadAllocations();
-		std::string GuiThreadAllocations();
+		void GuiThreadAllocations();
 	private:
 		int m_NumThreads;
 		int m_ThreadID;
@@ -57,6 +60,9 @@ namespace prev {
 		StrongHandle<LineGraph> m_LineGraphUpdate;
 		StrongHandle<LineGraph> m_LineGraphDraw;
 		StrongHandle<LineGraph> m_LineGraphMemory;
+
+		//
+		gmDebuggerFunk m_de;
 	};
 
 }

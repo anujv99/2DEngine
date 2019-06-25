@@ -28,11 +28,13 @@ namespace prev {
 	static const int MAX_OLD_COMMANDS = 16;
 	static const char * LOG_FILE = "log.txt";
 
-	VirtualConsole::VirtualConsole() {
+	VirtualConsole::VirtualConsole() : m_Enabled(false) {
 		m_CmdIndex = 0;
 		m_Text.reserve(1024 * 1024);
 
-		LayerStack::Ref().GetImGuiLayer()->AddGuiFunction(std::bind(&VirtualConsole::Gui, this));
+		ImGuiLayer * imlayer = LayerStack::Ref().GetImGuiLayer();
+		if (imlayer != nullptr)
+			imlayer->AddGuiFunction(std::bind(&VirtualConsole::Gui, this));
 
 		vmConsole.CommandCallbackFunction = [this](const char * command) -> void {
 			this->RunCommand(command);
@@ -110,6 +112,13 @@ namespace prev {
 	}
 
 	void VirtualConsole::Gui() {
+		if (Input::Ref().IsKeyPressed(PV_KEY_F2)) {
+			m_Enabled = !m_Enabled;
+		}
+
+		if (!m_Enabled)
+			return;
+
 		vmConsole.Draw("Console", &m_Enabled);
 	}
 

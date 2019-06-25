@@ -10,10 +10,11 @@
 #include "graphics/window.h"
 
 #include <imgui.h>
+#include "utils/input.h"
 
 namespace prev {
 
-	VirtualMachine::VirtualMachine() : 
+	VirtualMachine::VirtualMachine() :
 		m_NumThreads(0), m_ThreadID(0), 
 		m_DrawMs(0.0f), m_UpdateMs(0.0f), m_LastCallTime(0u),
 		m_VM(nullptr),
@@ -26,10 +27,14 @@ namespace prev {
 		InitGuiSettings();
 		InitGuiThreadAllocations();
 
-		LayerStack::Ref().GetImGuiLayer()->AddGuiFunction(std::bind(&VirtualMachine::GuiSettings, this));
+		ImGuiLayer * imlayer = LayerStack::Ref().GetImGuiLayer();
+		if (imlayer == nullptr) return;
+		imlayer->AddGuiFunction(std::bind(&VirtualMachine::GuiSettings, this));
 	}
 
 	VirtualMachine::~VirtualMachine() {
+		m_de.Close();
+
 		delete m_VM;
 		m_VM = nullptr;
 
@@ -43,15 +48,19 @@ namespace prev {
 		m_NumThreads = m_VM->Execute((int)Timer::GetTimeMs() - m_LastCallTime);
 		m_UpdateMs = Timer::GetTimeMs() - m_UpdateMs;
 		m_LastCallTime = (int)Timer::GetTimeMs();
+
+		m_de.Update();
 	}
 
 	void VirtualMachine::Render() {
 		if (!m_DrawManager.IsNull()) {
-			m_DrawMs = Timer::GetTimeMs();
-			m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(1));
-			m_VM->ExecuteFunction(m_DrawFunction, 0, true, &m_DrawManager);
-			m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(0));
-			m_DrawMs = Timer::GetTimeMs() - m_DrawMs;
+			if (!m_de.IsDebugging()) {
+				m_DrawMs = Timer::GetTimeMs();
+				m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(1));
+				m_VM->ExecuteFunction(m_DrawFunction, 0, true, &m_DrawManager);
+				m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(0));
+				m_DrawMs = Timer::GetTimeMs() - m_DrawMs;
+			}
 		}
 	}
 
@@ -67,6 +76,8 @@ namespace prev {
 		m_VM->SetDesiredByteMemoryUsageHard(memUsageHard);
 
 		m_VM->SetDebugMode(true);
+
+		m_de.Open(m_VM);
 
 		RegisterLibs(m_VM);
 		InitGlobals();
@@ -131,7 +142,16 @@ namespace prev {
 
 	}
 
-	std::string VirtualMachine::GuiSettings() {
+	void VirtualMachine::GuiSettings() {
+
+		static bool showGuiSettings = false;
+
+		if (Input::Ref().IsKeyPressed(PV_KEY_F1)) {
+			showGuiSettings = !showGuiSettings;
+		}
+
+		if (!showGuiSettings) return;
+
 		m_LineGraphUpdate->PushValue(m_UpdateMs);
 		m_LineGraphDraw->PushValue(m_DrawMs);
 		m_LineGraphMemory->SetMaxVal((float)m_VM->GetDesiredByteMemoryUsageHard());
@@ -142,7 +162,8 @@ namespace prev {
 		int memUsageSoft = m_VM->GetDesiredByteMemoryUsageSoft();
 		int memUsageHard = m_VM->GetDesiredByteMemoryUsageHard();
 
-		ImGui::Begin("GameMonkey Settings", (bool *)0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::SetNextWindowSize(Vec2(232, 800));
+		ImGui::Begin("GameMonkey Settings", &showGuiSettings, ImGuiWindowFlags_NoResize);
 		ImGui::Text("Update");
 		m_LineGraphUpdate->DrawImGui();
 		ImGui::Text("Draw");
@@ -153,17 +174,39 @@ namespace prev {
 			std::to_string(m_VM->GetCurrentMemoryUsage()).c_str());
 		ImGui::Text("Garbage Collector");
 		if (ImGui::Button("Force Full Collect")) { m_VM->CollectGarbage(true); }
-		ImGui::SliderInt("Work Per Increment", &workPerIncrement, 1, 600);
-		ImGui::SliderInt("Destructs Per Increment", &destructPerIncrement, 1, 600);
-		ImGui::SliderInt("Memory Usage Soft", &memUsageSoft, 200000, memUsageHard);
-		ImGui::SliderInt("Memory Usage Hard", &memUsageHard, memUsageSoft + 500, memUsageSoft + 200000);
+
+		ImGui::Text("Works Per Increment");
+		ImGui::PushID(&workPerIncrement);
+		ImGui::SliderInt("", &workPerIncrement, 1, 600);
+		ImGui::PopID();
+
+		ImGui::Text("Destructs Per Increment");
+		ImGui::PushID(&destructPerIncrement);
+		ImGui::SliderInt("", &destructPerIncrement, 1, 600);
+		ImGui::PopID();
+
+		ImGui::Text("Memory Usage Soft");
+		ImGui::PushID(&memUsageSoft);
+		ImGui::SliderInt("", &memUsageSoft, 200000, memUsageHard);
+		ImGui::PopID();
+
+		ImGui::Text("Memory Usage Hard");
+		ImGui::PushID(&memUsageHard);
+		ImGui::SliderInt("", &memUsageHard, memUsageSoft + 500, memUsageSoft + 200000);
+		ImGui::PopID();
+
 		ImGui::Separator();
 
 		int gcWarning = m_VM->GetStatsGCNumWarnings();
+		int gcNumFullCollects = m_VM->GetStatsGCNumFullCollects();
+		int gcNumIncCollects = m_VM->GetStatsGCNumIncCollects();
 
-		ImGui::ProgressBar(gcWarning == 0 ? 0 : 200.0f / gcWarning, Vec2(-1, 0), std::to_string(gcWarning).c_str());
-		ImGui::ProgressBar(100.0f / (float)m_VM->GetStatsGCNumFullCollects());
-		ImGui::ProgressBar(100.0f / (float)m_VM->GetStatsGCNumIncCollects());
+		ImGui::Text("GC Warning");
+		ImGui::ProgressBar(gcWarning == 0 ? 0 : gcWarning / 200.0f, Vec2(-1, 0), std::to_string(gcWarning).c_str());
+		ImGui::Text("GC Full Collects");
+		ImGui::ProgressBar(gcNumFullCollects == 0 ? 0 : gcNumFullCollects / 200.0f, Vec2(-1, 0), std::to_string(gcNumFullCollects).c_str());
+		ImGui::Text("GC Inc Collects");
+		ImGui::ProgressBar(gcNumIncCollects == 0 ? 0 : gcNumIncCollects / 200.0f, Vec2(-1, 0), std::to_string(gcNumIncCollects).c_str());
 		ImGui::End();
 
 		m_VM->SetDesiredByteMemoryUsageSoft(memUsageSoft);
@@ -171,7 +214,7 @@ namespace prev {
 		m_VM->GetGC()->SetWorkPerIncrement(workPerIncrement);
 		m_VM->GetGC()->SetDestructPerIncrement(destructPerIncrement);
 
-		return "GameMonkey Settings";
+		m_de.Gui();
 	}
 
 	void VirtualMachine::InitGuiThreadAllocations() {
@@ -179,8 +222,7 @@ namespace prev {
 		m_FreezThreadAllocationGui = false;
 	}
 
-	std::string VirtualMachine::GuiThreadAllocations() {
-		return "";
+	void VirtualMachine::GuiThreadAllocations() {
 	}
 
 }

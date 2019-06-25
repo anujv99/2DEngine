@@ -9,6 +9,8 @@
 
 */
 
+#if 0
+
 #include <string.h>
 #include "gmDebugger.h"
 
@@ -85,8 +87,8 @@ void gmDebuggerSession::Update()
 {
   for(;;)
   {
-    m_in = m_pumpMessage(this, m_inSize);
-    if(m_in == NULL) break;
+	m_in = m_pumpMessage(this, m_inSize);
+	if (m_in == NULL) break;
     m_inCursor = 0;
 
     int id, pa, pb, pc;
@@ -319,3 +321,5 @@ void gmMachineQuit(gmDebuggerSession * a_session)
 {
   a_session->Pack(ID_mend).Send();
 }
+
+#endif
