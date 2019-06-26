@@ -15,6 +15,8 @@
 #define X1BUTTONCODE	3
 #define X2BUTTONCODE	4
 
+extern LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 namespace prev {
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
