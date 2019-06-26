@@ -104,20 +104,6 @@ namespace prev {
 			Gui();
 			PROFILER_END("App::Gui");
 
-			PROFILER_BEGIN("App::Draw");
-			Sprite sprite;
-			sprite.Position = Vec2(0);
-			sprite.Color = SpriteColor(Vec4(0, 0, 0, 1));
-			sprite.Dimension = Vec2(100);
-
-			for (unsigned int i = 0; i < 1024; i++) {
-				sprite.Position += Vec2(1);
-				SpriteRenderer::Ref().Submit(sprite);
-			}
-
-			SpriteRenderer::Ref().Render();
-			PROFILER_END("App::Draw");
-
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
 			LayerStack::Ref().GetImGuiLayer()->EndFrame();

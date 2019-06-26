@@ -68,17 +68,28 @@ namespace prev {
 		drawVertices[4].Color = sprite.Color;
 		drawVertices[5].Color = sprite.Color;
 
-		size_t index = m_DrawGroups[0].Vertices.size();
-		m_DrawGroups[0].Vertices.resize(index + 6);
+		//size_t index = m_DrawGroups[0].Vertices.size();
+		//m_DrawGroups[0].Vertices.resize(index + 6);
+		//std::memcpy(&m_DrawGroups[0].Vertices[index], drawVertices, sizeof(drawVertices));
 
-		std::memcpy(&m_DrawGroups[0].Vertices[index], drawVertices, sizeof(drawVertices));
+		unsigned int drawGroup = 0u;
+
+		std::memcpy(
+			m_DrawGroups[drawGroup].MappedBuffer + m_DrawGroups[drawGroup].MappedBufferIndex,
+			drawVertices,
+			sizeof(drawVertices)
+		);
+
+		m_DrawGroups[drawGroup].MappedBufferIndex += std::size(drawVertices);
 	}
 
 	void SpriteRenderer::Render() {
-		auto & vertices = m_DrawGroups[0].Vertices;
-		auto & drawBuffer = m_DrawGroups[0].DrawBuffer;
+		unsigned int drawGroup = 0u;
 
-		drawBuffer->SubData(vertices.data(), vertices.size() * sizeof(vertices[0]), 0);
+		StrongHandle<VertexBuffer> & drawBuffer = m_DrawGroups[drawGroup].DrawBuffer;
+		unsigned int & numVertices = m_DrawGroups[drawGroup].MappedBufferIndex;
+	
+		drawBuffer->UnMap();
 
 		drawBuffer->Bind();
 		m_VertexLayout->Bind();
@@ -86,9 +97,10 @@ namespace prev {
 		m_PixelShader->Bind();
 		m_VertexShader->UpdateMVP();
 
-		drawBuffer->Draw(vertices.size(), 0);
-		vertices.clear();
-		vertices.reserve(MAX_NUM_VERTICES);
+ 		drawBuffer->Draw(numVertices, 0);
+
+		m_DrawGroups[drawGroup].MappedBuffer = reinterpret_cast<SpriteVertex *>(m_DrawGroups[drawGroup].DrawBuffer->Map());
+		numVertices = 0u;
 	}
 
 	void SpriteRenderer::CreateVertexLayout() {
@@ -96,7 +108,7 @@ namespace prev {
 		m_VertexLayout->BeginEntries();
 		m_VertexLayout->AddEntry(PV_DATA_TYPE_FLOAT_32, 2, offsetof(SpriteVertex, Position), "POSITION", false);
 		m_VertexLayout->AddEntry(PV_DATA_TYPE_FLOAT_32, 2, offsetof(SpriteVertex, UV), "TEXCOORDS", false);
-		m_VertexLayout->AddEntry(PV_DATA_TYPE_FLOAT_32, 4, offsetof(SpriteVertex, Color), "COLOR", true);
+		m_VertexLayout->AddEntry(PV_DATA_TYPE_UINT_8, 4, offsetof(SpriteVertex, Color), "COLOR", true);
 		m_VertexLayout->EndEntries(m_VertexShader);
 	}
 
@@ -109,9 +121,10 @@ namespace prev {
 		size_t index = m_DrawGroups.size();
 
 		m_DrawGroups.resize(index + 1);
-		m_DrawGroups[index].Vertices.reserve(MAX_NUM_VERTICES);
 		m_DrawGroups[index].DrawBuffer = VertexBuffer::CreateVertexBuffer();
 		m_DrawGroups[index].DrawBuffer->Init(nullptr, MAX_NUM_VERTICES, sizeof(SpriteVertex), BUFFER_USAGE_STREAM);
+		m_DrawGroups[index].MappedBuffer = reinterpret_cast<SpriteVertex *>(m_DrawGroups[index].DrawBuffer->Map());
+		m_DrawGroups[index].MappedBufferIndex = 0u;
 	}
 
 }

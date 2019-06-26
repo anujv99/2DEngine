@@ -49,8 +49,9 @@ namespace prev {
 
 		//each group will have it's own texture
 		struct SpriteGroup {
-			std::vector<SpriteVertex> Vertices;
 			StrongHandle<VertexBuffer> DrawBuffer;
+			SpriteVertex * MappedBuffer;
+			unsigned int MappedBufferIndex;
 		};
 
 		std::vector<SpriteGroup> m_DrawGroups;

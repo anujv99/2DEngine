@@ -2,7 +2,9 @@
 CreateDrawManager = function() {
 	
 	DrawManager = {
-		tar = Vec4(0, 0, 0, 1)
+		tar = Vec4(0, 0, 0, 1),
+		pos = Vec2(500),
+		radius = 100
 	};
 
 	DrawManager.Init = function() {
@@ -15,12 +17,15 @@ CreateDrawManager = function() {
 	DrawManager.Draw = function() {
 		Gui.Begin("Hello");
 		.tar = Gui.ColorEdit4("Shit Amount", .tar);
+		.pos = Gui.SliderVec2("Pos", .pos, 0, 1280);
+		.radius = Gui.SliderInt("Rad", .radius, 0, 500);
 		Gui.End();
 
+		
 		Imm.BeginDefaultShader();
 		Imm.BeginDraw();
 		Imm.Color(.tar);
-		Imm.DrawCircle(Vec2(500), 100);
+		Imm.DrawCircle(.pos, .radius, 7);
 	};
 
 	DrawManager.Clear = function() {

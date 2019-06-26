@@ -154,8 +154,8 @@ namespace prev {
 			GM_CHECK_NUM_PARAMS(4);
 			GM_CHECK_STRING_PARAM(name, 0);
 			GM_CHECK_FLOAT_PARAM(val, 1);
-			GM_CHECK_FLOAT_PARAM(min, 2);
-			GM_CHECK_FLOAT_PARAM(max, 3);
+			GM_CHECK_FLOAT_OR_INT_PARAM(min, 2);
+			GM_CHECK_FLOAT_OR_INT_PARAM(max, 3);
 
 			ImGui::SliderFloat(name, &val, min, max);
 			a_thread->PushFloat(val);
@@ -167,8 +167,8 @@ namespace prev {
 			GM_CHECK_NUM_PARAMS(4);
 			GM_CHECK_STRING_PARAM(name, 0);
 			GM_VEC2_PARAM(val, 1);
-			GM_CHECK_INT_PARAM(min, 2);
-			GM_CHECK_INT_PARAM(max, 3);
+			GM_CHECK_FLOAT_OR_INT_PARAM(min, 2);
+			GM_CHECK_FLOAT_OR_INT_PARAM(max, 3);
 
 			ImGui::SliderFloat2(name, &val[0], min, max);
 			a_thread->PushVec2(val);
@@ -180,8 +180,8 @@ namespace prev {
 			GM_CHECK_NUM_PARAMS(4);
 			GM_CHECK_STRING_PARAM(name, 0);
 			GM_VEC3_PARAM(val, 1);
-			GM_CHECK_INT_PARAM(min, 2);
-			GM_CHECK_INT_PARAM(max, 3);
+			GM_CHECK_FLOAT_OR_INT_PARAM(min, 2);
+			GM_CHECK_FLOAT_OR_INT_PARAM(max, 3);
 
 			ImGui::SliderFloat3(name, &val[0], min, max);
 			a_thread->PushVec3(val);
@@ -193,8 +193,8 @@ namespace prev {
 			GM_CHECK_NUM_PARAMS(4);
 			GM_CHECK_STRING_PARAM(name, 0);
 			GM_VEC4_PARAM(val, 1);
-			GM_CHECK_INT_PARAM(min, 2);
-			GM_CHECK_INT_PARAM(max, 3);
+			GM_CHECK_FLOAT_OR_INT_PARAM(min, 2);
+			GM_CHECK_FLOAT_OR_INT_PARAM(max, 3);
 
 			ImGui::SliderFloat4(name, &val[0], min, max);
 			a_thread->PushVec4(val);

@@ -3,9 +3,10 @@
 
 #include "gm/gmMathLib.h"
 #include "gm/gmDebug.h"
-#include "gmbind/gmImmediateGfxLib.h"
 
+#include "gmbind/gmImmediateGfxLib.h"
 #include "gmbind/gmimguilib.h"
+#include "gmbind/gminputlib.h"
 
 namespace prev {
 
@@ -18,6 +19,7 @@ namespace prev {
 		//Custom Libs
 		gmBindImGuiLib(vm);
 		gmBindImmediateGFXLib(vm);
+		gmBindInputLib(vm);
 
 		//CustomLibs
 	}

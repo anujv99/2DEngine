@@ -21,6 +21,8 @@ namespace prev {
 		virtual void Init(const void * data, unsigned int numElements, unsigned int strideBytes, BufferUsage bufferType) = 0;
 		virtual void SubData(const void * data, unsigned int numBytes, unsigned int byteOffset) = 0;
 		virtual void Draw(unsigned int numVertices, unsigned int vertexOffset) = 0;
+		virtual void * Map() = 0;
+		virtual void UnMap() = 0;
 
 		virtual BindableType GetType() const override {
 			return BindableType::VERTEX_BUFFER;

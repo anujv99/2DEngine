@@ -41,6 +41,14 @@ namespace prev {
 				}
 			}
 
+			if (normalize) {
+				if (dataType == PV_DATA_TYPE_FLOAT_16 || dataType == PV_DATA_TYPE_FLOAT_32 || 
+					dataType == PV_DATA_TYPE_SINT_32 || dataType == PV_DATA_TYPE_UINT_32) {
+					LOG_ERROR("Connot use float or 32 bit data when normalizing, Use SINT or UINT with 16 or 8 bits instead");
+					return;
+				}
+			}
+
 			Entry & entry = m_Entries[m_NumEntries];
 			entry.EntryDataType = dataType;
 			entry.NumElements = numElements;
