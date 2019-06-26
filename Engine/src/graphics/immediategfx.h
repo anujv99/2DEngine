@@ -22,6 +22,7 @@ namespace prev {
 		~ImmediateGFX();
 
 		void InitializeVertexBuffer();
+		void DrawCurrentPrimitive();
 	private:
 		StrongHandle<VertexShader> m_VertexShader;
 		StrongHandle<PixelShader> m_PixelShader;

@@ -1,0 +1,40 @@
+
+CreateDrawManager = function() {
+	
+	DrawManager = {
+		tar = Vec4(0, 0, 0, 1),
+		pos = Vec2(500),
+		radius = 100
+	};
+
+	DrawManager.Init = function() {
+		global a = Vec4(1, 2, 3, 4);
+		global b = Vec3(0, 7, 9);
+		print(b.xyya / a);
+		print("Init Draw Manager");
+	};
+
+	DrawManager.Draw = function() {
+		Gui.Begin("Hello");
+		.tar = Gui.ColorEdit4("Shit Amount", .tar);
+		.pos = Gui.SliderVec2("Pos", .pos, 0, 1280);
+		.radius = Gui.SliderInt("Rad", .radius, 0, 500);
+		Gui.End();
+
+		
+		Imm.BeginDefaultShader();
+		Imm.BeginDraw();
+		Imm.Color(.tar);
+		Imm.DrawCircle(.pos, .radius, 7);
+	};
+
+	DrawManager.Clear = function() {
+		print("Clear Draw Manager");
+	};
+
+	return DrawManager;
+
+};
+
+global g_DrawManager = CreateDrawManager();
+g_DrawManager.Init();

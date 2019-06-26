@@ -6,6 +6,8 @@
 #include "prevmath.h"
 #include "vec2.h"
 
+#include "gm/gmMathVector.h"
+
 namespace prev {
 
 	class Vec3 {
@@ -13,10 +15,12 @@ namespace prev {
 		union {
 			struct { float x, y, z; };
 			struct { float r, g, b; };
+			gmvec3 gmv;
 		};
 
 		Vec3();
 		explicit Vec3(float _v);
+		Vec3(gmvec3 _vec);
 		Vec3(float _x, float _y, float _z);
 		explicit Vec3(const Vec2 &_vec);
 

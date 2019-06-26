@@ -1,5 +1,6 @@
 inline Vec2i::Vec2i() : x(0), y(0) {}
 inline Vec2i::Vec2i(int _v) : x(_v), y(_v) {}
+inline Vec2i::Vec2i(gmvec2i _vec) : x(_vec.x), y(_vec.y) {}
 inline Vec2i::Vec2i(int _x, int _y) : x(_x), y(_y) {}
 
 inline Vec2i & Vec2i::operator+=(const Vec2i & _vec) {

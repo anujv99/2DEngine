@@ -108,6 +108,7 @@ namespace prev {
 		void AddLogCallback(LogCallbackFunc callbackFunction);
 	private:
 		Logger();
+		~Logger();
 		void Initialize();
 	private:
 		std::shared_ptr<spdlog::logger> s_CoreLogger;

@@ -1,3 +1,9 @@
 [submodule "Engine/vendor/spdlog"]
 	path = Engine/vendor/spdlog
 	url = https://github.com/preversewharf45/spdlog
+[submodule "Engine/vendor/gmscript"]
+	path = Engine/vendor/gmscript
+	url = https://github.com/preversewharf45/gmscript
+[submodule "Engine/vendor/imgui"]
+	path = Engine/vendor/imgui
+	url = https://github.com/preversewharf45/imgui/

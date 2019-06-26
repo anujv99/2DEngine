@@ -1,23 +1,26 @@
 #include "pch.h"
 #include "application.h"
 
-#include "common/log.h"
+#include "utils/input.h"
 
 #include "graphics/window.h"
 #include "graphics/graphicscontext.h"
-#include "utils/input.h"
-
 #include "graphics/renderstate.h"
-
 #include "graphics/immediategfx.h"
 #include "graphics/shadermanager.h"
-#include "math/mvp.h"
-#include "imgui/imguilayer.h"
-#include "imgui/Imgui.h"
 
+#include "math/mvp.h"
 #include "math/mat4.h"
 
 #include "common/profiler.h"
+
+#include "vm/virtualmachine.h"
+
+#include <imgui.h>
+
+#include "renderer/spriterenderer.h"
+
+extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
@@ -26,8 +29,8 @@ namespace prev {
 		EventHandler::CreateInst();
 
 		auto dis = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 5;
-		dis[selectedDis].SetWindowStyle(WindowStyle::WINDOWED);
+		unsigned int selectedDis = 0;
+		dis[selectedDis].SetWindowStyle(WindowStyle::FULLSCREEN);
 		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
@@ -37,15 +40,26 @@ namespace prev {
 		RenderState::CreateInst();
 		ShaderManager::CreateInst();
 		ImmediateGFX::CreateInst();
-		Profiler::CreateInst();
 		LayerStack::CreateInst();
 		//ImGui Layer
-		//LayerStack::Ref().PushLayer(new ImGuiLayer());
 
-		Profiler::Ref().PushGUILayer(); // Because profiler depends on imgui layer
+		m_ImGuiLayer = new ImGuiLayer();
+
+		LayerStack::Ref().PushLayer(m_ImGuiLayer);
+
+		Profiler::CreateInst(); // Because profiler use imgui layer
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
+		RenderState::Ref().DisableScissors();
+
+		VirtualMachine::CreateInst();
+		VirtualMachine::Ref().RunMain();
+
+		MVP::Ref().Projection().Push();
+		MVP::Ref().Projection().Load(Ortho(0, dis[selectedDis].GetWindowSize().x, 0, dis[selectedDis].GetWindowSize().y, -150.0f, 150.0f));
+
+		SpriteRenderer::CreateInst();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -54,6 +68,8 @@ namespace prev {
 	Application::~Application() {
 		MVP::Ref().Projection().Pop();
 
+		SpriteRenderer::DestroyInst();
+		VirtualMachine::DestroyInst();
 		Profiler::DestroyInst();
 		LayerStack::DestroyInst();
 		ImmediateGFX::DestroyInst();
@@ -75,10 +91,14 @@ namespace prev {
 			Timer::Update();
 
 			GraphicsContext::Ref().BeginFrame();
+			LayerStack::Ref().GetImGuiLayer()->StartFrame();
 
 			LayerStack::Ref().OnUpdate();
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
+
+			VirtualMachine::Ref().Update();
+			VirtualMachine::Ref().Render();
 
 			PROFILER_BEGIN("App::Gui");
 			Gui();
@@ -86,6 +106,7 @@ namespace prev {
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
+			LayerStack::Ref().GetImGuiLayer()->EndFrame();
 			GraphicsContext::Ref().EndFrame();
 
 			Window::Ref().PollEvents();

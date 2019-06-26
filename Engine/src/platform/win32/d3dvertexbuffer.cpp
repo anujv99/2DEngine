@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "d3dvertexbuffer.h"
 
+unsigned int GLOBAL_DRAW_CALL_COUNT = 0;
+
 namespace prev {
 
 	StrongHandle<VertexBuffer> VertexBuffer::CreateVertexBuffer() {
@@ -12,7 +14,8 @@ namespace prev {
 		m_NumElements(0),
 		m_TotalBytes(0),
 		m_BufferUsage(D3D11_USAGE_DEFAULT),
-		m_IsInitialized(false)
+		m_IsInitialized(false),
+		m_IsMapped(false)
 	{}
 
 	void D3DVertexBuffer::Init(const void * data, unsigned int numElements, unsigned int strideBytes, BufferUsage bufferType) {
@@ -77,7 +80,24 @@ namespace prev {
 	}
 
 	void D3DVertexBuffer::Draw(unsigned int numVertices, unsigned int vertexOffset) {
+		GLOBAL_DRAW_CALL_COUNT++;
 		GetDeviceContext()->Draw(numVertices, vertexOffset);
+	}
+
+	void * D3DVertexBuffer::Map() {
+		if (m_IsMapped) return m_MappedBuffer.pData;
+
+		GetDeviceContext()->Map(m_Buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &m_MappedBuffer);
+		m_IsMapped = true;
+		return m_MappedBuffer.pData;
+	}
+
+	void D3DVertexBuffer::UnMap() {
+		if (!m_IsMapped) return;
+		GetDeviceContext()->Unmap(m_Buffer.Get(), 0);
+		ZeroMemory(&m_MappedBuffer, sizeof(m_MappedBuffer));
+		m_IsMapped = false;
+		return;
 	}
 
 	void D3DVertexBuffer::Bind() {

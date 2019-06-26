@@ -3,6 +3,8 @@
 #include "prevmath.h"
 #include "common/assert.h"
 
+#include "gm/gmMathVector.h"
+
 namespace prev {
 
 	class Vec2i {
@@ -10,10 +12,12 @@ namespace prev {
 		union {
 			struct { int x, y; };
 			struct { int u, v; };
+			gmvec2i gmv;
 		};
 
 		Vec2i();
 		explicit Vec2i(int _v);
+		Vec2i(gmvec2i _vec);
 		Vec2i(int _x, int _y);
 
 		int & operator[](unsigned int _index) { ASSERT(_index < 2); return (&x)[_index]; }

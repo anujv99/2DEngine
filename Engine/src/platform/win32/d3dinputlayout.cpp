@@ -57,6 +57,49 @@ namespace prev {
 
 	DXGI_FORMAT D3DInputLayout::GetLayoutFormat(LayoutDataType dataType, unsigned int numElements, bool normalized) {
 
+		if (normalized) {
+			switch (dataType) {
+			case prev::PV_DATA_TYPE_SINT_16:
+			{
+				switch (numElements) {
+				case 1: return DXGI_FORMAT_R16_SNORM;
+				case 2: return DXGI_FORMAT_R16G16_SNORM;
+				case 4: return DXGI_FORMAT_R16G16B16A16_SNORM;
+				default: DXGI_FORMAT_UNKNOWN;
+				}
+			}
+			case prev::PV_DATA_TYPE_SINT_8:
+			{
+				switch (numElements) {
+				case 1: return DXGI_FORMAT_R8_SNORM;
+				case 2: return DXGI_FORMAT_R8G8_SNORM;
+				case 4: return DXGI_FORMAT_R8G8B8A8_SNORM;
+				default: DXGI_FORMAT_UNKNOWN;
+				}
+			}
+			case prev::PV_DATA_TYPE_UINT_16:
+			{
+				switch (numElements) {
+				case 1: return DXGI_FORMAT_R16_UNORM;
+				case 2: return DXGI_FORMAT_R16G16_UNORM;
+				case 4: return DXGI_FORMAT_R16G16B16A16_UNORM;
+				default: DXGI_FORMAT_UNKNOWN;
+				}
+			}
+			case prev::PV_DATA_TYPE_UINT_8:
+			{
+				switch (numElements) {
+				case 1: return DXGI_FORMAT_R8_UNORM;
+				case 2: return DXGI_FORMAT_R8G8_UNORM;
+				case 4: return DXGI_FORMAT_R8G8B8A8_UNORM;
+				default: DXGI_FORMAT_UNKNOWN;
+				}
+			}
+			default:
+				break;
+			}
+		}
+
 		switch (dataType) {
 		case PV_DATA_TYPE_FLOAT_32:
 		{

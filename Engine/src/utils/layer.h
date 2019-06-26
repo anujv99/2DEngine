@@ -14,7 +14,7 @@ namespace prev {
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
 		virtual void OnUpdate() {}
-		virtual std::string OnImGuiUpdate() { return ""; } // please return the window name
+		virtual void OnImGuiUpdate() {} // please return the window name
 		virtual void OnEvent(Event & event) {}
 
 		inline const std::string & GetName() const { return m_DebugName; }

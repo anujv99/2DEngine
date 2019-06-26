@@ -12,12 +12,14 @@ workspace "2DEngine"
 
     IncludeDirs = {}
     IncludeDirs["spdlog"] = "Engine/vendor/spdlog/include"
+	IncludeDirs["imgui"] = "Engine/vendor/imgui"
 
     include "Engine/vendor/spdlog"
+	include "Engine/vendor/imgui"
 
     project "Engine"
         location "Engine"
-        kind "StaticLib"
+        kind "ConsoleApp"
         language "C++"
         cppdialect "C++17"
 		staticruntime "on"
@@ -29,15 +31,17 @@ workspace "2DEngine"
             "%{prj.name}/src/**.h",
             "%{prj.name}/src/**.cpp"
         }
-
+		
         links {
+			"ImGui",
             "d3d11.lib",
             "dxgi.lib",
-            "d3dcompiler.lib"
+            "d3dcompiler.lib",
         }
 
         includedirs {
             "%{IncludeDirs.spdlog}",
+            "%{IncludeDirs.imgui}",
 			"%{prj.name}/src",
 			"%{prj.name}"
         }
@@ -45,54 +49,17 @@ workspace "2DEngine"
 		defines {
 			"USER_ENGINE",
 			"LOG_DETAILED",
-			--"LOG_DISABLED"
+			--"LOG_DISABLED",
+			"PREVMATH",
 		}
-
+		
         pchsource "%{prj.name}/src/pch.cpp"
         pchheader "pch.h"
-
-        filter "configurations:Debug"
-            defines {"ENGINE_DEBUG"}
-            runtime "Debug"
-            symbols "On"
-
-        filter "configurations:Release"
-            defines {"ENGINE_RELEASE"}
-            runtime "Release"
-	        optimize "On"
-
-	    filter "configurations:Distribute"
-            defines {"ENGINE_DIST"}
-            runtime "Release"
-		    optimize "On"
-			
-	project "App"
-		location "App"
-        kind "ConsoleApp"
-        language "C++"
-        cppdialect "C++17"
-		staticruntime "on"
-
-        targetdir ("bin/" .. outputDir .. "%{prj.name}")
-        objdir ("bin-int/" .. outputDir .. "%{prj.name}")
-
-        files {
-            "%{prj.name}/src/**.h",
-            "%{prj.name}/src/**.cpp",
-        }
-
-        links {
-            "Engine",
-        }
-
-        includedirs {
-			"Engine/src/",
-			"%{prj.name}/src",
-			"%{prj.name}",
-			"%{IncludeDirs.spdlog}",
-        }
 		
-		filter "configurations:Debug"
+		filter "files:Engine/src/gm/**.cpp"
+			flags { "NoPCH" }
+		
+        filter "configurations:Debug"
             defines {"ENGINE_DEBUG"}
             runtime "Debug"
             symbols "On"
