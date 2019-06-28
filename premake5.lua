@@ -13,9 +13,11 @@ workspace "2DEngine"
     IncludeDirs = {}
     IncludeDirs["spdlog"] = "Engine/vendor/spdlog/include"
 	IncludeDirs["imgui"] = "Engine/vendor/imgui"
+	IncludeDirs["box2d"] = "Engine/vendor/box2d"
 
     include "Engine/vendor/spdlog"
 	include "Engine/vendor/imgui"
+	include "Engine/vendor/box2d"
 
     project "Engine"
         location "Engine"
@@ -34,6 +36,7 @@ workspace "2DEngine"
 		
         links {
 			"ImGui",
+			"Box2D",
             "d3d11.lib",
             "dxgi.lib",
             "d3dcompiler.lib",
@@ -42,6 +45,7 @@ workspace "2DEngine"
         includedirs {
             "%{IncludeDirs.spdlog}",
             "%{IncludeDirs.imgui}",
+            "%{IncludeDirs.box2d}",
 			"%{prj.name}/src",
 			"%{prj.name}"
         }
