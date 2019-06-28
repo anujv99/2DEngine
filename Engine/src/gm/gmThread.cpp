@@ -175,12 +175,12 @@ void gmThread::Mark(gmuint32 a_mark)
 // RAGE AGAINST THE VIRTUAL MACHINE =)
 gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
 {
-  register union
+  union
   {
     const gmuint8 * instruction;
     const gmuint32 * instruction32;
   };
-  register gmVariable * top;
+  gmVariable * top;
   gmVariable * base;
   gmVariable * operand;
   const gmuint8 * code;
@@ -294,7 +294,7 @@ gmThread::State gmThread::Sys_Execute(gmVariable * a_return)
         --top; 
         
         // NOTE: Classic logic for operators.  Higher type processes the operation.
-        register gmType t1 = operand[1].m_type; 
+        gmType t1 = operand[1].m_type; 
         if(operand->m_type > t1) t1 = operand->m_type; 
         
         gmOperatorFunction op = OPERATOR(t1, (gmOperator) instruction32[-1]); 

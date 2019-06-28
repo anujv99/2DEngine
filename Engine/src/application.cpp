@@ -19,10 +19,14 @@
 #include <imgui.h>
 
 #include "renderer/spriterenderer.h"
+#include "game/particlesystem.h"
+#include "renderer/particlerenderer.h"
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
+
+	ParticleSystem ps(1024);
 
 	Application::Application() {
 		Timer::FPSCounter(true);
@@ -57,9 +61,11 @@ namespace prev {
 		VirtualMachine::Ref().RunMain();
 
 		MVP::Ref().Projection().Push();
-		MVP::Ref().Projection().Load(Ortho(0, dis[selectedDis].GetWindowSize().x, 0, dis[selectedDis].GetWindowSize().y, -150.0f, 150.0f));
+		Vec2 winSize = ToVec2(dis[selectedDis].GetWindowSize());
+		MVP::Ref().Projection().Load(Ortho(0.0f, winSize.x, 0.0f, winSize.y, -150.0f, 150.0f));
 
 		SpriteRenderer::CreateInst();
+		ParticleRenderer::CreateInst();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -68,6 +74,7 @@ namespace prev {
 	Application::~Application() {
 		MVP::Ref().Projection().Pop();
 
+		ParticleRenderer::DestroyInst();
 		SpriteRenderer::DestroyInst();
 		VirtualMachine::DestroyInst();
 		Profiler::DestroyInst();
@@ -83,8 +90,6 @@ namespace prev {
 	}
 
 	void Application::Run() {
-		srand(Timer::GetTime());
-
 		while (m_ApplicationRunning) {
 			PROFILER_ROOT_BEGIN;
 
@@ -102,7 +107,13 @@ namespace prev {
 
 			PROFILER_BEGIN("App::Gui");
 			Gui();
+			ps.Gui();
 			PROFILER_END("App::Gui");
+
+			PROFILER_BEGIN("App::Partcile");
+			ps.Update();
+			ParticleRenderer::Ref().Render(ps);
+			PROFILER_END("App::Partcile");
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 

@@ -20,7 +20,7 @@ namespace prev {
 		auto & batch = GetVertexBatch();
 
 		if (!batch.empty()) {
-			vbo->Init(&batch.front(), batch.size(), GetNumBytesPerVertex(), BUFFER_USAGE_STATIC);
+			vbo->Init(&batch.front(), (unsigned int)batch.size(), GetNumBytesPerVertex(), BUFFER_USAGE_STATIC);
 		}
 
 		return vbo;

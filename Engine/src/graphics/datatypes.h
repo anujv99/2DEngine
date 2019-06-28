@@ -28,4 +28,27 @@ namespace prev {
 		PV_TEXTURE_FILTER_NEAREST
 	};
 
+	enum BlendOption {
+		PV_BLEND_ZERO,
+		PV_BLEND_ONE,
+		PV_BLEND_SRC_ALPHA,
+		PV_BLEND_INV_SRC_ALPHA,
+		PV_BLEND_DEST_ALPHA,
+		PV_BLEND_INV_DEST_ALPHA
+	};
+
+	enum BlendOperation {
+		PV_BLEND_OP_ADD,
+		PV_BLEND_OP_SUBTRACT,
+		PV_BLEND_OP_REV_SUBTRACT,
+		PV_BLEND_OP_MIN,
+		PV_BLEND_OP_MAX
+	};
+
+	struct BlendFunction {
+		BlendOption SrcBlend;
+		BlendOption DestBlend;
+		BlendOperation Operation;
+	};
+
 }

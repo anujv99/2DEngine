@@ -252,7 +252,7 @@ namespace prev {
 
 			std::string buffer(buff);
 			ImGui::InputText(name, &buffer);
-			a_thread->PushNewString(buffer.c_str(), buffer.size());
+			a_thread->PushNewString(buffer.c_str(), (int)buffer.size());
 
 			return GM_OK;
 		}

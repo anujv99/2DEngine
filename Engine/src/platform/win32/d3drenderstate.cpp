@@ -10,10 +10,12 @@ namespace prev {
 	D3DRenderSate::D3DRenderSate() {
 		m_PrimitiveTopology = defaultRenderState.DefaultPrimTopology;
 		m_Viewport = defaultRenderState.DefaultViewport;
+		m_BlendFunction = defaultRenderState.Blend;
 
 		SetPrimitiveTopology(m_PrimitiveTopology);
 		SetViewport(m_Viewport);
-		m_ScissorBox = { 0.0f, 0.0f, 0.0f, 0.0f };
+		SetBlendFunction(m_BlendFunction);
+		m_ScissorBox = { 0, 0, 0, 0 };
 	}
 
 	void D3DRenderSate::SetPrimitiveTopology(PrimitiveTopology prim) {
@@ -57,14 +59,45 @@ namespace prev {
 		}
 	}
 
+	D3D11_BLEND D3DRenderSate::MapBlendOption(BlendOption option) {
+		switch (option) {
+		case prev::PV_BLEND_ZERO: return D3D11_BLEND_ZERO;
+		case prev::PV_BLEND_ONE: return D3D11_BLEND_ONE;
+		case prev::PV_BLEND_SRC_ALPHA: return D3D11_BLEND_SRC_ALPHA;
+		case prev::PV_BLEND_INV_SRC_ALPHA: return D3D11_BLEND_INV_SRC_ALPHA;
+		case prev::PV_BLEND_DEST_ALPHA: return D3D11_BLEND_DEST_ALPHA;
+		case prev::PV_BLEND_INV_DEST_ALPHA: return D3D11_BLEND_INV_DEST_ALPHA;
+		default:
+		{
+			LOG_ERROR("Invalid blend option : {}", option);
+			return D3D11_BLEND_ZERO;
+		}
+		}
+	}
+
+	D3D11_BLEND_OP D3DRenderSate::MapBlendOperation(BlendOperation operation) {
+		switch (operation) {
+		case prev::PV_BLEND_OP_ADD:	return D3D11_BLEND_OP_ADD;
+		case prev::PV_BLEND_OP_SUBTRACT: return D3D11_BLEND_OP_SUBTRACT;
+		case prev::PV_BLEND_OP_REV_SUBTRACT: return D3D11_BLEND_OP_REV_SUBTRACT;
+		case prev::PV_BLEND_OP_MIN:	return D3D11_BLEND_OP_MIN;
+		case prev::PV_BLEND_OP_MAX:	return D3D11_BLEND_OP_MAX;
+		default:
+		{
+			LOG_ERROR("Invalid blend operation : {}", operation);
+			return D3D11_BLEND_OP_ADD;
+		}
+		}
+	}
+
 	void D3DRenderSate::SetScissorBox(const ScissorBox & sBox) {
 		Vec2i windowSize = Window::Ref().GetDisplayMode().GetWindowSize();
 
 		D3D11_RECT rc;
-		rc.left = sBox.Left;
-		rc.right = sBox.Right;
-		rc.top = windowSize.y - sBox.Top;
-		rc.bottom = windowSize.y - sBox.Bottom;
+		rc.left = (long)sBox.Left;
+		rc.right = (long)sBox.Right;
+		rc.top = (long)windowSize.y - (long)sBox.Top;
+		rc.bottom = (long)windowSize.y - (long)sBox.Bottom;
 
 		GetDeviceContext()->RSSetScissorRects(1, &rc);
 		m_ScissorBox = sBox;
@@ -85,6 +118,35 @@ namespace prev {
 
 		GetDeviceContext()->RSSetScissorRects(1, &rc);
 		ZeroMemory(&m_ScissorBox, sizeof(m_ScissorBox));
+	}
+
+	void D3DRenderSate::SetBlendFunction(const BlendFunction & blendFunc) {
+		D3D11_BLEND_DESC bd;
+		bd.AlphaToCoverageEnable						= FALSE;
+		bd.IndependentBlendEnable						= FALSE;
+		bd.RenderTarget[0].BlendEnable					= TRUE;
+		bd.RenderTarget[0].SrcBlend						= MapBlendOption(blendFunc.SrcBlend);
+		bd.RenderTarget[0].DestBlend					= MapBlendOption(blendFunc.DestBlend);
+		bd.RenderTarget[0].BlendOp						= MapBlendOperation(blendFunc.Operation);
+		bd.RenderTarget[0].SrcBlendAlpha				= D3D11_BLEND_ZERO;
+		bd.RenderTarget[0].DestBlendAlpha				= D3D11_BLEND_ZERO;
+		bd.RenderTarget[0].BlendOpAlpha					= D3D11_BLEND_OP_ADD;
+		bd.RenderTarget[0].RenderTargetWriteMask		= D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
+
+		HRESULT hr = GetDevice()->CreateBlendState(&bd, blendState.GetAddressOf());
+		if (FAILED(hr)) {
+			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Failed to create Blend state");
+		}
+
+		GetDeviceContext()->OMSetBlendState(blendState.Get(), nullptr, 0xffffffff);
+
+		m_BlendFunction = blendFunc;
+	}
+
+	prev::BlendFunction D3DRenderSate::GetBlendFunction() {
+		return m_BlendFunction;
 	}
 
 }

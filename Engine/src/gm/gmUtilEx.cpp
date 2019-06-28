@@ -49,4 +49,6 @@ int gmCompileStr(gmMachine * a_machine, const char * file) {
 		break;
 	}
 
+	return -1;
+
 }

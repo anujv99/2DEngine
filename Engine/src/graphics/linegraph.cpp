@@ -36,10 +36,10 @@ namespace prev {
 		imm.Color(1.0f, 1.0f, 0.0f);
 
 		ScissorBox sb;
-		sb.Left = minPos.x;
-		sb.Right = maxPos.x;
-		sb.Bottom = minPos.y;
-		sb.Top = maxPos.y;
+		sb.Left = (int)minPos.x;
+		sb.Right = (int)maxPos.x;
+		sb.Bottom = (int)minPos.y;
+		sb.Top = (int)maxPos.y;
 
 		RenderState::Ref().SetScissorBox(sb);
 

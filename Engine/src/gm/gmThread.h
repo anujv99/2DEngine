@@ -1007,7 +1007,7 @@ inline gmUserObject * gmThread::ThisUserObject()
   #define GM_VEC4_PARAM(VAR, PARAM) prev::Vec4 VAR; if (!GM_THREAD_ARG->ParamVec4((PARAM), (VAR), prev::Vec4(0.0f))) { return GM_EXCEPTION; }
   #define GM_VEC3_PARAM(VAR, PARAM) prev::Vec3 VAR; if (!GM_THREAD_ARG->ParamVec3((PARAM), (VAR), prev::Vec3(0.0f))) { return GM_EXCEPTION; }
   #define GM_VEC2_PARAM(VAR, PARAM) prev::Vec2 VAR; if (!GM_THREAD_ARG->ParamVec2((PARAM), (VAR), prev::Vec2(0.0f))) { return GM_EXCEPTION; }
-  #define GM_VEC2I_PARAM(VAR, PARAM) prev::Vec2i VAR; if (!GM_THREAD_ARG->ParamVec2i((PARAM), (VAR), prev::Vec2i(0.0f))) { return GM_EXCEPTION; }
+  #define GM_VEC2I_PARAM(VAR, PARAM) prev::Vec2i VAR; if (!GM_THREAD_ARG->ParamVec2i((PARAM), (VAR), prev::Vec2i(0))) { return GM_EXCEPTION; }
   #define GM_STRING_PARAM(VAR, PARAM, DEFAULT) const char * VAR; if( !GM_THREAD_ARG->ParamString((PARAM), (VAR), (DEFAULT)) )  { return GM_EXCEPTION; }
   #define GM_FUNCTION_PARAM(VAR, PARAM) gmFunctionObject * VAR; if( !GM_THREAD_ARG->ParamFunction((PARAM), (VAR)) )  { return GM_EXCEPTION; }
   #define GM_TABLE_PARAM(VAR, PARAM) gmTableObject * VAR; if( !GM_THREAD_ARG->ParamTable((PARAM), (VAR))  )  { return GM_EXCEPTION; }

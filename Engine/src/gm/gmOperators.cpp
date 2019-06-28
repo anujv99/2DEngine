@@ -520,7 +520,7 @@ void GM_CDECL gmvec4GetDot(gmThread * a_thread, gmVariable * a_operands) {
   GM_OP_VEC4(thisVal, 0);
   GM_OP_STR_PTR(memberStr, 1);
   
-  const int elements = strlen(memberStr);
+  const int elements = (int)strlen(memberStr);
   
   char members[4] = { '0', '0', '0', '0' };
   memcpy(members, memberStr, elements);
@@ -785,7 +785,7 @@ void GM_CDECL gmvec3GetDot(gmThread * a_thread, gmVariable * a_operands) {
   GM_OP_VEC3(thisVal, 0);
   GM_OP_STR_PTR(memberStr, 1);
   
-  const int elements = strlen(memberStr);
+  const int elements = (int)strlen(memberStr);
   
   char members[4] = { '0', '0', '0', '0' };
   memcpy(members, memberStr, elements);
@@ -1069,7 +1069,7 @@ void GM_CDECL gmvec2GetDot(gmThread * a_thread, gmVariable * a_operands) {
   GM_OP_VEC2(thisVal, 0);
   GM_OP_STR_PTR(memberStr, 1);
   
-  const int elements = strlen(memberStr);
+  const int elements = (int)strlen(memberStr);
   
   char members[4] = { '0', '0', '0', '0' };
   memcpy(members, memberStr, elements);
@@ -1153,7 +1153,7 @@ void GM_CDECL gmvec2iOpAdd(gmThread * a_thread, gmVariable * a_operands)
   switch (type) {
   case GM_FLOAT:
   {
-	int val = (float)a_operands[1].GetFloat();
+	int val = (int)a_operands[1].GetFloat();
 	result += prev::Vec2i(val);
 	a_operands[0].SetVec2i(result);
 	break;
@@ -1197,7 +1197,7 @@ void GM_CDECL gmvec2iOpSub(gmThread * a_thread, gmVariable * a_operands)
   switch (type) {
   case GM_FLOAT:
   {
-	int val = (float)a_operands[1].GetFloat();
+	int val = (int)a_operands[1].GetFloat();
 	result -= prev::Vec2i(val);
 	a_operands[0].SetVec2i(result);
 	break;
@@ -1241,7 +1241,7 @@ void GM_CDECL gmvec2iOpMul(gmThread * a_thread, gmVariable * a_operands)
   switch (type) {
   case GM_FLOAT:
   {
-	int val = (float)a_operands[1].GetFloat();
+	int val = (int)a_operands[1].GetFloat();
 	result *= prev::Vec2i(val);
 	a_operands[0].SetVec2i(result);
 	break;
@@ -1285,7 +1285,7 @@ void GM_CDECL gmvec2iOpDiv(gmThread * a_thread, gmVariable * a_operands)
   switch (type) {
   case GM_FLOAT:
   {
-	int val = (float)a_operands[1].GetFloat();
+	int val = (int)a_operands[1].GetFloat();
 	result /= prev::Vec2i(val);
 	a_operands[0].SetVec2i(result);
 	break;
@@ -1341,7 +1341,7 @@ void GM_CDECL gmvec2iGetDot(gmThread * a_thread, gmVariable * a_operands) {
   GM_OP_VEC2I(thisVal, 0);
   GM_OP_STR_PTR(memberStr, 1);
   
-  const int elements = strlen(memberStr);
+  const int elements = (int)strlen(memberStr);
   
   char members[4] = { '0', '0', '0', '0' };
   memcpy(members, memberStr, elements);

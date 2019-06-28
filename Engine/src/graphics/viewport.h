@@ -11,10 +11,10 @@ namespace prev {
 	};
 
 	struct ScissorBox {
-		float Left;
-		float Right;
-		float Top;
-		float Bottom;
+		int Left;
+		int Right;
+		int Top;
+		int Bottom;
 	};
 
 }

@@ -60,10 +60,10 @@ namespace prev {
 		void DrawDonut(const Vec2 center, const float radius, const float thickness, unsigned int segment = 32);
 		void DrawDonutWire(const Vec2 center, const float radius, const float thickness, unsigned int segment = 32);
 		void DrawArcDonut(const Vec2 center, const float radius, const float thickness, 
-			const float startAngle, const float endAngle, int segment = 32);
+			const float startAngle, const float endAngle, unsigned int segment = 32);
 		void DrawArcDonutWire(const Vec2 center, const float radius, const float thickness,
-			const float startAngle, const float endAngle, int segment = 32);
-		void DrawArcLine(const Vec2 center, const float radius, const float startAngle, const float endAngle, int segment = 32);
+			const float startAngle, const float endAngle, unsigned int segment = 32);
+		void DrawArcLine(const Vec2 center, const float radius, const float startAngle, const float endAngle, unsigned int segment = 32);
 
 		StrongHandle<VertexLayout> CreateVertexLayout(StrongHandle<VertexShader> vShader) const;
 	protected:

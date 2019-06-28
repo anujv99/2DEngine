@@ -45,7 +45,6 @@ namespace prev {
 
 		if (FAILED(hr)) {
 			std::string errorMessage = (const char *)errorMessages->GetBufferPointer();
-			errorMessage = errorMessage.substr(errorMessage.find_first_of(":", 20) + 1);
 
 			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Unable to compile vertex shader : \n" + errorMessage);
 			return false;

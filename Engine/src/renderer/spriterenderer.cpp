@@ -33,16 +33,42 @@ namespace prev {
 	{}
 
 	SpriteRenderer::SpriteRenderer() {
+		CreateShadersDefault();
+		CreateVertexLayoutDefault();
 		AddDrawGroup();
-		CreateShaders();
-		CreateVertexLayout();
 	}
 
 	SpriteRenderer::~SpriteRenderer() {
 
 	}
 
-	void SpriteRenderer::Submit(const Sprite & sprite) {
+	unsigned int SpriteRenderer::AddEmptyDrawGroup() {
+		AddDrawGroup();
+		return (unsigned int)m_DrawGroups.size() - 1u;
+	}
+
+	void SpriteRenderer::SetVertexShader(StrongHandle<VertexShader> shader, unsigned int drawGroup) {
+		ASSERT(drawGroup < m_DrawGroups.size());
+		ASSERT(shader != nullptr);
+
+		m_DrawGroups[drawGroup].VertexShader = shader;
+	}
+
+	void SpriteRenderer::SetPixelShader(StrongHandle<PixelShader> shader, unsigned int drawGroup) {
+		ASSERT(drawGroup < m_DrawGroups.size());
+		ASSERT(shader != nullptr);
+
+		m_DrawGroups[drawGroup].PixelShader = shader;
+	}
+
+	void SpriteRenderer::SetVertexLayout(StrongHandle<VertexLayout> layout, unsigned int drawGroup) {
+		ASSERT(drawGroup < m_DrawGroups.size());
+		ASSERT(layout != nullptr);
+
+		m_DrawGroups[drawGroup].VertexLayout = layout;
+	}
+
+	void SpriteRenderer::Submit(const Sprite & sprite, unsigned int drawGroup /*= DEFAULT_DRAW_GROUP*/) {
 		SpriteVertices vertices(sprite.Position, sprite.Dimension);
 		static TextureCoordinates defaultUvs(Vec2(0, 1), Vec2(0, 1));
 
@@ -68,34 +94,27 @@ namespace prev {
 		drawVertices[4].Color = sprite.Color;
 		drawVertices[5].Color = sprite.Color;
 
-		//size_t index = m_DrawGroups[0].Vertices.size();
-		//m_DrawGroups[0].Vertices.resize(index + 6);
-		//std::memcpy(&m_DrawGroups[0].Vertices[index], drawVertices, sizeof(drawVertices));
-
-		unsigned int drawGroup = 0u;
-
 		std::memcpy(
 			m_DrawGroups[drawGroup].MappedBuffer + m_DrawGroups[drawGroup].MappedBufferIndex,
 			drawVertices,
 			sizeof(drawVertices)
 		);
 
-		m_DrawGroups[drawGroup].MappedBufferIndex += std::size(drawVertices);
+		m_DrawGroups[drawGroup].MappedBufferIndex += (unsigned int)std::size(drawVertices);
 	}
 
-	void SpriteRenderer::Render() {
-		unsigned int drawGroup = 0u;
-
+	void SpriteRenderer::Render(unsigned int drawGroup /*= DEFAULT_DRAW_GROUP*/)
+{
 		StrongHandle<VertexBuffer> & drawBuffer = m_DrawGroups[drawGroup].DrawBuffer;
 		unsigned int & numVertices = m_DrawGroups[drawGroup].MappedBufferIndex;
 	
 		drawBuffer->UnMap();
 
 		drawBuffer->Bind();
-		m_VertexLayout->Bind();
-		m_VertexShader->Bind();
-		m_PixelShader->Bind();
-		m_VertexShader->UpdateMVP();
+		m_DrawGroups[drawGroup].VertexLayout->Bind();
+		m_DrawGroups[drawGroup].VertexShader->Bind();
+		m_DrawGroups[drawGroup].PixelShader->Bind();
+		m_DrawGroups[drawGroup].VertexShader->UpdateMVP();
 
  		drawBuffer->Draw(numVertices, 0);
 
@@ -103,18 +122,18 @@ namespace prev {
 		numVertices = 0u;
 	}
 
-	void SpriteRenderer::CreateVertexLayout() {
-		m_VertexLayout = VertexLayout::CreateVertexLayout();
-		m_VertexLayout->BeginEntries();
-		m_VertexLayout->AddEntry(PV_DATA_TYPE_FLOAT_32, 2, offsetof(SpriteVertex, Position), "POSITION", false);
-		m_VertexLayout->AddEntry(PV_DATA_TYPE_FLOAT_32, 2, offsetof(SpriteVertex, UV), "TEXCOORDS", false);
-		m_VertexLayout->AddEntry(PV_DATA_TYPE_UINT_8, 4, offsetof(SpriteVertex, Color), "COLOR", true);
-		m_VertexLayout->EndEntries(m_VertexShader);
+	void SpriteRenderer::CreateVertexLayoutDefault() {
+		m_VertexLayoutDefault = VertexLayout::CreateVertexLayout();
+		m_VertexLayoutDefault->BeginEntries();
+		m_VertexLayoutDefault->AddEntry(PV_DATA_TYPE_FLOAT_32, 2, offsetof(SpriteVertex, Position), "POSITION", false);
+		m_VertexLayoutDefault->AddEntry(PV_DATA_TYPE_FLOAT_32, 2, offsetof(SpriteVertex, UV), "TEXCOORDS", false);
+		m_VertexLayoutDefault->AddEntry(PV_DATA_TYPE_UINT_8, 4, offsetof(SpriteVertex, Color), "COLOR", true);
+		m_VertexLayoutDefault->EndEntries(m_VertexShaderDefault);
 	}
 
-	void SpriteRenderer::CreateShaders() {
-		m_VertexShader = ShaderManager::Ref().LoadVertexShaderFromFile("SPRITE_VERTEX_SHADER", "../Engine/res/shaders/spriteDefaultVertex.hlsl");
-		m_PixelShader = ShaderManager::Ref().LoadPixelShaderFromFile("SPRITE_PIXEL_SHADER", "../Engine/res/shaders/spriteDefaultPixel.hlsl");
+	void SpriteRenderer::CreateShadersDefault() {
+		m_VertexShaderDefault = ShaderManager::Ref().LoadVertexShaderFromFile("SPRITE_VERTEX_SHADER", "../Engine/res/shaders/spriteDefaultVertex.hlsl");
+		m_PixelShaderDefault = ShaderManager::Ref().LoadPixelShaderFromFile("SPRITE_PIXEL_SHADER", "../Engine/res/shaders/spriteDefaultPixel.hlsl");
 	}
 
 	void SpriteRenderer::AddDrawGroup() {
@@ -125,6 +144,10 @@ namespace prev {
 		m_DrawGroups[index].DrawBuffer->Init(nullptr, MAX_NUM_VERTICES, sizeof(SpriteVertex), BUFFER_USAGE_STREAM);
 		m_DrawGroups[index].MappedBuffer = reinterpret_cast<SpriteVertex *>(m_DrawGroups[index].DrawBuffer->Map());
 		m_DrawGroups[index].MappedBufferIndex = 0u;
+
+		m_DrawGroups[index].PixelShader = m_PixelShaderDefault;
+		m_DrawGroups[index].VertexShader = m_VertexShaderDefault;
+		m_DrawGroups[index].VertexLayout = m_VertexLayoutDefault;
 	}
 
 }

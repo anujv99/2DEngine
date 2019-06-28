@@ -618,7 +618,7 @@ namespace prev {
 	}
 
 	void VertexBatcher::DrawArcDonut(const Vec2 center, const float radius, const float thickness, 
-		const float startAngle, const float endAngle, int segment /*= 32*/) {
+		const float startAngle, const float endAngle, unsigned int segment /*= 32*/) {
 
 		float delta_angle = (endAngle - startAngle) / (segment);
 
@@ -639,7 +639,7 @@ namespace prev {
 	}
 
 	void VertexBatcher::DrawArcDonutWire(const Vec2 center, const float radius, const float thickness, 
-		const float startAngle, const float endAngle, int segment /*= 32*/) {
+		const float startAngle, const float endAngle, unsigned int segment /*= 32*/) {
 
 		float delta_angle = (endAngle - startAngle) / (segment);
 
@@ -667,7 +667,7 @@ namespace prev {
 
 	}
 
-	void VertexBatcher::DrawArcLine(const Vec2 center, const float radius, const float startAngle, const float endAngle, int segment /*= 32*/) {
+	void VertexBatcher::DrawArcLine(const Vec2 center, const float radius, const float startAngle, const float endAngle, unsigned int segment /*= 32*/) {
 		float delta_angle = (endAngle - startAngle) / (segment - 1);
 
 		PolygonBegin(PV_PRIM_LINELIST);

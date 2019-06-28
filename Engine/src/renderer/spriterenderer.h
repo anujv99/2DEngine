@@ -8,7 +8,9 @@
 
 namespace prev {
 
-	// batches will be separated by texture id
+	// batches will be separated by textures and shaders
+
+	static const unsigned int DEFAULT_DRAW_GROUP = 0u;
 
 	class SpriteRenderer : public Singleton<SpriteRenderer> {
 		friend class Singleton<SpriteRenderer>;
@@ -16,11 +18,16 @@ namespace prev {
 		SpriteRenderer();
 		~SpriteRenderer();
 	public:
-		void Submit(const Sprite & sprite);
-		void Render();
+		unsigned int AddEmptyDrawGroup();
+		void SetVertexShader(StrongHandle<VertexShader> shader, unsigned int drawGroup);
+		void SetPixelShader(StrongHandle<PixelShader> shader, unsigned int drawGroup);
+		void SetVertexLayout(StrongHandle<VertexLayout> layout, unsigned int drawGroup);
+
+		void Submit(const Sprite & sprite, unsigned int drawGroup);
+		void Render(unsigned int drawGroup);
 	private:
-		void CreateVertexLayout();
-		void CreateShaders();
+		void CreateVertexLayoutDefault();
+		void CreateShadersDefault();
 		void AddDrawGroup();
 	private:
 
@@ -49,16 +56,20 @@ namespace prev {
 
 		//each group will have it's own texture
 		struct SpriteGroup {
-			StrongHandle<VertexBuffer> DrawBuffer;
 			SpriteVertex * MappedBuffer;
 			unsigned int MappedBufferIndex;
+
+			StrongHandle<VertexLayout> VertexLayout;
+			StrongHandle<VertexShader> VertexShader;
+			StrongHandle<PixelShader> PixelShader;
+			StrongHandle<VertexBuffer> DrawBuffer;
 		};
 
 		std::vector<SpriteGroup> m_DrawGroups;
 
-		StrongHandle<VertexLayout> m_VertexLayout;
-		StrongHandle<VertexShader> m_VertexShader;
-		StrongHandle<PixelShader> m_PixelShader;
+		StrongHandle<VertexLayout> m_VertexLayoutDefault;
+		StrongHandle<VertexShader> m_VertexShaderDefault;
+		StrongHandle<PixelShader> m_PixelShaderDefault;
 	};
 
 }

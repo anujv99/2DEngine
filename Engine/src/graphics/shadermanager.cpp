@@ -124,7 +124,7 @@ namespace prev {
 			inFile.open(fileName);
 			shaderCode << inFile.rdbuf();
 			inFile.close();
-		} catch (std::ifstream::failure & e) {
+		} catch (std::ifstream::failure &) {
 			ERROR_TRACE(ERR_FILE_NOT_FOUND, "Shader file with name : " + fileName + " not found");
 			auto shaderString = shaderCode.str();
 			shaderString.clear();

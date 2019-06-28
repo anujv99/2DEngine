@@ -71,7 +71,7 @@ namespace prev {
 			if (m_OldCmds.size() > MAX_OLD_COMMANDS) m_OldCmds.pop_front();
 			m_OldCmds.push_back(cmd);
 		}
-		m_CmdIndex = m_OldCmds.size();
+		m_CmdIndex = (int)m_OldCmds.size();
 
 		gmMachine * machine = &VirtualMachine::Get()->GetVM();
 		ASSERT(machine);

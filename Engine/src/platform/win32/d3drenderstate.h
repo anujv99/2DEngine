@@ -19,12 +19,18 @@ namespace prev {
 		virtual void SetScissorBox(const ScissorBox & sBox) override;
 		virtual ScissorBox GetScissorBox() override;
 		virtual void DisableScissors() override;
+
+		virtual void SetBlendFunction(const BlendFunction & blendFunc) override;
+		virtual BlendFunction GetBlendFunction() override;
 	private:
 		D3D_PRIMITIVE_TOPOLOGY MapPrimitiveTopology(PrimitiveTopology prim);
+		D3D11_BLEND MapBlendOption(BlendOption option);
+		D3D11_BLEND_OP MapBlendOperation(BlendOperation operation);
 	private:
 		PrimitiveTopology m_PrimitiveTopology;
 		Viewport m_Viewport;
 		ScissorBox m_ScissorBox;
+		BlendFunction m_BlendFunction;
 	};
 
 }

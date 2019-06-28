@@ -81,8 +81,8 @@ namespace prev {
 			);
 
 			RenderState::Ref().SetPrimitiveTopology(m_DrawPrimitive);
-			m_VertexBuffer->Draw(GetVertexBatch().size(), m_BufferIndex);
-			m_BufferIndex += GetVertexBatch().size();
+			m_VertexBuffer->Draw((unsigned int)GetVertexBatch().size(), m_BufferIndex);
+			m_BufferIndex += (unsigned int)GetVertexBatch().size();
 		}
 	}
 

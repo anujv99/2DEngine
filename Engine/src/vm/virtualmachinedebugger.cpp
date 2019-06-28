@@ -71,7 +71,7 @@ bool ThreadImgui(gmThread * a_thread, void * a_context) {
 	char hint[128] = "unknown";
 
 	if (a_thread->GetMachine()->GetSourceCode(source_id, source, filename)) {
-		const int len = strlen(filename);
+		const int len = (unsigned int)strlen(filename);
 
 		int a = len;
 		int b = len;
@@ -348,11 +348,11 @@ void gmDebuggerFunk::GuiSource() {
 		const int width = (int)(windowDimen.x * DEBUG_WINDOW_WIDTH);
 		const int height = (int)(windowDimen.y * DEBUG_WINDOW_HEIGHT);
 
-		ImGui::SetNextWindowSize(Vec2(width, height));
+		ImGui::SetNextWindowSize(Vec2((float)width, (float)height));
 		ImGui::Begin(titleBuffer);
 	}
 
-	int srcLen = strlen(source);
+	int srcLen = (int)strlen(source);
 	//int offset = 0;
 	int lineNumber = 1;
 	const char * textPos = source;

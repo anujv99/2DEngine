@@ -744,7 +744,7 @@ static int GM_CDECL gmfCreateVec2i(gmThread * a_thread) {
 			a_thread->PushVec2i(vec);
 		} else {
 			GM_CHECK_FLOAT_OR_INT_PARAM(val, 0);
-			a_thread->PushVec2i(prev::Vec2i(val));
+			a_thread->PushVec2i(prev::Vec2i((int)val));
 		}
 	} else if (numParams == 2) {
 		GM_CHECK_FLOAT_OR_INT_PARAM(val0, 0);
