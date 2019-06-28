@@ -26,8 +26,6 @@ extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	ParticleSystem ps(1024);
-
 	Application::Application() {
 		Timer::FPSCounter(true);
 		EventHandler::CreateInst();
@@ -107,13 +105,7 @@ namespace prev {
 
 			PROFILER_BEGIN("App::Gui");
 			Gui();
-			ps.Gui();
 			PROFILER_END("App::Gui");
-
-			PROFILER_BEGIN("App::Partcile");
-			ps.Update();
-			ParticleRenderer::Ref().Render(ps);
-			PROFILER_END("App::Partcile");
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 

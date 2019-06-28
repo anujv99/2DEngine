@@ -21,15 +21,21 @@ namespace prev {
 		Vec2 GenerateVelocity(const Vec2 vel);
 		Vec2 GeneratePosition(const Vec2 pos);
 		float GenerateScale(const float scale);
+		float GenerateAplha(const float alpha);
 	private:
 		std::vector<Particle> m_Particles;
 		unsigned int m_MaxNumParticles;
 		bool m_Simulate;
 		
 		Vec2 m_Position;
-		Vec2 m_VelocityVariance;
 		Vec2 m_PositionVariance;
+		Vec2 m_Velocity;
+		Vec2 m_VelocityVariance;
 		Vec4 m_Color;
+		Vec2 m_AttractorPos;
+		float m_AlphaVariance;
+		float m_AlphaDecay;
+		float m_AttractorStrenght;
 		float m_Scale;
 		float m_ScaleVariace;
 		float m_ScaleDecay;
