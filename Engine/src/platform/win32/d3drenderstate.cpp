@@ -15,7 +15,7 @@ namespace prev {
 		SetPrimitiveTopology(m_PrimitiveTopology);
 		SetViewport(m_Viewport);
 		SetBlendFunction(m_BlendFunction);
-		m_ScissorBox = { 0, 0, 0, 0 };
+		DisableScissors();
 	}
 
 	void D3DRenderSate::SetPrimitiveTopology(PrimitiveTopology prim) {

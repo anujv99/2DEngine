@@ -21,7 +21,7 @@ namespace prev {
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
-		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam) != 0)
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 			return 0;
 
 		switch (msg) {
@@ -152,6 +152,7 @@ namespace prev {
 
 	WindowsWindow::WindowsWindow(const DisplayMode & displayMode) : Window(displayMode) {
 		m_HInst = GetModuleHandle(nullptr);
+		SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
 		m_DisplaySize = Vec2i(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 
 		m_DisplayPos.x = (m_DisplaySize.x - displayMode.GetWindowSize().x) / 2;

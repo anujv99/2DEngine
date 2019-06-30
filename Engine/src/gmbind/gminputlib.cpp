@@ -21,14 +21,14 @@ namespace prev {
 
 		GM_MEMFUNC_DECL(GetMousePos) {
 			GM_CHECK_NUM_PARAMS(0);
-			Vec2 pos = ToVec2(Input::Get()->GetMousePosition());
+			Vec2 pos = Input::Get()->GetMousePosition();
 			a_thread->PushVec2(pos);
 			return GM_OK;
 		}
 
 		GM_MEMFUNC_DECL(GetMouseDelta) {
 			GM_CHECK_NUM_PARAMS(0);
-			Vec2 pos = ToVec2(Input::Get()->GetMouseDeltaPosition());
+			Vec2 pos = Input::Get()->GetMouseDeltaPosition();
 			a_thread->PushVec2(pos);
 			return GM_OK;
 		}

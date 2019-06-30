@@ -15,17 +15,15 @@ namespace prev {
 	public:
 		Vec2i GetWindowSize() const { return WindowSize; }
 		WindowStyle GetWindowStyle() const { return Style; }
-		bool IsWindowFullscreen() const { return IsFullscreen; }
+		bool IsWindowFullscreen() const { return Style == WindowStyle::FULLSCREEN; }
 
-		void SetFullscreen(bool fullscreen) { IsFullscreen = fullscreen; }
 		void SetWindowStyle(WindowStyle style) { Style = style; }
 	private:
 		DisplayMode() :
-			WindowSize(0, 0), Style(WindowStyle::WINDOWED), IsFullscreen(false) {}
+			WindowSize(0, 0), Style(WindowStyle::WINDOWED) {}
 	private:
 		Vec2i WindowSize;
 		WindowStyle Style;
-		bool IsFullscreen;
 	};
 
 	class Window : public Singleton<Window> {

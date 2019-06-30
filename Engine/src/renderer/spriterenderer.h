@@ -32,7 +32,7 @@ namespace prev {
 	private:
 
 		struct SpriteVertices {
-			SpriteVertices(Vec2 center, Vec2 dimension);
+			SpriteVertices(Vec2 center, Vec2 dimension, float rotation);
 			// do not change the order
 			const Vec2 TopLeft;
 			const Vec2 BottomLeft;

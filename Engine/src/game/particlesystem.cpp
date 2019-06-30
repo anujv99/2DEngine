@@ -11,17 +11,17 @@ namespace prev {
 		m_Particles.reserve(numParticles);
 		m_Simulate = true;
 		m_MaxNumParticles = numParticles;
-		m_Position = Vec2(400.0f);
+		m_Position = Vec2(0.0f);
 		m_PositionVariance = Vec2(0.0f);
 		m_Velocity = Vec2(0.0f);
-		m_VelocityVariance = Vec2(5.0f);
-		m_Color = Vec4(0.1f, 0.9f, 0.3f, 0.5f);
+		m_VelocityVariance = Vec2(0.1f);
+		m_Color = Vec4(1.0f, 0.5f, 0.0f, 1.0f);
 		m_AlphaVariance = 0.0f;
 		m_AlphaDecay = 0.0f;
 		m_AttractorPos = Vec2(0);
 		m_AttractorStrenght = 0;
-		m_ScaleVariace = 10.0f;
-		m_Scale = 50.0f;
+		m_ScaleVariace = 0.1f;
+		m_Scale = 1.0f;
 		m_ScaleDecay = 0.0f;
 		m_Life = 1.0f;
 		std::srand((int)Timer::GetTime() * 321651320);
@@ -48,19 +48,19 @@ namespace prev {
 			m_Particles.clear();
 			m_Particles.reserve(m_MaxNumParticles);
 		}
-		ImGui::DragFloat2("Position", &m_Position[0], 1);
-		ImGui::DragFloat2("Position Variance", &m_PositionVariance[0], 0.1f);
-		ImGui::DragFloat2("Velocity", &m_Velocity[0], 0.1f);
-		ImGui::DragFloat2("Velocity Variance", &m_VelocityVariance[0], 0.1f);
+		ImGui::DragFloat2("Position", &m_Position[0], 0.001f);
+		ImGui::DragFloat2("Position Variance", &m_PositionVariance[0], 0.001f);
+		ImGui::DragFloat2("Velocity", &m_Velocity[0], 0.001f);
+		ImGui::DragFloat2("Velocity Variance", &m_VelocityVariance[0], 0.001f);
 		ImGui::ColorEdit4("Color", &m_Color[0]);
 		ImGui::SliderFloat("Alpha Variance", &m_AlphaVariance, 0.0f, 1.0f);
 		ImGui::SliderFloat("Alpha Decay", &m_AlphaDecay, 0.0f, 1.0f);
-		ImGui::DragFloat2("AttractorPos", &m_AttractorPos[0], 0.1f);
-		ImGui::DragFloat("AttractorStrenght", &m_AttractorStrenght, 0.1f);
-		ImGui::DragFloat("Start Scale", &m_Scale, 0.1f);
-		ImGui::DragFloat("Scale Variance", &m_ScaleVariace, 0.1f);
-		ImGui::DragFloat("Scale Decay", &m_ScaleDecay, 0.1f);
-		ImGui::DragFloat("Life", &m_Life, 0.1f);
+		ImGui::DragFloat2("AttractorPos", &m_AttractorPos[0], 0.001f);
+		ImGui::DragFloat("AttractorStrenght", &m_AttractorStrenght, 0.001f);
+		ImGui::DragFloat("Start Scale", &m_Scale, 0.001f);
+		ImGui::DragFloat("Scale Variance", &m_ScaleVariace, 0.001f);
+		ImGui::DragFloat("Scale Decay", &m_ScaleDecay, 0.001f);
+		ImGui::DragFloat("Life", &m_Life, 0.001f);
 		ImGui::End();
 	}
 

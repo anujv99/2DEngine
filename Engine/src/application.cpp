@@ -22,6 +22,10 @@
 #include "game/particlesystem.h"
 #include "renderer/particlerenderer.h"
 
+#include <Box2D/Box2D.h>
+#include "physics/box2dmanager.h"
+#include "physics/box2ddebugdraw.h"
+
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
@@ -32,7 +36,7 @@ namespace prev {
 
 		auto dis = GraphicsContext::GetDisplayModes();
 		unsigned int selectedDis = 0;
-		dis[selectedDis].SetWindowStyle(WindowStyle::FULLSCREEN);
+		dis[selectedDis].SetWindowStyle(WindowStyle::BORDERLESS);
 		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
@@ -46,39 +50,32 @@ namespace prev {
 		//ImGui Layer
 
 		m_ImGuiLayer = new ImGuiLayer();
-
 		LayerStack::Ref().PushLayer(m_ImGuiLayer);
-
 		Profiler::CreateInst(); // Because profiler use imgui layer
-
-		////////////////////////////////////////TESTING////////////////////////////////////////
-
-		RenderState::Ref().DisableScissors();
 
 		VirtualMachine::CreateInst();
 		VirtualMachine::Ref().RunMain();
 
-		MVP::Ref().Projection().Push();
-		Vec2 winSize = ToVec2(dis[selectedDis].GetWindowSize());
-		MVP::Ref().Projection().Load(Ortho(0.0f, winSize.x, 0.0f, winSize.y, -150.0f, 150.0f));
-
 		SpriteRenderer::CreateInst();
 		ParticleRenderer::CreateInst();
+		Box2DManager::CreateInst();
+
+		////////////////////////////////////////TESTING////////////////////////////////////////
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
 	}
 
 	Application::~Application() {
-		MVP::Ref().Projection().Pop();
 
+		Box2DManager::DestroyInst();
 		ParticleRenderer::DestroyInst();
 		SpriteRenderer::DestroyInst();
 		VirtualMachine::DestroyInst();
 		Profiler::DestroyInst();
 		LayerStack::DestroyInst();
 		ImmediateGFX::DestroyInst();
-		ShaderManager::DestroyInst();
+		ShaderManager::DestroyInst(); 
 		RenderState::DestroyInst();
 		GraphicsContext::DestroyInst();
 		MVP::DestroyInst();
@@ -98,16 +95,18 @@ namespace prev {
 
 			LayerStack::Ref().OnUpdate();
 
-			////////////////////////////////////////TESTING////////////////////////////////////////
-
 			VirtualMachine::Ref().Update();
 			VirtualMachine::Ref().Render();
+
+			////////////////////////////////////////TESTING////////////////////////////////////////
+
+			////////////////////////////////////////TESTING////////////////////////////////////////
+
+			SpriteRenderer::Ref().Render(0);
 
 			PROFILER_BEGIN("App::Gui");
 			Gui();
 			PROFILER_END("App::Gui");
-
-			////////////////////////////////////////TESTING////////////////////////////////////////
 
 			LayerStack::Ref().GetImGuiLayer()->EndFrame();
 			GraphicsContext::Ref().EndFrame();

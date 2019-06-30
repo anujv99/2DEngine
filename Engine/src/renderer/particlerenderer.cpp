@@ -21,9 +21,9 @@ namespace prev {
 	void ParticleRenderer::Render(const ParticleSystem & particleSystem) {
 		for (auto & part : particleSystem.m_Particles) {
 			Sprite sprite;
-			sprite.Position = part.Position;
-			sprite.Dimension = Vec2(part.Scale);
-			sprite.Color = SpriteColor(part.Color);
+			sprite.SetPosition(part.Position);
+			sprite.SetDimension(Vec2(part.Scale));
+			sprite.SetColor(part.Color);
 			SpriteRenderer::Ref().Submit(sprite, m_DrawGroupIndex);
 		}
 

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "spriterenderer.h"
+#include "graphics/renderstate.h"
 
 namespace prev {
 
@@ -7,9 +8,8 @@ namespace prev {
 	static const unsigned int MAX_NUM_VERTICES_PER_SPRTIE = 6;
 	static const unsigned int MAX_NUM_VERTICES = MAX_NUM_SPRITES * MAX_NUM_VERTICES_PER_SPRTIE;
 
-	SpriteRenderer::SpriteVertices::SpriteVertices(Vec2 center, Vec2 dimension) {
-		// 1x1 square
-		static Vec2 squareVertices[] = {
+	SpriteRenderer::SpriteVertices::SpriteVertices(Vec2 center, Vec2 dimension, float rotation) {
+		static const Vec2 squareVertices[] = {
 			{ -0.5f,  0.5f }, //ToLeft
 			{ -0.5f, -0.5f }, //BottomLeft
 			{  0.5f, -0.5f }, //BottomRight
@@ -18,11 +18,19 @@ namespace prev {
 
 		Vec2 * vertArr = reinterpret_cast<Vec2 *>(this);
 
-		for (unsigned int i = 0; i < 4u; i++) {
-			vertArr[i].x = (squareVertices[i].x * dimension.x) + center.x;
-			vertArr[i].y = (squareVertices[i].y * dimension.y) + center.y;
+		if (rotation == 0) {
+			for (unsigned int i = 0; i < 4u; i++) {
+				vertArr[i].x = (squareVertices[i].x * dimension.x) + center.x;
+				vertArr[i].y = (squareVertices[i].y * dimension.y) + center.y;
+			}
+		} else {
+			for (unsigned int i = 0; i < 4u; i++) {
+				vertArr[i].x = (squareVertices[i].x * dimension.x);
+				vertArr[i].y = (squareVertices[i].y * dimension.y);
+				vertArr[i] = Rotate(vertArr[i], rotation);
+				vertArr[i] += center;
+			}
 		}
-
 	}
 
 	SpriteRenderer::TextureCoordinates::TextureCoordinates(Vec2 x, Vec2 y) :
@@ -69,7 +77,7 @@ namespace prev {
 	}
 
 	void SpriteRenderer::Submit(const Sprite & sprite, unsigned int drawGroup /*= DEFAULT_DRAW_GROUP*/) {
-		SpriteVertices vertices(sprite.Position, sprite.Dimension);
+		SpriteVertices vertices(sprite.GetPosition(), sprite.GetDimension(), sprite.GetRotation());
 		static TextureCoordinates defaultUvs(Vec2(0, 1), Vec2(0, 1));
 
 		SpriteVertex drawVertices[6];
@@ -87,12 +95,12 @@ namespace prev {
 		drawVertices[4].UV = defaultUvs.TopRight;
 		drawVertices[5].UV = defaultUvs.BottomRight;
 
-		drawVertices[0].Color = sprite.Color;
-		drawVertices[1].Color = sprite.Color;
-		drawVertices[2].Color = sprite.Color;
-		drawVertices[3].Color = sprite.Color;
-		drawVertices[4].Color = sprite.Color;
-		drawVertices[5].Color = sprite.Color;
+		drawVertices[0].Color = sprite.GetColor();
+		drawVertices[1].Color = sprite.GetColor();
+		drawVertices[2].Color = sprite.GetColor();
+		drawVertices[3].Color = sprite.GetColor();
+		drawVertices[4].Color = sprite.GetColor();
+		drawVertices[5].Color = sprite.GetColor();
 
 		std::memcpy(
 			m_DrawGroups[drawGroup].MappedBuffer + m_DrawGroups[drawGroup].MappedBufferIndex,
@@ -103,14 +111,15 @@ namespace prev {
 		m_DrawGroups[drawGroup].MappedBufferIndex += (unsigned int)std::size(drawVertices);
 	}
 
-	void SpriteRenderer::Render(unsigned int drawGroup /*= DEFAULT_DRAW_GROUP*/)
-{
+	void SpriteRenderer::Render(unsigned int drawGroup /*= DEFAULT_DRAW_GROUP*/) {
 		StrongHandle<VertexBuffer> & drawBuffer = m_DrawGroups[drawGroup].DrawBuffer;
 		unsigned int & numVertices = m_DrawGroups[drawGroup].MappedBufferIndex;
 	
 		drawBuffer->UnMap();
 
 		drawBuffer->Bind();
+
+		RenderState::Ref().SetPrimitiveTopology(PV_PRIM_TRIANGLELIST);
 		m_DrawGroups[drawGroup].VertexLayout->Bind();
 		m_DrawGroups[drawGroup].VertexShader->Bind();
 		m_DrawGroups[drawGroup].PixelShader->Bind();

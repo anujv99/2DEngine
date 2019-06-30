@@ -75,6 +75,10 @@ namespace prev {
 			return;
 		}
 
+		if (displayMode.IsWindowFullscreen()) {
+			m_SwapChain->SetFullscreenState(TRUE, nullptr);
+		}
+
 		LOG_INFO("D3D11 Successfully Initialized");
 	}
 

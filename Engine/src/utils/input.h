@@ -4,6 +4,7 @@
 #include "src/graphics/window.h"
 #include "src/events/event.h"
 #include "pvkeycodes.h" // Contains defines for buttons
+#include "math/vec2.h"
 
 #define MAX_KEYS 0xFF
 #define MAX_MOUSE_BUTTONS 5
@@ -32,8 +33,8 @@ namespace prev {
 
 		inline const std::vector<char> & GetPressedCharacterBuffer() const { return m_CharacterPressedBuffer; }
 
-		inline Vec2i GetMousePosition() const { return Vec2i(m_MousePos.x, m_WindowSize.y - m_MousePos.y); }
-		inline Vec2i GetMouseDeltaPosition() const { return m_MousePos - m_PrevMousePos; }
+		inline Vec2 GetMousePosition() const { return m_MousePos; }
+		inline Vec2 GetMouseDeltaPosition() const { return m_MousePos - m_PrevMousePos; }
 		inline Vec2i GetMouseScrollDelta() const { return m_MouseScrollDelta; }
 	protected:
 		Input();
@@ -55,8 +56,8 @@ namespace prev {
 		bool m_MouseButtons[MAX_MOUSE_BUTTONS];
 		bool m_PrevMouseButtons[MAX_MOUSE_BUTTONS]; //Previous Key States
 
-		Vec2i m_MousePos = Vec2i(0);
-		Vec2i m_PrevMousePos = Vec2i(0);
+		Vec2 m_MousePos = Vec2(0);
+		Vec2 m_PrevMousePos = Vec2(0);
 		Vec2i m_MouseScrollDelta = Vec2i(0);
 		Vec2i m_WindowSize = Vec2i(0);
 

@@ -7,6 +7,8 @@
 
 #include "gm/gmMathVector.h"
 
+struct b2Vec2;
+
 namespace prev {
 
 	class Vec2 {
@@ -20,6 +22,7 @@ namespace prev {
 		Vec2();
 		explicit Vec2(float _v);
 		Vec2(gmvec2 _vec);
+		Vec2(b2Vec2 _vec);
 		Vec2(float _x, float _y);
 
 		float & operator[](unsigned int _index) { ASSERT(_index < 2); return (&x)[_index]; }
@@ -67,6 +70,8 @@ namespace prev {
 	Vec2 Perpendicular(const Vec2 & _vec);
 	Vec2 UnitCircle(float _angle);
 	Vec2 Hermite(const Vec2 & _v1, const Vec2 & _tan1, const Vec2 & _v2, const Vec2 & _tan2, float _val);
+
+	Vec2 Rotate(const Vec2 & _dir, float _angle);
 
 	inline std::ostream & operator<<(std::ostream & os, const Vec2 & _vec) {
 		return os << "[Vec2 : x = " << _vec.x <<

@@ -192,3 +192,13 @@ inline Vec2 Hermite(const Vec2 & _v1, const Vec2 & _tan1, const Vec2 & _v2, cons
 
 	return h1 * _v1 + h2 * _v2 + h3 * _tan1 + h4 * _tan2;
 }
+
+inline Vec2 Rotate(const Vec2 & _dir, float _angle) {
+	float cosine = prev::Cos(_angle);
+	float sine = prev::Sin(_angle);
+
+	float newX = _dir.x * cosine - _dir.y * sine;
+	float newY = _dir.x * sine + _dir.y * cosine;
+
+	return Vec2(newX, newY);
+}
