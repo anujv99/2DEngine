@@ -4,6 +4,7 @@
 
 namespace prev {
 
+	//All values should be in pixels
 	struct Viewport {
 		Vec2 TopLeft;
 		Vec2 Dimension;

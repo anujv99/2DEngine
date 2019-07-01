@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "gmUtilEx.h"
 
 
 #undef GetObject
@@ -76,43 +77,14 @@ static int GM_CDECL gmfSystem(gmThread * a_thread)
 static int GM_CDECL gmfDoFile(gmThread * a_thread) // filename, now (1), return thread id, null on error, exception on compile error.
 {
   GM_CHECK_NUM_PARAMS(1);
-  GM_CHECK_STRING_PARAM(filename, 0);
+  GM_CHECK_STRING_PARAM(fileName, 0);
   GM_INT_PARAM(now, 1, 1);
-  gmVariable paramThis = a_thread->Param(2, gmVariable::s_null); // 3rd param is 'this'
 
-  int id = GM_INVALID_THREAD;
-  if(filename)
+  if (fileName)
   {
-    char * string = NULL;
-
-    FILE * fp = fopen(filename, "rb");
-    if(fp)
-    {
-      fseek(fp, 0, SEEK_END);
-      int size = ftell(fp);
-      rewind(fp);
-      string = new char[size + 1];
-      fread(string, 1, size, fp);
-      string[size] = 0;
-      fclose(fp);
-    }
-    else
-    {
-      GM_EXCEPTION_MSG("failed to open file '%s'", filename);
-      return GM_EXCEPTION;
-    }
-    if(string == NULL) return GM_OK;
-
-    int errors = a_thread->GetMachine()->ExecuteString(string, &id, (now) ? true : false, filename, &paramThis);
-    delete[] string;
-    if(errors)
-    {
-      return GM_EXCEPTION;
-    }
-    else
-    {
-      a_thread->PushInt(id);
-    }
+	int id = gmCompileStr(a_thread->GetMachine(), fileName);
+	if (id == 0) return GM_EXCEPTION;
+	a_thread->PushInt(id);
   }
   return GM_OK;
 }

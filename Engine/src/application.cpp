@@ -31,7 +31,7 @@ extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 namespace prev {
 
 	Application::Application() {
-		Timer::FPSCounter(true);
+		Timer::FPSCounter(false);
 		EventHandler::CreateInst();
 
 		auto dis = GraphicsContext::GetDisplayModes();
@@ -67,7 +67,6 @@ namespace prev {
 	}
 
 	Application::~Application() {
-
 		Box2DManager::DestroyInst();
 		ParticleRenderer::DestroyInst();
 		SpriteRenderer::DestroyInst();
@@ -99,7 +98,6 @@ namespace prev {
 			VirtualMachine::Ref().Render();
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
-
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
 			SpriteRenderer::Ref().Render(0);

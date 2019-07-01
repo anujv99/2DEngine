@@ -257,6 +257,27 @@ namespace prev {
 			return GM_OK;
 		}
 
+		GM_MEMFUNC_DECL(Text) {
+			GM_CHECK_NUM_PARAMS(1);
+			GM_CHECK_STRING_PARAM(text, 0);
+
+			ImGui::Text(text);
+			return GM_OK;
+		}
+
+		GM_MEMFUNC_DECL(Separator) {
+			GM_CHECK_NUM_PARAMS(0);
+			ImGui::Separator();
+			return GM_OK;
+		}
+
+		GM_MEMFUNC_DECL(Button) {
+			GM_CHECK_NUM_PARAMS(1);
+			GM_CHECK_STRING_PARAM(name, 0);
+			a_thread->PushInt(ImGui::Button(name));
+			return GM_OK;
+		}
+
 	};
 
 	static gmFunctionEntry s_ImGuiLib[] = {
@@ -273,6 +294,10 @@ namespace prev {
 		GM_LIBFUNC_ENTRY(ColorEdit3, ImGui)
 		GM_LIBFUNC_ENTRY(ColorEdit4, ImGui)
 		GM_LIBFUNC_ENTRY(TextInput, ImGui)
+		GM_LIBFUNC_ENTRY(Text, ImGui)
+		GM_LIBFUNC_ENTRY(Separator, ImGui)
+		GM_LIBFUNC_ENTRY(Button, ImGui)
+
 	};
 
 	void gmBindImGuiLib(gmMachine * a_machine) {

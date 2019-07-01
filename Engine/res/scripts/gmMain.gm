@@ -1,35 +1,108 @@
 
-CreateDrawManager = function() {
+local AddDrawLayers = function() {
+	local val = 0;
+
+	.Clear			= val; val += 1;
+	.Scene			= val; val += 1;
+	.SceneDebug		= val; val += 1;
+	.ScreenDebug	= val; val += 1;
+
+	//DO NOT SET ME
+	._END			= val; val += 1;
+};
+
+global DrawLayers = {};
+DrawLayers:AddDrawLayers();
+
+global RegisterDraw = function(layer, func, obj, funcArg = null) {
+	assert(layer);
+	assert(func);
+
+	g_DrawManager.Register(layer, func, obj, funcArg);
+};
+
+local CreateDrawManager = function() {
 	
-	DrawManager = {
-		tar = Vec4(1, 0, 0, 1),
-		pos = Vec2(0),
-		radius = 5.0
-	};
+	DrawManager = {};
+
+	DrawManager.registerCache = table();
 
 	DrawManager.Init = function() {
-		global a = Vec4(1, 2, 3, 4);
-		global b = Vec3(0, 7, 9);
-		print(b.xyya / a);
-		print("Init Draw Manager");
+		debug();
+		.DrawCalls = array(DrawLayers._END);
+
+		for (i = 0; i < .DrawCalls.Size(); i += 1) {
+			.DrawCalls[i] = array();
+		};
+
+		.Clear();
+	};
+
+	DrawManager._PopCache = function() {
+		local count = tableCount(.registerCache);
+		if (count <= 0) {
+			local t = table();
+			.registerCache[t] = t;
+		};
+
+		foreach (k and v in .registerCache) {
+			.registerCache[v] = null;
+			return v;
+		};
+
+		assert(false);
+	};
+
+	DrawManager._PushCache = function(item) {
+		.registerCache[item] = item;
+	};
+
+	DrawManager.Register = function(layer, func, obj, funcArg = null) {
+		assert(.DrawCalls[layer]);
+		assert(func);
+		assert(layer && layer >= 0 && layer < DrawLayers._END);
+
+		local object = _PopCache();
+
+		object.Func = func;
+		object.FuncArg = funcArg;
+		object.Obj = obj;
+
+		local layer = .DrawCalls[layer];
+		layer.Resize(layer.Size() + 1);
+		layer[layer.Size() - 1] = object;
 	};
 
 	DrawManager.Draw = function() {
-		//Gui.Begin("Hello");
-		//.tar = Gui.ColorEdit4("Shit Amount", .tar);
-		//.pos = Gui.SliderVec2("Pos", .pos, -10, 10);
-		//.radius = Gui.SliderFloat("Rad", .radius, -10, 10);
-		//Gui.End();
-		//
-		//
-		//Imm.BeginDefaultShader();
-		//Imm.BeginDraw();
-		//Imm.Color(.tar);
-		//Imm.DrawCircle(.pos, .radius, 64);
+		for (i = 0; i < .DrawCalls.Size(); i += 1) {
+			for (j = 0; j < .DrawCalls[i].Size(); j += 1) {
+				local callback = .DrawCalls[i][j];
+
+				local obj = callback.Obj;
+				local unc = callback.Func;
+				local arg = callback.FuncArg;
+
+				obj:func(arg);
+			};
+
+			for (j = 0; j < .DrawCalls[i].Size(); j += 1) {
+				local cached = .DrawCalls[i][j];
+
+				cached.obj = null;
+				cached.func = null;
+				cached.arg = null;
+
+				._PushCache(cached);
+			};
+
+			.DrawCalls[i].Resize(0);
+		};
 	};
 
 	DrawManager.Clear = function() {
-		print("Clear Draw Manager");
+		for (i = 0; i < .DrawCalls.Size(); i += 1) {
+			.DrawCalls[i].Resize(0);
+		};
 	};
 
 	return DrawManager;

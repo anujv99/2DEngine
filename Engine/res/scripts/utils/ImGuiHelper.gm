@@ -1,0 +1,66 @@
+global FileChooser = function(title, directory, descriptionFunc, descriptionData) {
+	assert(title && directory);
+	
+	local params = {
+		title = title,
+		finished = false,
+		directory = directory,
+		result = null,
+		descriptionFunc = descriptionFunc,
+		descriptionData = descriptionData
+	};
+	
+	local DrawGui = function(params) {
+		Gui.Text("Directory: " + params.directory);
+		Gui.Separator();
+		local file = system.FileFindFirst(params.directory + "*.*");
+		
+		while (file) {
+			local filename = file.filename;
+			
+			if (filename == ".svn" || filename == "." || filename == "..") {
+				file = system.FileFindNext(file);
+				continue;
+			}
+			
+			if (Gui.Button(filename)) {
+				if (file.GetAttribute('d')) {
+					params.directory += filename + "/";
+					system.FileFindFirst(params.directory + "*.*");
+				} else {
+					params.result = filename;
+					params.finished = true;
+					break;
+				}
+			}
+			
+			if (params.descriptionFunc && params.descriptionData) {
+				if (!params.descriptionData[filename]) {
+					params.descriptionData[filename] = params.descriptionFunc(filename);
+				}
+				
+				Gui.SameLine();
+				Gui.Text(params.descriptionData[filename]);
+			}
+			
+			file = system.FileFindNext(file);
+		}
+		
+		Gui.Separator();
+		
+		if (Gui.Button("Cancle")) {
+			params.result = null;
+			params.finished = true;
+		}
+		
+	};
+	
+	while (!params.finished) {
+		Gui.Begin("File Chooser");
+		DrawGui(params);
+		Gui.End();
+		yield();
+	}
+	
+	return params.result;
+};

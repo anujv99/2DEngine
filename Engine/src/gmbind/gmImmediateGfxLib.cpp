@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "gmImmediateGFXLib.h"
+#include "gmImmediategfxlib.h"
 
 #include "gm/gmMachine.h"
 #include "gm/gmThread.h"
