@@ -46,31 +46,31 @@ static int GM_CDECL gmfGetDirectoryList(gmThread * a_thread)
   gmTableObject* results = a_thread->GetMachine()->AllocTableObject();
 
   #if !defined(__APPLE__)
-    WIN32_FIND_DATA findData;
-    HANDLE handle = FindFirstFile(root, &findData);
-    int index = 0;
-    
-    if ( handle != INVALID_HANDLE_VALUE )
+  WIN32_FIND_DATA findData;
+  HANDLE handle = FindFirstFile(root, &findData);
+  int index = 0;
+  
+  if ( handle != INVALID_HANDLE_VALUE )
+  {
+    BOOL remaining = TRUE;
+    while ( remaining )
     {
-        BOOL remaining = TRUE;
-        while ( remaining )
-        {
-            if ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-            {
-               const char* path = findData.cFileName; 
-               gmStringObject* gmso = a_thread->GetMachine()->AllocStringObject(path);
-               gmVariable gmpath = gmVariable(gmso);
-               results->Set(a_thread->GetMachine(), index, gmpath);
-               index += 1;
-            }
+      if ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+      {
+         const char* path = findData.cFileName; 
+         gmStringObject* gmso = a_thread->GetMachine()->AllocStringObject(path);
+         gmVariable gmpath = gmVariable(gmso);
+         results->Set(a_thread->GetMachine(), index, gmpath);
+         index += 1;
+      }
 
-            remaining = FindNextFile( handle, &findData );
-        }
-
-        FindClose(handle);
+      remaining = FindNextFile( handle, &findData );
     }
+
+    FindClose(handle);
+  }
   #endif
-    a_thread->PushTable(results);
+  a_thread->PushTable(results);
   return GM_OK;
 }
 

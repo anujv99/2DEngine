@@ -4,7 +4,7 @@
 
 namespace prev {
 
-	class ParticleSystem : HandledObject<ParticleSystem> {
+	class ParticleSystem : public HandledObject<ParticleSystem> {
 		friend class ParticleRenderer;
 	public:
 		ParticleSystem(unsigned int numParticles);
@@ -17,29 +17,61 @@ namespace prev {
 		bool UpdateSingleParticle(Particle & particle);
 		void AddNewParticle();
 		void UpdateAndRemoveParticles();
-
-		Vec2 GenerateVelocity(const Vec2 vel);
-		Vec2 GeneratePosition(const Vec2 pos);
-		float GenerateScale(const float scale);
-		float GenerateAplha(const float alpha);
+	private:
+		//Generate Random Number Between -1.0f and  1.0f
+		float GenerateRandom();
+		float GenerateLifeSpan();
+		float GenerateFloat(float start, float variance, bool canBeNegative = true);
+		Vec2 GenerateVec2(Vec2 start, Vec2 variance, bool canBeNegative = true);
+		Vec3 GenerateVec3(Vec3 start, Vec3 variance, bool canBeNegative = true);
 	private:
 		std::vector<Particle> m_Particles;
 		unsigned int m_MaxNumParticles;
 		bool m_Simulate;
 		
-		Vec2 m_Position;
-		Vec2 m_PositionVariance;
+		//Number of particles
+		unsigned int m_NumParticlesPerEmission;
+
+		//Cooldown
+		float m_Cooldown;
+		float m_ElapsedTime;
+
+		//Life
+		float m_LifeSpan;
+		float m_LifeSpanVaraince;
+
+		//Position
+		Vec2 m_StartPosition;
+		Vec2 m_StartPositionVariance;
+
+		//Scale
+		Vec2 m_StartScale;
+		Vec2 m_StartScaleVariance;
+		Vec2 m_EndScale;
+		Vec2 m_EndScaleVariance;
+
+		//Speed
 		Vec2 m_Velocity;
 		Vec2 m_VelocityVariance;
-		Vec4 m_Color;
-		Vec2 m_AttractorPos;
-		float m_AlphaVariance;
-		float m_AlphaDecay;
-		float m_AttractorStrenght;
-		float m_Scale;
-		float m_ScaleVariace;
-		float m_ScaleDecay;
-		float m_Life;
+
+		//Acceleration
+		Vec2 m_Accel;
+
+		//Angle
+		float m_StartAngle;
+		float m_StartAngleVariance;
+		float m_RotationVelocity;
+		float m_RotationVelocityVariance;
+
+		//Color
+		Vec3 m_StartColor;
+		Vec3 m_StartColorVariance;
+		Vec3 m_EndColor;
+		Vec3 m_EndColorVariance;
+		float m_StartAlpha;
+		float m_StartAlphaVariance;
+		float m_EndAplha;
+		float m_EndAplhaVariance;
 	};
 
 }

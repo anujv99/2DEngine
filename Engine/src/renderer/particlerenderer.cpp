@@ -22,8 +22,8 @@ namespace prev {
 		for (auto & part : particleSystem.m_Particles) {
 			Sprite sprite;
 			sprite.SetPosition(part.Position);
-			sprite.SetDimension(Vec2(part.Scale));
-			sprite.SetColor(part.Color);
+			sprite.SetDimension(Vec2(part.CurrentScale));
+			sprite.SetColor(Vec4(part.CurrentColor, part.CurrentAlpha));
 			SpriteRenderer::Ref().Submit(sprite, m_DrawGroupIndex);
 		}
 

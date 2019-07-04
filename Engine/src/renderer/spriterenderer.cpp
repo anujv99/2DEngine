@@ -4,7 +4,7 @@
 
 namespace prev {
 
-	static const unsigned int MAX_NUM_SPRITES = 4096;
+	static const unsigned int MAX_NUM_SPRITES = 1024 * 16;
 	static const unsigned int MAX_NUM_VERTICES_PER_SPRTIE = 6;
 	static const unsigned int MAX_NUM_VERTICES = MAX_NUM_SPRITES * MAX_NUM_VERTICES_PER_SPRTIE;
 

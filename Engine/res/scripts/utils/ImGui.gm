@@ -1,11 +1,7 @@
 
-global RegisterGui = function(winName, winSize, func, obj, arg) {
-	assert(winName && typeId(winName) == g_TypeId.string);
-
+global RegisterGui = function(func, obj, arg) {
 	local callback = g_ImGuiManager.AllocTable();
 
-	callback.WindowName = winName;
-	callback.WindowDimen = winSize;
 	callback.Function = func;
 	callback.Object = obj;
 	callback.Argument = arg;
@@ -41,15 +37,11 @@ local MakeImGuiManager = function() {
 		for (i = 0; i < .GuiTable.Size(); i += 1) {
 			local gui = .GuiTable[i];
 
-			Gui.Begin(gui.WindowName, gui.WindowDimen);
-			
 			local obj = gui.Object;
 			local func = gui.Function;
 			local arg = gui.Argument;
 
 			obj:func(arg);
-
-			Gui.End();
 		}
 
 		g_Rendering = false;

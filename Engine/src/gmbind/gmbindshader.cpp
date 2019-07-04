@@ -6,6 +6,10 @@
 
 #include "gmbindfuncgen.h"
 
+#include "graphics/vertexshader.h"
+#include "graphics/pixelshader.h"
+#include "graphics/shadermanager.h"
+
 using namespace prev;
 
 GM_REG_NAMESPACE(VertexShader) {

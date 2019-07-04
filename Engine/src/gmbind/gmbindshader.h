@@ -2,10 +2,6 @@
 
 #include "gmbind.h"
 
-#include "graphics/vertexshader.h"
-#include "graphics/pixelshader.h"
-#include "graphics/shadermanager.h"
-
 GM_REG_NAMESPACE(VertexShader) {
 	GM_BIND_TYPEID(VertexShader);
 	GM_BIND_DECL(VertexShader);

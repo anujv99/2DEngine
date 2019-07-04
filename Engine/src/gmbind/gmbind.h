@@ -18,6 +18,7 @@
 #define GM_MEMFUNC_DECL(FUNC_NAME) static int GM_CDECL gmf##FUNC_NAME(gmThread * a_thread)
 #define GM_REG_MEMFUNC(CLASS, FUNC_NAME) a_machine->RegisterTypeLibraryFunction(gmTypeId, #FUNC_NAME, gmf##CLASS::gmf##FUNC_NAME);
 
+#define GM_PUSH_USER(TYPE, PTR) { TYPE * _ptr = (PTR); GM_THREAD_ARG->PushNewUser(_ptr, GM_TYPEID(TYPE)); }
 #define GM_PUSH_USER_HANDLED(TYPE, PTR) { TYPE * _ptr = (PTR); _ptr->AddRef(); GM_THREAD_ARG->PushNewUser(_ptr, GM_TYPEID(TYPE)); }
 
 #define GM_BIND_DEFINE( TYPE )							\

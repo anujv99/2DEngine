@@ -10,7 +10,9 @@
 #include "gmbind/gmImmediateGfxLib.h"
 #include "gmbind/gmimguilib.h"
 #include "gmbind/gminputlib.h"
+
 #include "gmbind/gmbindshader.h"
+#include "gmbind/gmbindparticle.h"
 
 namespace prev {
 
@@ -31,6 +33,7 @@ namespace prev {
 		//Custom Types
 		GM_BIND_INIT(VertexShader, vm);
 		GM_BIND_INIT(PixelShader, vm);
+		GM_BIND_INIT(ParticleSystem, vm);
 	}
 
 }

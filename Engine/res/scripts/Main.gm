@@ -42,6 +42,8 @@ local MakeMain = function() {
 
 		while (!DebugSettings.Game) {
 			local drawGui = function(games) {
+				Gui.Begin("Select Game");
+
 				Gui.Text("Select a game");
 				Gui.Text("To add a new game :- ");
 				Gui.Text("1 : Create a new folder in the 'games' folder");
@@ -53,9 +55,11 @@ local MakeMain = function() {
 						DebugSettings.Game = game;
 					}
 				}
+
+				Gui.End();
 			};
 
-			RegisterGui("Select Game", null, drawGui, this, stripped);
+			RegisterGui(drawGui, this, stripped);
 			yield();
 		}
 

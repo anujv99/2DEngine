@@ -6,17 +6,21 @@ local MakeBlankGame = function() {
 		Segments = 32,
 		Color = Vec4(1),
 		ThreadId = -1,
+		Particles
 	};
 
 	BlankGame.Init = function() {
 		print("This is a blank game");
+		.Particles = ParticleSystem(1024);
 		.ThreadId = this:thread(.Update);
 	};
 
 	BlankGame.Update = function() {
 		while (true) {
 			RegisterDraw(.Draw, this);
-			RegisterGui("Blank Game", null, .Gui, this);
+			RegisterGui(.Gui, this);
+
+			.Particles.Update();
 
 			if (Input.IsKeyPressed(Input.KEY_ESCAPE)) {
 				break;
@@ -27,6 +31,8 @@ local MakeBlankGame = function() {
 	};
 
 	BlankGame.Gui = function() {
+		Gui.Begin("Blank Game");
+
 		Gui.Text("Blank Game GUI");
 		Gui.Separator();
 		.Pos = Gui.SliderVec2("Position", .Pos, -20.0f, 20.0f);
@@ -38,11 +44,17 @@ local MakeBlankGame = function() {
 		Gui.Text("[F1] Analytics");
 		Gui.Text("[F2] Virtual Console");
 		Gui.Text("[F3] Profiler");
+
+		Gui.End();
+
+		.Particles.Gui();
 	};
 
 	BlankGame.Draw = function() {
 		Imm.Color(.Color);
 		Imm.DrawCircle(.Pos, .Radius, .Segments);
+
+		.Particles.Draw();
 	};
 
 	return BlankGame;
