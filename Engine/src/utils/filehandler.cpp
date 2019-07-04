@@ -13,7 +13,7 @@ namespace prev {
 			inFile.open(fileName);
 
 		if (!inFile) {
-			LOG_ERROR("Unable to open file : " + fileName);
+			ERROR_TRACE(ERR_FILE_NOT_FOUND, "Script file " + fileName + " not found");
 			return "";
 		}
 

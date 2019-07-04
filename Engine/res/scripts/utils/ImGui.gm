@@ -1,0 +1,78 @@
+
+global RegisterGui = function(winName, winSize, func, obj, arg) {
+	assert(winName && typeId(winName) == g_TypeId.string);
+
+	local callback = g_ImGuiManager.AllocTable();
+
+	callback.WindowName = winName;
+	callback.WindowDimen = winSize;
+	callback.Function = func;
+	callback.Object = obj;
+	callback.Argument = arg;
+
+	g_ImGuiManager.Register(callback);
+};
+
+local MakeImGuiManager = function() {
+
+	local ImGuiManager = {
+		GuiTable = array(),
+		_RegisterCache = {},
+	};
+
+	ImGuiManager.Register = function(callback) {
+		assert(callback);
+		.GuiTable.Resize(.GuiTable.Size() + 1);
+		.GuiTable[.GuiTable.Size() - 1] = callback;
+	};
+
+	ImGuiManager.Clear = function() {
+		for (i = 0; i < .GuiTable.Size(); i += 1) {
+			local callback = .GuiTable[i];
+			._RegisterCache[callback] = callback;
+		}
+		.GuiTable.Resize(0);
+	};
+
+	ImGuiManager.Draw = function() {
+		global g_Rendering;
+		g_Rendering = true;
+
+		for (i = 0; i < .GuiTable.Size(); i += 1) {
+			local gui = .GuiTable[i];
+
+			Gui.Begin(gui.WindowName, gui.WindowDimen);
+			
+			local obj = gui.Object;
+			local func = gui.Function;
+			local arg = gui.Argument;
+
+			obj:func(arg);
+
+			Gui.End();
+		}
+
+		g_Rendering = false;
+		.Clear();
+	};
+
+	ImGuiManager.AllocTable = function() {
+		if (tableCount(._RegisterCache) > 0) {
+			foreach (k and v in ._RegisterCache) {
+				._RegisterCache[v] = null;
+				return v;
+			}
+		}
+
+		return table();
+	};
+
+	ImGuiManager.Init = function() {
+		print("ImGui Manager Initialized");
+	};
+
+	return ImGuiManager;
+};
+
+global g_ImGuiManager = MakeImGuiManager();
+g_ImGuiManager.Init();

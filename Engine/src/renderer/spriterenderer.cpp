@@ -141,8 +141,8 @@ namespace prev {
 	}
 
 	void SpriteRenderer::CreateShadersDefault() {
-		m_VertexShaderDefault = ShaderManager::Ref().LoadVertexShaderFromFile("SPRITE_VERTEX_SHADER", "../Engine/res/shaders/spriteDefaultVertex.hlsl");
-		m_PixelShaderDefault = ShaderManager::Ref().LoadPixelShaderFromFile("SPRITE_PIXEL_SHADER", "../Engine/res/shaders/spriteDefaultPixel.hlsl");
+		m_VertexShaderDefault = ShaderManager::Ref().LoadVertexShaderFromFile("SPRITE_VERTEX_SHADER", "res/shaders/spriteDefaultVertex.hlsl");
+		m_PixelShaderDefault = ShaderManager::Ref().LoadPixelShaderFromFile("SPRITE_PIXEL_SHADER", "res/shaders/spriteDefaultPixel.hlsl");
 	}
 
 	void SpriteRenderer::AddDrawGroup() {

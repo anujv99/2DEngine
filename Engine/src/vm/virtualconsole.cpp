@@ -14,8 +14,7 @@
 #include "virtualconsole.inl"
 
 static void GM_CDECL printCallback(gmMachine * a_machine, const char * str) {
-	std::string log = "[GM] > " + std::string(str);
-	vmConsole.AddLog(log.c_str());
+	vmConsole.AddLog(str);
 }
 
 namespace prev {
@@ -51,10 +50,7 @@ namespace prev {
 
 	void VirtualConsole::Log(const std::string & text, bool newLine /*= true*/) {
 		if (text.empty()) return;
-
-		LOG_TRACE("[GM] {}", text);
-
-		vmConsole.AddLog("[GM] > %s", text.c_str());
+		vmConsole.AddLog(text.c_str());
 	}
 
 	void VirtualConsole::Enable(bool enable) {

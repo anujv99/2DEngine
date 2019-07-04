@@ -1,0 +1,12 @@
+
+global g_TypeId = {
+	int			= typeId(1),
+	float		= typeId(1.0f),
+	Vec4		= typeId(Vec4(0.0f)),
+	Vec3		= typeId(Vec3(0.0f)),
+	Vec2		= typeId(Vec2(0.0f)),
+	Vec2i		= typeId(Vec2i(0)),
+	string		= typeId("sample"),
+	table_t		= typeId({}),
+	null_t		= typeId(null)
+};

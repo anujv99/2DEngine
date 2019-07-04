@@ -51,6 +51,7 @@ namespace prev {
 		inline b2Body * GetBody() { return m_Body; }
 
 		void MakeKinematic(b2World * world, b2BodyType type);
+		bool IsPosInBox(Vec2 pos);
 	};
 
 }

@@ -16,6 +16,7 @@ namespace prev {
 	public:
 		void Update();
 		void Render();
+		void Gui();
 		void RunMain();
 
 		gmMachine & GetVM() { return *m_VM; }

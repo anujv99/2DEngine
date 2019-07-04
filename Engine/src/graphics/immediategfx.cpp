@@ -42,12 +42,12 @@ namespace prev {
 		LOG_TRACE("\tinitializing Shaders");
 		m_VertexShader = ShaderManager::Ref().LoadVertexShaderFromFile(
 			"IMMGFX_DEFAULT_VERTEX_SHADER", 
-			"../Engine/res/shaders/immGFXDefaultVertex.hlsl"
+			"res/shaders/immGFXDefaultVertex.hlsl"
 		);
 
 		m_PixelShader = ShaderManager::Ref().LoadPixelShaderFromFile(
 			"IMMGFX_DEFAULT_PIXEL_SHADER", 
-			"../Engine/res/shaders/immGFXDefaultPixel.hlsl"
+			"res/shaders/immGFXDefaultPixel.hlsl"
 		);
 
 		LOG_TRACE("\tCreating Verex Layout");
@@ -69,6 +69,9 @@ namespace prev {
 
 	void ImmediateGFX::DrawCurrentPrimitive() {
 		
+		BeginDefaultShaders();
+		BeginDraw();
+
 		if (m_BufferIndex + GetVertexBatch().size() >= IMMEDIATEGFX_MAX_VERTS) {
 			m_BufferIndex = 0;
 		}

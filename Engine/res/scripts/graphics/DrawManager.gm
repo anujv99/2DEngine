@@ -1,0 +1,80 @@
+
+global RegisterDraw = function(func, obj = null, arg = null) {
+	g_DrawManager.Register(func, obj, arg);
+};
+
+local MakeDrawManager = function() {
+	
+	drawMngr = {
+		DrawTable = array(),
+		_RegisterCache = table(),
+	};
+
+	drawMngr.Init = function() {
+		print("Draw Manager Initialized");
+	};
+
+	drawMngr.Draw = function() {
+		for (i = 0; i < .DrawTable.Size(); i += 1) {
+			local callback = .DrawTable[i];
+
+			func = callback.Func;
+			obj = callback.Obj;
+			arg = callback.Arg;
+
+			obj:func(arg);
+		}
+
+		for (i = 0; i < .DrawTable.Size(); i += 1) {
+			local cached = .DrawTable[i];
+			cached.Func = null;
+			cached.Obj = null;
+			cached.Arg = null;
+
+			._PushCache(cached);
+		}
+
+		.DrawTable.Resize(0);
+	};
+
+	drawMngr.Clear = function() {
+		.DrawTable.Resize(0);
+	};
+
+	drawMngr._PopCache = function() {
+		local count = tableCount(._RegisterCache);
+
+		if (count <= 0) {
+			local t = table();
+			._RegisterCache[t] = t;
+		}
+
+		foreach (k and v in ._RegisterCache) {
+			._RegisterCache[v] = null;
+			return v;
+		}
+
+		assert(false);
+	};
+
+	drawMngr._PushCache = function(item) {
+		._RegisterCache[item] = item;
+	};
+
+	drawMngr.Register = function(func, obj, arg) {
+		assert(func);
+
+		local callback = ._PopCache();
+		callback.Func = func;
+		callback.Obj = obj;
+		callback.Arg = arg;
+
+		.DrawTable.Resize(.DrawTable.Size() + 1);
+		.DrawTable[.DrawTable.Size() - 1] = callback;
+	};
+
+	return drawMngr;
+};
+
+global g_DrawManager = MakeDrawManager();
+g_DrawManager.Init();

@@ -8,6 +8,7 @@ namespace prev {
 
 	VertexShader::VertexShader(const std::string & shaderName) : m_ShaderName(shaderName) {
 		ShaderManager::Ref().RegisterVertexShader(this, shaderName);
+		LOG_TRACE("Vertex Shader : {} successfully loaded", shaderName);
 	}
 
 	void VertexShader::UpdateMVP() {

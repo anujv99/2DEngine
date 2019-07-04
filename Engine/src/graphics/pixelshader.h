@@ -14,7 +14,7 @@ namespace prev {
 		virtual void Bind() override = 0;
 		virtual void UnBind() override = 0;
 		virtual void Init(const std::string & shaderCode) = 0;
-		virtual void Reload() = 0;
+		virtual int GetUniformLocation(const std::string & uniformName) = 0;
 
 		virtual BindableType GetType() const override {
 			return BindableType::PIXEL_SHADER;
@@ -25,7 +25,7 @@ namespace prev {
 		}
 
 		static StrongHandle<PixelShader> CreatePixelShader(const std::string & shaderName);
-	private:
+	protected:
 		std::string m_ShaderName;
 	};
 

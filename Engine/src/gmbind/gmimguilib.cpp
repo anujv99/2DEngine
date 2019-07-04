@@ -108,7 +108,7 @@ namespace prev {
 
 			ImGuiWindowFlags winFlags = 0;
 
-			if (num_params == 2) {
+			if (num_params == 2 && a_thread->Param(1).m_type != GM_NULL) {
 				GM_CHECK_VEC2_OR_VEC2I_PARAM(size, 1);
 				ImGui::Begin(name, nullptr, size);
 			} else {

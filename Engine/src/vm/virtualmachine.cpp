@@ -11,8 +11,11 @@
 
 #include <imgui.h>
 #include "utils/input.h"
+#include "gm/gmCall.h"
 
 namespace prev {
+	
+	static const char * g_EntryFile = "res/scripts/Main.gm";
 
 	VirtualMachine::VirtualMachine() :
 		m_NumThreads(0), m_ThreadID(0), 
@@ -60,7 +63,28 @@ namespace prev {
 				m_VM->ExecuteFunction(m_DrawFunction, 0, true, &m_DrawManager);
 				m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(0));
 				m_DrawMs = Timer::GetTimeMs() - m_DrawMs;
+			} else {
+				m_VM->ExecuteFunction(m_ClearFunction, 0, true, &m_DrawManager);
 			}
+		}
+	}
+
+	void VirtualMachine::Gui() {
+		gmVariable imguimanagerkey = gmVariable(m_VM->AllocStringObject("g_ImGuiManager"));
+		gmVariable imguimanager = m_VM->GetGlobals()->Get(imguimanagerkey);
+
+		if (!imguimanager.IsNull()) {
+			gmTableObject * imguiManagerObject = m_VM->GetGlobals()->Get(imguimanagerkey).GetTableObjectSafe();
+			ASSERT(imguiManagerObject);
+
+			// grab g_core.OnExit() function
+			gmFunctionObject * drawGuiFunc = imguiManagerObject->Get(m_VM, "Draw").GetFunctionObjectSafe();
+			ASSERT(drawGuiFunc);
+
+			// call the function
+			gmCall call;
+			call.BeginFunction(m_VM, drawGuiFunc, gmVariable(imguiManagerObject));
+			call.End();
 		}
 	}
 
@@ -82,7 +106,7 @@ namespace prev {
 		RegisterLibs(m_VM);
 		InitGlobals();
 
-		m_ThreadID = gmCompileStr(m_VM, "../Engine/res/scripts/gmMain.gm");
+		m_ThreadID = gmCompileStr(m_VM, g_EntryFile);
 
 		InitDrawManager();
 	}

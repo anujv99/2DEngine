@@ -5,6 +5,7 @@
 #include "gm/gmSystemLib.h"
 #include "gm/gmArrayLib.h"
 #include "gm/gmDebug.h"
+#include "gm/gmMachineLib.h"
 
 #include "gmbind/gmImmediateGfxLib.h"
 #include "gmbind/gmimguilib.h"
@@ -25,9 +26,11 @@ namespace prev {
 		gmBindImGuiLib(vm);
 		gmBindImmediateGFXLib(vm);
 		gmBindInputLib(vm);
+		gmBindShaderManagerLib(vm);
 
 		//Custom Types
 		GM_BIND_INIT(VertexShader, vm);
+		GM_BIND_INIT(PixelShader, vm);
 	}
 
 }

@@ -1431,6 +1431,25 @@ inline const char * gmUnknownToString(gmMachine * a_machine, gmVariable * a_unkn
   {
     sprintf(a_buffer, "%lld", (gmint64)a_unknown->m_value.m_int); // this won't be > 64 chars
   }
+  else if (a_unknown->m_type == GM_VEC4)
+  {
+	sprintf(a_buffer, "Vec4[%.5f, %.5f, %.5f, %.5f]", 
+	  a_unknown->m_value.m_vec4.x, a_unknown->m_value.m_vec4.y, 
+	  a_unknown->m_value.m_vec4.z, a_unknown->m_value.m_vec4.w);
+  }
+  else if (a_unknown->m_type == GM_VEC3)
+  {
+	sprintf(a_buffer, "Vec3[%.5f, %.5f, %.5f]", 
+	  a_unknown->m_value.m_vec3.x, a_unknown->m_value.m_vec3.y, a_unknown->m_value.m_vec3.z);
+  }
+  else if (a_unknown->m_type == GM_VEC2)
+  {
+	sprintf(a_buffer, "Vec2[%.5f, %.5f]", a_unknown->m_value.m_vec2.x, a_unknown->m_value.m_vec2.y);
+  }
+  else if (a_unknown->m_type == GM_VEC2I)
+  {
+	sprintf(a_buffer, "Vec2i[%d, %d]", a_unknown->m_value.m_vec2i.x, a_unknown->m_value.m_vec2i.y);
+  }
   else if(a_unknown->m_type == GM_FLOAT)
   {
     sprintf(a_buffer, "%f", a_unknown->m_value.m_float); // this won't be > 64 chars

@@ -57,4 +57,17 @@ namespace prev {
 		m_Body->CreateFixture(&shape, 1.0f);
 	}
 
+	bool Sprite::IsPosInBox(Vec2 pos) {
+		if (m_Body == nullptr) {
+			float left = m_Position.x - m_Dimension.x / 2;
+			float right = m_Position.x + m_Dimension.x / 2;
+			float bottom = m_Position.y - m_Dimension.y / 2;
+			float top = m_Position.y + m_Dimension.y / 2;
+
+			return (pos.x >= left) && (pos.x <= right) && (pos.y >= bottom) && (pos.y <= top);
+		} else {
+			return m_Body->GetFixtureList()[0].TestPoint(pos);
+		}
+	}
+
 }

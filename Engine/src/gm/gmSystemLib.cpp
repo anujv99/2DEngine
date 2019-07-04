@@ -35,6 +35,46 @@
 #undef GetObject
 
 //
+// custom
+//
+
+static int GM_CDECL gmfGetDirectoryList(gmThread * a_thread)
+{
+  GM_CHECK_NUM_PARAMS(1);
+  GM_CHECK_STRING_PARAM(root, 0);
+
+  gmTableObject* results = a_thread->GetMachine()->AllocTableObject();
+
+  #if !defined(__APPLE__)
+    WIN32_FIND_DATA findData;
+    HANDLE handle = FindFirstFile(root, &findData);
+    int index = 0;
+    
+    if ( handle != INVALID_HANDLE_VALUE )
+    {
+        BOOL remaining = TRUE;
+        while ( remaining )
+        {
+            if ( findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+            {
+               const char* path = findData.cFileName; 
+               gmStringObject* gmso = a_thread->GetMachine()->AllocStringObject(path);
+               gmVariable gmpath = gmVariable(gmso);
+               results->Set(a_thread->GetMachine(), index, gmpath);
+               index += 1;
+            }
+
+            remaining = FindNextFile( handle, &findData );
+        }
+
+        FindClose(handle);
+    }
+  #endif
+    a_thread->PushTable(results);
+  return GM_OK;
+}
+
+//
 //
 // system functions
 //
@@ -854,6 +894,8 @@ static gmFunctionEntry s_systemLib[] =
     \return the time as a string.
   */
   {"FormatTime", gmfFormatTime},
+
+  {"GetDirectoryList", gmfGetDirectoryList},
 };
 
 static gmFunctionEntry s_fileFindLib[] = 

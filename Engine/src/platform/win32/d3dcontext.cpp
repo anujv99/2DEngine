@@ -79,7 +79,7 @@ namespace prev {
 			m_SwapChain->SetFullscreenState(TRUE, nullptr);
 		}
 
-		LOG_INFO("D3D11 Successfully Initialized");
+		LOG_TRACE("D3D11 Successfully Initialized");
 	}
 
 	void D3DContext::BeginFrame() {

@@ -61,7 +61,6 @@ namespace prev {
 		Box2DManager::CreateInst();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
-
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
 	}
@@ -94,6 +93,8 @@ namespace prev {
 
 			LayerStack::Ref().OnUpdate();
 
+			Box2DManager::Ref().Update();
+
 			VirtualMachine::Ref().Update();
 			VirtualMachine::Ref().Render();
 
@@ -118,6 +119,7 @@ namespace prev {
 	}
 
 	void Application::Gui() {
+		VirtualMachine::Ref().Gui();
 		LayerStack::Ref().OnImGuiUpdate();
 	}
 

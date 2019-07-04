@@ -21,10 +21,17 @@ namespace prev {
 	void D3DPixelShader::Init(const std::string & shaderCode) {
 		LOG_ON_CONDITION(!m_IsShaderCreated, LOG_ERROR, "Pixel Shader already initialized", return);
 		m_IsShaderCreated = CompileAndCreateShader(shaderCode);
+		GetShaderReflection(m_ShaderName);
 	}
 
-	void D3DPixelShader::Reload() {
-
+	int D3DPixelShader::GetUniformLocation(const std::string & uniformName) {
+		D3D11_SHADER_INPUT_BIND_DESC ibd;
+		ZeroMemory(&ibd, sizeof(ibd));
+		HRESULT hr = m_ShaderInfo->GetResourceBindingDescByName(uniformName.c_str(), &ibd);
+		if (FAILED(hr)) {
+			return -1;
+		}
+		return ibd.BindPoint;
 	}
 
 	bool D3DPixelShader::CompileAndCreateShader(const std::string & shaderCode) {
@@ -68,6 +75,15 @@ namespace prev {
 		}
 
 		return true;
+	}
+
+	void D3DPixelShader::GetShaderReflection(const std::string & shaderName) {
+		HRESULT hr = D3DReflect(m_ShaderBytecode->GetBufferPointer(), m_ShaderBytecode->GetBufferSize(),
+			IID_ID3D11ShaderReflection, (void **)m_ShaderInfo.GetAddressOf());
+		if (FAILED(hr)) {
+			LOG_WARN("Unable to get shader reflection {}", shaderName);
+		}
+		return;
 	}
 
 }

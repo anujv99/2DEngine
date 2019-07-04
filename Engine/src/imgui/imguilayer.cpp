@@ -16,7 +16,7 @@ namespace prev {
 		config.OversampleH = 3;
 		config.OversampleV = 3;
 
-		io.Fonts->AddFontFromFileTTF("../Engine/res/fonts/Roboto-Regular.ttf", 15.0f, &config);
+		io.Fonts->AddFontFromFileTTF("res/fonts/Roboto-Regular.ttf", 15.0f, &config);
 		SetupImGuiStyle(true, 1.0f);
 
 		LOG_TRACE("ImGui Initialized");

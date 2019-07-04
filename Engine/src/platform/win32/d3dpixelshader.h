@@ -14,9 +14,11 @@ namespace prev {
 		virtual void Bind() override;
 		virtual void UnBind() override;
 		virtual void Init(const std::string & shaderCode) override;
-		virtual void Reload() override;
+		virtual int GetUniformLocation(const std::string & uniformName) override;
 	private:
 		bool CompileAndCreateShader(const std::string & shaderCode);
+		void GetShaderReflection(const std::string & shaderName);
+		Microsoft::WRL::ComPtr<ID3D11ShaderReflection> m_ShaderInfo;
 	private:
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_PixelShader;
 		Microsoft::WRL::ComPtr<ID3DBlob> m_ShaderBytecode;
