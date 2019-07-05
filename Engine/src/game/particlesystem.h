@@ -24,7 +24,7 @@ namespace prev {
 		float GenerateFloat(float start, float variance, bool canBeNegative = true);
 		Vec2 GenerateVec2(Vec2 start, Vec2 variance, bool canBeNegative = true);
 		Vec3 GenerateVec3(Vec3 start, Vec3 variance, bool canBeNegative = true);
-	private:
+	public:
 		std::vector<Particle> m_Particles;
 		unsigned int m_MaxNumParticles;
 		bool m_Simulate;
@@ -57,7 +57,11 @@ namespace prev {
 		//Acceleration
 		Vec2 m_Accel;
 
-		//Angle
+		//Attractor
+		Vec2 m_AttractorPosition;
+		float m_AttractorStrenght;
+
+		//Angle :- Not using right now
 		float m_StartAngle;
 		float m_StartAngleVariance;
 		float m_RotationVelocity;
@@ -70,8 +74,8 @@ namespace prev {
 		Vec3 m_EndColorVariance;
 		float m_StartAlpha;
 		float m_StartAlphaVariance;
-		float m_EndAplha;
-		float m_EndAplhaVariance;
+		float m_EndAlpha;
+		float m_EndAlphaVariance;
 	};
 
 }

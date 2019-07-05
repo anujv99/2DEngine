@@ -1,5 +1,5 @@
 workspace "2DEngine"
-    startproject "App"
+    startproject "Engine"
     architecture "x64"
 
     configurations {

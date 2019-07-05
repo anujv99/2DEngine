@@ -2,7 +2,7 @@ local MakeBlankGame = function() {
 	
 	local BlankGame = {
 		Pos = Vec2(0),
-		Radius = 1.0f,
+		Radius = 0.0f,
 		Segments = 32,
 		Color = Vec4(1),
 		ThreadId = -1,
@@ -51,9 +51,6 @@ local MakeBlankGame = function() {
 	};
 
 	BlankGame.Draw = function() {
-		Imm.Color(.Color);
-		Imm.DrawCircle(.Pos, .Radius, .Segments);
-
 		.Particles.Draw();
 	};
 

@@ -1027,9 +1027,10 @@ inline gmUserObject * gmThread::ThisUserObject()
 // OPERATORS
 //
 
+#define GM_OP_USER_PTR(TYPE, INDEX, PTR) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_TYPEID(TYPE), "userptr");\
+										 TYPE * PTR = static_cast<TYPE *>(static_cast<gmUserObject *>(GM_OBJECT(a_operands[INDEX].m_value.m_ref))->m_user);
 #define GM_OP_STR_PTR(CHAR_PTR, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_STRING, "string");\
 									   const char * CHAR_PTR = (static_cast<gmStringObject *>(GM_OBJECT(a_operands[INDEX].m_value.m_ref)))->GetString();
-
 #define GM_OP_VEC4(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_VEC4, "vec4");\
 	                           gmvec4 & VAL = a_operands[INDEX].m_value.m_vec4;
 #define GM_OP_VEC3(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_VEC3, "vec3");\
@@ -1039,12 +1040,12 @@ inline gmUserObject * gmThread::ThisUserObject()
 #define GM_OP_VEC2I(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_VEC2I, "vec2i");\
 	                            gmvec2i & VAL = a_operands[INDEX].m_value.m_vec2i;
 #define GM_OP_FLOAT(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_FLOAT, "float");\
-                                float VAL = a_operands[INDEX].m_type.m_float;
+                                float VAL = a_operands[INDEX].m_value.m_float;
 #define GM_OP_INT(VAL, INDEX) GM_OP_ASSERT(a_operands[INDEX].m_type == GM_INT, "int");\
-                                int VAL = a_operands[INDEX].m_type.m_int;
+                                int VAL = a_operands[INDEX].m_value.m_int;
 #define GM_OP_FLOAT_OR_INT(VAL, INDEX) float VAL = 0.0f;\
-		                               if (a_operands[INDEX].m_type == GM_INT) VAL = (float)a_operands[INDEX].m_vale.m_int;\
-									   else if (a_operands[INDEX].m_type == GM_FLOAT) VAL = a_operands[INDEX].m_vale.m_float;\
+		                               if (a_operands[INDEX].m_type == GM_INT) VAL = (float)a_operands[INDEX].m_value.m_int;\
+									   else if (a_operands[INDEX].m_type == GM_FLOAT) VAL = a_operands[INDEX].m_value.m_float;\
 		                               else { GM_OP_ASSERT(false, "float/int"); }
 
 //

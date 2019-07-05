@@ -32,6 +32,9 @@ namespace prev {
 
 		m_Accel							= Vec2(0.0f);
 
+		m_AttractorPosition				= Vec2(0.0f);
+		m_AttractorStrenght				= 0.0f;
+
 		m_StartAngle					= 0.0f;
 		m_StartAngleVariance			= 0.0f;
 		m_RotationVelocity				= 0.0f;
@@ -44,8 +47,8 @@ namespace prev {
 
 		m_StartAlpha					= 1.0f;
 		m_StartAlphaVariance			= 0.0f;
-		m_EndAplha						= 1.0f;
-		m_EndAplhaVariance				= 0.0f;
+		m_EndAlpha						= 1.0f;
+		m_EndAlphaVariance				= 0.0f;
 
 		std::srand((int)Timer::GetTime() * 321651320);
 	}
@@ -90,15 +93,26 @@ namespace prev {
 		ImGui::DragFloat2("Velocity", &m_Velocity[0], 0.01f);
 		ImGui::DragFloat2("Velocity Variance", &m_VelocityVariance[0], 0.01f);
 		ImGui::DragFloat2("Acceleration", &m_Accel[0], 0.01f);
+		ImGui::DragFloat2("Attractor Position", &m_AttractorPosition[0], 0.01f);
+		ImGui::DragFloat("Attractor Strength", &m_AttractorStrenght, 0.01f);
 		ImGui::Separator();
 		ImGui::ColorEdit3("Start Color", &m_StartColor[0]);
-		ImGui::ColorEdit3("End Color", &m_EndColor[0]);
+		ImGui::ColorEdit3("End Color", &m_EndColor[0]); 
+		ImGui::ColorEdit3("Start Color Variance", &m_StartColorVariance[0]);
+		ImGui::ColorEdit3("End Color Variance", &m_EndColorVariance[0]);
 		ImGui::DragFloat("Start Alpha", &m_StartAlpha, 0.001f, 0.0f, 1.0f);
-		ImGui::DragFloat("End Alpha", &m_EndAplha, 0.001f, 0.0f, 1.0f);
+		ImGui::DragFloat("End Alpha", &m_EndAlpha, 0.001f, 0.0f, 1.0f); 
+		ImGui::DragFloat("Start Alpha Variance", &m_StartAlphaVariance, 0.001f, 0.0f, 1.0f);
+		ImGui::DragFloat("End Alpha Variance", &m_EndAlphaVariance, 0.001f, 0.0f, 1.0f);
 		ImGui::End();
 	}
 
 	bool ParticleSystem::UpdateSingleParticle(Particle & particle) {
+		Vec2 attractorVel = m_AttractorPosition - particle.Position;
+		if (Length(attractorVel) > 1) {
+			Normalize(attractorVel);
+		} 
+		particle.Velocity += attractorVel * m_AttractorStrenght;
 		return particle.Update(Timer::GetDeltaTime());
 	}
 
@@ -114,7 +128,7 @@ namespace prev {
 		partice.StartColor = GenerateVec3(m_StartColor, m_StartColorVariance, false);
 		partice.EndColor = GenerateVec3(m_EndColor, m_EndColorVariance, false);
 		partice.StartAlpha = GenerateFloat(m_StartAlpha, m_StartAlphaVariance, false);
-		partice.EndAlpha = GenerateFloat(m_EndAplha, m_EndAplhaVariance, false);
+		partice.EndAlpha = GenerateFloat(m_EndAlpha, m_EndAlphaVariance, false);
 		partice.StartAngle = GenerateFloat(m_StartAngle, m_StartAngleVariance);
 		partice.RotationVelocity = GenerateFloat(m_RotationVelocity, m_RotationVelocityVariance);
 

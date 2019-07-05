@@ -189,8 +189,10 @@ namespace prev {
 		ImGui::SetNextWindowSize(Vec2(232, 800));
 		ImGui::Begin("GameMonkey Settings", &showGuiSettings, ImGuiWindowFlags_NoResize);
 		ImGui::Text("Update");
+		ImGui::ProgressBar(m_UpdateMs / 100.0f, Vec2(-1, 0), std::to_string(m_UpdateMs).c_str());
 		m_LineGraphUpdate->DrawImGui();
 		ImGui::Text("Draw");
+		ImGui::ProgressBar(m_DrawMs / 100.0f, Vec2(-1, 0), std::to_string(m_DrawMs).c_str());
 		m_LineGraphDraw->DrawImGui();
 		ImGui::Text("Memory");
 		m_LineGraphMemory->DrawImGui();
