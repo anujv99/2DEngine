@@ -30,7 +30,6 @@ namespace prev {
 	void ImGuiLayer::StartFrame() {
 		Start();
 		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
 	}
 
 	void ImGuiLayer::EndFrame() {

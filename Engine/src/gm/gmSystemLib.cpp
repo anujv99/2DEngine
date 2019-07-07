@@ -332,6 +332,28 @@ static int GM_CDECL gmfFileWriteString(gmThread * a_thread) // string, return 1 
   return GM_OK;
 }
 
+static int GM_CDECL gmfSaveTableToFile(gmThread * a_thread)
+{
+  GM_CHECK_NUM_PARAMS(2);
+  GM_CHECK_TABLE_PARAM(table, 0);
+  GM_CHECK_STRING_PARAM(file, 1);
+  
+  int result = gmSaveTableToFile(table, file);
+  a_thread->PushInt(result);
+  
+  return GM_OK;
+}
+
+static int GM_CDECL gmfLoadTableFromFile(gmThread * a_thread)
+{
+  GM_CHECK_NUM_PARAMS(1);
+  GM_CHECK_STRING_PARAM(file, 0);
+  
+  gmTableObject * table = gmLoadTableFromFile(a_thread->GetMachine(), file);
+  a_thread->PushTable(table);
+  return GM_OK;
+}
+
 #if GM_USE_INCGC
 static void GM_CDECL gmGCDestructFileUserType(gmMachine * a_machine, gmUserObject* a_object)
 {
@@ -791,7 +813,7 @@ static gmFunctionEntry s_systemLib[] =
   /*gm
     \function Exec
     \brief Exec will execute a system command
-    \param string params will be concatinated together with a single space to form the final system command string
+    \param string params will be concatenated together with a single space to form the final system command string
     \return integer value returned from system exec call, -1 on error
   */
   {"Exec", gmfSystem},
@@ -896,6 +918,8 @@ static gmFunctionEntry s_systemLib[] =
   {"FormatTime", gmfFormatTime},
 
   {"GetDirectoryList", gmfGetDirectoryList},
+  {"SaveTableToFile", gmfSaveTableToFile},
+  {"LoadTableFromFile", gmfLoadTableFromFile},
 };
 
 static gmFunctionEntry s_fileFindLib[] = 

@@ -11,10 +11,10 @@ int main() {
 
 	LOG_WARN("This is the application!");
 
-	Application * app = new Application();
-	app->Run();
-	delete app;
-
+	Application::CreateInst();
+	Application::Ref().Run();
+	Application::DestroyInst();
+	
 	Logger::DestroyInst();
 
 	return 0;

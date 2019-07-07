@@ -72,7 +72,6 @@ namespace prev {
 	}
 
 	void ParticleSystem::Gui() {
-		ImGui::Begin("Particle Settings", (bool *)0, ImGuiWindowFlags_AlwaysAutoResize);
 		if (ImGui::Button("Clear")) {
 			m_Particles.clear();
 		}
@@ -104,7 +103,6 @@ namespace prev {
 		ImGui::DragFloat("End Alpha", &m_EndAlpha, 0.001f, 0.0f, 1.0f); 
 		ImGui::DragFloat("Start Alpha Variance", &m_StartAlphaVariance, 0.001f, 0.0f, 1.0f);
 		ImGui::DragFloat("End Alpha Variance", &m_EndAlphaVariance, 0.001f, 0.0f, 1.0f);
-		ImGui::End();
 	}
 
 	bool ParticleSystem::UpdateSingleParticle(Particle & particle) {

@@ -1,0 +1,57 @@
+global SaveParticleSystemToFile = function(particleSys, file) {
+	local attribs = table();
+
+	attribs.Life					= particleSys.Life;
+	attribs.LifeVariance			= particleSys.LifeVariance;
+	attribs.Position				= particleSys.Position;
+	attribs.PositionVariance		= particleSys.PositionVariance;
+	attribs.StartScale				= particleSys.StartScale;
+	attribs.StartScaleVariance		= particleSys.StartScaleVariance;
+	attribs.EndScale				= particleSys.EndScale;
+	attribs.EndScaleVariance		= particleSys.EndScaleVariance;
+	attribs.Velocity				= particleSys.Velocity;
+	attribs.VelocityVariance		= particleSys.VelocityVariance;
+	attribs.Acceleration			= particleSys.Acceleration;
+	attribs.AttractorPosition		= particleSys.AttractorPosition;
+	attribs.AttractorStrenght		= particleSys.AttractorStrenght;
+	attribs.StartColor				= particleSys.StartColor;
+	attribs.StartColorVariance		= particleSys.StartColorVariance;
+	attribs.EndColor				= particleSys.EndColor;
+	attribs.EndColorVariance		= particleSys.EndColorVariance;
+	attribs.StartAlpha				= particleSys.StartAlpha;
+	attribs.StartAlphaVariance		= particleSys.StartAlphaVariance;
+	attribs.EndAlpha				= particleSys.EndAlpha;
+	attribs.EndAlphaVariance		= particleSys.EndAlphaVariance;
+
+	system.SaveTableToFile(attribs, file);
+
+	attribs = null;
+};
+
+global LoadParticleSystemFromFile = function(patricleSystem, file) {
+	local attribs = system.LoadTableFromFile(file);
+
+	patricleSystem.Life 					= attribs.Life;
+	patricleSystem.LifeVariance 			= attribs.LifeVariance;
+	patricleSystem.Position 				= attribs.Position;
+	patricleSystem.PositionVariance 		= attribs.PositionVariance;
+	patricleSystem.StartScale 				= attribs.StartScale;
+	patricleSystem.StartScaleVariance 		= attribs.StartScaleVariance;
+	patricleSystem.EndScale 				= attribs.EndScale;
+	patricleSystem.EndScaleVariance 		= attribs.EndScaleVariance;
+	patricleSystem.Velocity 				= attribs.Velocity;
+	patricleSystem.VelocityVariance 		= attribs.VelocityVariance;
+	patricleSystem.Acceleration 			= attribs.Acceleration;
+	patricleSystem.AttractorPosition 		= attribs.AttractorPosition;
+	patricleSystem.AttractorStrenght 		= attribs.AttractorStrenght;
+	patricleSystem.StartColor 				= attribs.StartColor;
+	patricleSystem.StartColorVariance 		= attribs.StartColorVariance;
+	patricleSystem.EndColor 				= attribs.EndColor;
+	patricleSystem.EndColorVariance 		= attribs.EndColorVariance;
+	patricleSystem.StartAlpha 				= attribs.StartAlpha;
+	patricleSystem.StartAlphaVariance 		= attribs.StartAlphaVariance;
+	patricleSystem.EndAlpha 				= attribs.EndAlpha;
+	patricleSystem.EndAlphaVariance 		= attribs.EndAlphaVariance;
+
+	return ps;
+};

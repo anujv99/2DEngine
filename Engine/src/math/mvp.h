@@ -24,14 +24,6 @@ namespace prev {
 		Mat4 Get();
 
 		bool IsDirty();
-	public:
-		static const float s_Near;
-		static const float s_Far;
-		static const float s_YScale;
-		static float s_XScale;
-	private:
-		void EventFunction(Event & e);
-		bool WindowResize(WindowResizeEvent & e);
 	private:
 		MatrixStack m_MatrixStack[3]; //Model, View, Projection
 		Mat4 m_MVPCache;

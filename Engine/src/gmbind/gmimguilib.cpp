@@ -297,7 +297,6 @@ namespace prev {
 		GM_LIBFUNC_ENTRY(Text, ImGui)
 		GM_LIBFUNC_ENTRY(Separator, ImGui)
 		GM_LIBFUNC_ENTRY(Button, ImGui)
-
 	};
 
 	void gmBindImGuiLib(gmMachine * a_machine) {

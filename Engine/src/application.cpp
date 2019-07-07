@@ -30,6 +30,11 @@ extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
+	// Just used for initialization
+	static constexpr float S_DEFCAMERA_SCALE_Y	=  10.0f;
+	static constexpr float S_DEFCAMERA_NEAR		= -150.0f;
+	static constexpr float S_DEFCAMERA_FAR		=  150.0f;
+
 	Application::Application() {
 		Timer::FPSCounter(false);
 		EventHandler::CreateInst();
@@ -61,11 +66,27 @@ namespace prev {
 		Box2DManager::CreateInst();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
-		////////////////////////////////////////TESTING////////////////////////////////////////
 
+		Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+		float aspect = winSize.x / winSize.y;
+
+		float defCameraXScale = aspect * S_DEFCAMERA_SCALE_Y;
+
+		m_DefCamera.SetScreenSpace(
+			Vec2(-defCameraXScale / 2, -S_DEFCAMERA_SCALE_Y / 2),
+			Vec2(defCameraXScale / 2, S_DEFCAMERA_SCALE_Y / 2)
+		);
+
+		m_DefCamera.SetNearFar(S_DEFCAMERA_NEAR, S_DEFCAMERA_FAR);
+		m_DefCamera.Begin();
+
+		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
 	Application::~Application() {
+
+		m_DefCamera.End();
+
 		Box2DManager::DestroyInst();
 		ParticleRenderer::DestroyInst();
 		SpriteRenderer::DestroyInst();
@@ -99,6 +120,18 @@ namespace prev {
 			VirtualMachine::Ref().Render();
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
+			ImmediateGFX::Ref().Color(1, 1, 1, 1);
+			ImmediateGFX::Ref().DrawCircle(Vec2(0), 1);
+
+			static Vec2 pos;
+
+			ImGui::Begin("Camera");
+			ImGui::DragFloat2("Pos", &pos[0], 0.001f);
+			ImGui::End();
+
+			m_DefCamera.SetPos(pos);
+			m_DefCamera.UpdateMatrix();
+
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
 			SpriteRenderer::Ref().Render(0);
@@ -126,6 +159,7 @@ namespace prev {
 	void Application::OnEvent(Event & e) {
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::WindowClosed));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::WindowResized));
 
 		LayerStack::Ref().OnEvent(e);
 	}
@@ -133,6 +167,24 @@ namespace prev {
 	bool Application::WindowClosed(WindowCloseEvent & e) {
 		m_ApplicationRunning = false;
 		return true;
+	}
+
+	bool Application::WindowResized(WindowResizeEvent & e) {
+		Vec2 winSize = ToVec2(e.GetWindowSize());
+		float aspect = winSize.x / winSize.y;
+
+		float defCameraXScale = aspect * S_DEFCAMERA_SCALE_Y;
+
+		m_DefCamera.SetScreenSpace(
+			Vec2(-defCameraXScale / 2, -S_DEFCAMERA_SCALE_Y / 2),
+			Vec2(defCameraXScale / 2, S_DEFCAMERA_SCALE_Y / 2)
+		);
+
+		m_DefCamera.SetNearFar(S_DEFCAMERA_NEAR, S_DEFCAMERA_FAR);
+		m_DefCamera.End();
+		m_DefCamera.Begin();
+
+		return false;
 	}
 
 }

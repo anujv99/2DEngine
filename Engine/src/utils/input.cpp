@@ -2,6 +2,7 @@
 #include "input.h"
 #include "math/vecconversion.h"
 #include "math/mvp.h"
+#include "application.h"
 
 namespace prev {
 
@@ -77,11 +78,8 @@ namespace prev {
 	}
 
 	bool Input::MouseMoved(MouseMovedEvent & e) {
-		m_MousePos = ToVec2(e.GetMousePos());
-		m_MousePos /= ToVec2(m_WindowSize);
-		m_MousePos = m_MousePos - Vec2(0.5f, 0.5f);
-		m_MousePos.y *= -1;
-		m_MousePos *= Vec2(MVP::s_XScale, MVP::s_YScale);
+		const Cam2D & defCamera = Application::Ref().GetDefaultCamera();
+		m_MousePos = defCamera.MapMouseCoords(e.GetMousePos());
 		return false;
 	}
 

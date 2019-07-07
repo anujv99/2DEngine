@@ -4,7 +4,6 @@
 
 #include <gm/gmDebug.h>
 #include <gm/gmArrayLib.h>
-#include <math/Cam2d.h>
 
 class gmMachine;
 
