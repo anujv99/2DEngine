@@ -30,8 +30,7 @@ workspace "2DEngine"
         objdir ("bin-int/" .. outputDir .. "%{prj.name}")
 
         files {
-            "%{prj.name}/src/**.h",
-            "%{prj.name}/src/**.cpp"
+            "%{prj.name}/src/**.*"
         }
 		
         links {
@@ -55,6 +54,10 @@ workspace "2DEngine"
 			"LOG_DETAILED",
 			--"LOG_DISABLED",
 			"PREVMATH",
+		}
+		
+		undefines {
+			"UNICODE"
 		}
 		
         pchsource "%{prj.name}/src/pch.cpp"

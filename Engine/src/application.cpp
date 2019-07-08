@@ -40,8 +40,8 @@ namespace prev {
 		EventHandler::CreateInst();
 
 		auto dis = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 0;
-		dis[selectedDis].SetWindowStyle(WindowStyle::BORDERLESS);
+		unsigned int selectedDis = 5;
+		dis[selectedDis].SetWindowStyle(WindowStyle::WINDOWED);
 		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
@@ -131,7 +131,6 @@ namespace prev {
 
 			m_DefCamera.SetPos(pos);
 			m_DefCamera.UpdateMatrix();
-
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
 			SpriteRenderer::Ref().Render(0);

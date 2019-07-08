@@ -6,6 +6,32 @@
 
 #include "imgui.h"
 
+#include "systemres/resource.h"
+
+#undef IDC_ARROW
+#define IDC_ARROW MAKEINTRESOURCEA(IDC_CARROW)
+
+#undef IDC_IBEAM
+#define IDC_IBEAM MAKEINTRESOURCEA(IDC_CTEXTINPUT)
+
+#undef IDC_SIZEALL
+#define IDC_SIZEALL MAKEINTRESOURCEA(IDC_CSIZEALL)
+
+#undef IDC_SIZEWE
+#define IDC_SIZEWE MAKEINTRESOURCEA(IDC_CSIZEWE)
+
+#undef IDC_SIZENS
+#define IDC_SIZENS MAKEINTRESOURCEA(IDC_CSIZENS)
+
+#undef IDC_SIZENESW
+#define IDC_SIZENESW MAKEINTRESOURCEA(IDC_CSIZENESW)
+
+#undef IDC_SIZENWSE
+#define IDC_SIZENWSE MAKEINTRESOURCEA(IDC_CSIZENWSE)
+
+#undef LoadCursor
+#define LoadCursor(h, c) LoadCursorA(GetModuleHandleA(NULL), c)
+
 #include "examples/imgui_impl_win32.h"
 #include "examples/imgui_impl_win32.cpp"
 

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "windowswindow.h"
 
+#include "systemres/resource.h"
+
 #include "imgui.h"
 #include "examples/imgui_impl_win32.h"
 
@@ -25,6 +27,10 @@ namespace prev {
 			return 0;
 
 		switch (msg) {
+			case WM_SETCURSOR:
+			{
+				break;
+			}
 			case WM_MOUSEWHEEL:
 			{
 				short delta = GET_WHEEL_DELTA_WPARAM(wParam);
@@ -190,6 +196,8 @@ namespace prev {
 			return;
 		}
 
+		::SetCursor(::LoadCursor(m_HInst, MAKEINTRESOURCE(IDC_CARROW)));
+
 		return;
 	}
 
@@ -208,7 +216,7 @@ namespace prev {
 		wc.cbWndExtra			= 0;
 		wc.hInstance			= m_HInst;
 		wc.hIcon				= LoadIcon(NULL, IDI_WINLOGO);
-		wc.hCursor				= LoadCursor(NULL, IDC_ARROW);
+		wc.hCursor				= LoadCursor(NULL, MAKEINTRESOURCE(IDC_CARROW));
 		wc.hbrBackground		= (HBRUSH)GetStockObject(BLACK_BRUSH);
 		wc.lpszMenuName			= NULL;
 		wc.lpszClassName		= WINDOW_CLASS_NAME;
