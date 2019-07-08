@@ -71,25 +71,28 @@
 		
 
 //SETDOT PARAMS
-#define GM_SETDOT_PARAM_USER_PTR(NAME, PARAM)	else if (strcmp(memStr, NAME) == 0) { GM_OP_USER_PTR(result, 1); ptr->PARAM = result;	}
-#define GM_SETDOT_PARAM_STR(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { GM_OP_STR_PTR(result, 1); ptr->PARAM = result;	}
-#define GM_SETDOT_PARAM_INT(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { GM_OP_INT(result, 1); ptr->PARAM = result;		}
-#define GM_SETDOT_PARAM_FLOAT(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { GM_OP_FLOAT(result, 1); ptr->PARAM = result;		}
-#define GM_SETDOT_PARAM_VEC4(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { GM_OP_VEC4(result, 1); ptr->PARAM = result;		}
-#define GM_SETDOT_PARAM_VEC3(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { GM_OP_VEC3(result, 1); ptr->PARAM = result;		}
-#define GM_SETDOT_PARAM_VEC2(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { GM_OP_VEC2(result, 1); ptr->PARAM = result;		}
-#define GM_SETDOT_PARAM_VEC2I(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { GM_OP_VEC2I(result, 1); ptr->PARAM = result;		}
+#define GM_SETDOT_PARAM_USER_PTR(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { GM_OP_USER_PTR(result, 1); ptr->PARAM = result;	}
+#define GM_SETDOT_PARAM_STR(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { GM_OP_STR_PTR(result, 1); ptr->PARAM = result;	}
+#define GM_SETDOT_PARAM_INT(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { GM_OP_INT(result, 1); ptr->PARAM = result;		}
+#define GM_SETDOT_PARAM_FLOAT(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { GM_OP_FLOAT(result, 1); ptr->PARAM = result;		}
+#define GM_SETDOT_PARAM_VEC4(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { GM_OP_VEC4(result, 1); ptr->PARAM = result;		}
+#define GM_SETDOT_PARAM_VEC3(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { GM_OP_VEC3(result, 1); ptr->PARAM = result;		}
+#define GM_SETDOT_PARAM_VEC2(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { GM_OP_VEC2(result, 1); ptr->PARAM = result;		}
+#define GM_SETDOT_PARAM_VEC2I(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { GM_OP_VEC2I(result, 1); ptr->PARAM = result;		}
+
+#define GM_SETDOT_PARAM_CUSTOM(NAME, OPERATION)		else if (strcmp(memStr, NAME) == 0) { OPERATION; }
 
 //GETDOT PARAMS
-#define GM_GETDOT_PARAM_USER_PTR(NAME, PARAM)	else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetUser(ptr->PARAM);	}
-#define GM_GETDOT_PARAM_STR(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetString(ptr->PARAM);	}
-#define GM_GETDOT_PARAM_INT(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetInt(ptr->PARAM);		}
-#define GM_GETDOT_PARAM_FLOAT(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetFloat(ptr->PARAM);	}
-#define GM_GETDOT_PARAM_VEC4(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetVec4(ptr->PARAM);	}
-#define GM_GETDOT_PARAM_VEC3(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetVec3(ptr->PARAM);	}
-#define GM_GETDOT_PARAM_VEC2(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetVec2(ptr->PARAM);	}
-#define GM_GETDOT_PARAM_VEC2I(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetVec2i(ptr->PARAM);	}
+#define GM_GETDOT_PARAM_USER_PTR(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetUser(ptr->PARAM);	}
+#define GM_GETDOT_PARAM_STR(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetString(ptr->PARAM);	}
+#define GM_GETDOT_PARAM_INT(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetInt(ptr->PARAM);		}
+#define GM_GETDOT_PARAM_FLOAT(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetFloat(ptr->PARAM);	}
+#define GM_GETDOT_PARAM_VEC4(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetVec4(ptr->PARAM);	}
+#define GM_GETDOT_PARAM_VEC3(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetVec3(ptr->PARAM);	}
+#define GM_GETDOT_PARAM_VEC2(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetVec2(ptr->PARAM);	}
+#define GM_GETDOT_PARAM_VEC2I(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetVec2i(ptr->PARAM);	}
 
+#define GM_GETDOT_PARAM_CUSTOM(NAME, OPERATION)		else if (strcmp(memStr, NAME) == 0) { OPERATION; }
 
 // REGISTER GET/SET DOT FUNCTIONS
 

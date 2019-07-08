@@ -114,6 +114,8 @@ namespace prev {
 	void SpriteRenderer::Render(unsigned int drawGroup /*= DEFAULT_DRAW_GROUP*/) {
 		StrongHandle<VertexBuffer> & drawBuffer = m_DrawGroups[drawGroup].DrawBuffer;
 		unsigned int & numVertices = m_DrawGroups[drawGroup].MappedBufferIndex;
+
+		if (numVertices == 0) return;
 	
 		drawBuffer->UnMap();
 

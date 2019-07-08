@@ -42,6 +42,7 @@
 
 //destructor
 #define GM_REG_HANDLED_DESTRUCTOR(TYPE) a_machine->RegisterUserCallbacks(GM_TYPEID(TYPE), GM_DEFAULT_TRACE_FUNC(TYPE), GM_DESTRUCT_STRONG_HANDLED(TYPE), nullptr);
+#define GM_REG_DESTRUCTOR(TYPE) a_machine->RegisterUserCallbacks(GM_TYPEID(TYPE), GM_DEFAULT_TRACE_FUNC(TYPE), GM_DESTRUCT(TYPE), nullptr);
 
 template<class T>
 void GM_CDECL gmDestructStrongHandled(gmMachine * a_machine, gmUserObject * a_object) {
@@ -57,6 +58,13 @@ void GM_CDECL gmDestructStrongHandled(gmMachine * a_machine, gmUserObject * a_ob
 		TYPE * p = (TYPE *)(a_object->m_user);\
 		p->ReleaseRef();\
 		if (p->RefCount() == 0) delete p;\
+	}
+
+#define GM_DESTRUCT(TYPE)\
+	[](gmMachine * a_machine, gmUserObject * a_object) {\
+		GM_ASSERT(a_object->m_userType == GM_TYPEID(TYPE));\
+		TYPE * p = (TYPE *)(a_object->m_user);\
+		delete p;\
 	}
 
 #define GM_DEFAULT_TRACE_FUNC(TYPE)\

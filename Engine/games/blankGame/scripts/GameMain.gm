@@ -6,11 +6,16 @@ local MakeBlankGame = function() {
 		Segments = 32,
 		Color = Vec4(1),
 		ThreadId = -1,
+		Box
 	};
 
 	BlankGame.Init = function() {
 		print("This is a blank game");
 		.ThreadId = this:thread(.Update);
+		.Box = Sprite();
+		.Box.Color = Vec4(0.8f, 0.4f, 0.1f, 1.0f);
+		.Box.Position = Vec2(0.0f);
+		.Box.Dimension = Vec2(1.0f);
 	};
 
 	BlankGame.Update = function() {
@@ -21,7 +26,6 @@ local MakeBlankGame = function() {
 			if (Input.IsKeyPressed(Input.KEY_ESCAPE)) {
 				break;
 			}
-
 
 			yield();
 		}
@@ -36,12 +40,16 @@ local MakeBlankGame = function() {
 		Gui.Text("[F2] Virtual Console");
 		Gui.Text("[F3] Profiler");
 
+		Gui.Separator();
+		.Box.Position = Gui.SliderVec2("Pos", .Box.Position, -10, 10);
+		.Box.Dimension = Gui.SliderVec2("Dimen", .Box.Dimension, -10, 10);
+		.Box.Rotation = Gui.SliderFloat("Rot", .Box.Rotation, -180, 180);
+		.Box.Color = Gui.ColorEdit4("Col", .Box.Color);
 		Gui.End();
 	};
 
 	BlankGame.Draw = function() {
-		Imm.Color(Vec4(1, 0, 1, 1));
-		Imm.DrawCircle(Input.GetMousePos(), 0.5f);
+		.Box.Draw();
 	};
 
 	return BlankGame;

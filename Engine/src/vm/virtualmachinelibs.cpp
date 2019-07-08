@@ -14,6 +14,7 @@
 
 #include "gmbind/gmbindshader.h"
 #include "gmbind/gmbindparticle.h"
+#include "gmbind/gmbindgame.h"
 
 namespace prev {
 
@@ -36,6 +37,7 @@ namespace prev {
 		GM_BIND_INIT(VertexShader, vm);
 		GM_BIND_INIT(PixelShader, vm);
 		GM_BIND_INIT(ParticleSystem, vm);
+		GM_BIND_INIT(Sprite, vm);
 	}
 
 }

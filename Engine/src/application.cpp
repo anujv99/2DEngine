@@ -40,8 +40,8 @@ namespace prev {
 		EventHandler::CreateInst();
 
 		auto dis = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 5;
-		dis[selectedDis].SetWindowStyle(WindowStyle::WINDOWED);
+		unsigned int selectedDis = 0;
+		dis[selectedDis].SetWindowStyle(WindowStyle::BORDERLESS);
 		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
@@ -65,8 +65,6 @@ namespace prev {
 		ParticleRenderer::CreateInst();
 		Box2DManager::CreateInst();
 
-		////////////////////////////////////////TESTING////////////////////////////////////////
-
 		Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
 		float aspect = winSize.x / winSize.y;
 
@@ -79,6 +77,8 @@ namespace prev {
 
 		m_DefCamera.SetNearFar(S_DEFCAMERA_NEAR, S_DEFCAMERA_FAR);
 		m_DefCamera.Begin();
+
+		////////////////////////////////////////TESTING////////////////////////////////////////
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
@@ -120,17 +120,7 @@ namespace prev {
 			VirtualMachine::Ref().Render();
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
-			ImmediateGFX::Ref().Color(1, 1, 1, 1);
-			ImmediateGFX::Ref().DrawCircle(Vec2(0), 1);
 
-			static Vec2 pos;
-
-			ImGui::Begin("Camera");
-			ImGui::DragFloat2("Pos", &pos[0], 0.001f);
-			ImGui::End();
-
-			m_DefCamera.SetPos(pos);
-			m_DefCamera.UpdateMatrix();
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
 			SpriteRenderer::Ref().Render(0);

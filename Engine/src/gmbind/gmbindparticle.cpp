@@ -30,9 +30,9 @@ GM_REG_NAMESPACE(ParticleSystem) {
 	}
 
 	GM_GEN_MEMFUNC_VOID_VOID(ParticleSystem, Update)
-		GM_GEN_MEMFUNC_VOID_VOID(ParticleSystem, Gui)
+	GM_GEN_MEMFUNC_VOID_VOID(ParticleSystem, Gui)
 
-		GM_SETDOT_FUNC_BEGIN(ParticleSystem)
+	GM_SETDOT_FUNC_BEGIN(ParticleSystem)
 		GM_SETDOT_PARAM_FLOAT("Life", m_LifeSpan)
 		GM_SETDOT_PARAM_FLOAT("LifeVariance", m_LifeSpanVaraince)
 		GM_SETDOT_PARAM_VEC2("Position", m_StartPosition)

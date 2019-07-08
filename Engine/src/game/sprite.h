@@ -18,6 +18,14 @@ namespace prev {
 			b((unsigned char)(color.b * 255)),
 			a((unsigned char)(color.a * 255)) {
 		}
+		Vec4 ToVec4() {
+			Vec4 res;
+			res.r = (float)r / 255.0f;
+			res.g = (float)g / 255.0f;
+			res.b = (float)b / 255.0f;
+			res.a = (float)a / 255.0f;
+			return res;
+		}
 		unsigned char r;
 		unsigned char g;
 		unsigned char b;
