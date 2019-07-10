@@ -25,6 +25,7 @@
 #include <Box2D/Box2D.h>
 #include "physics/box2dmanager.h"
 #include "physics/box2ddebugdraw.h"
+#include "graphics/texture2d.h"
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
@@ -79,7 +80,7 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
-
+		
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 

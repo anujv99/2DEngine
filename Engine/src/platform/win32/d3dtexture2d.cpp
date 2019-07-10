@@ -12,7 +12,7 @@ namespace prev {
 		return new D3DTexture2D();
 	}
 
-	void D3DTexture2D::Init(const std::string & fileName, unsigned int bindSlot) {
+	void D3DTexture2D::Init(const std::string & fileName, TextureParams texParams /*= TextureParams()*/, unsigned int texSlot /*= 0*/) {
 		LOG_ON_CONDITION(!m_IsCreated, LOG_ERROR, "Texture already created", return);
 
 		Microsoft::WRL::ComPtr<ID3D11Resource> textureResource;
@@ -40,25 +40,43 @@ namespace prev {
 		m_TextureDesc.TextureSize = Vec2i(textureDesc.Width, textureDesc.Height);
 
 		m_IsCreated = true;
-		m_BindSlot = bindSlot;
+		m_BindSlot = texSlot;
+
+		m_TextureSampler = new D3DSampler2D();
+		m_TextureSampler->Init(texParams);
 	}
 
-	void D3DTexture2D::Init(const Texture2DDesc desc, unsigned int bindSlot) {
+	void D3DTexture2D::Init(const Texture2DDesc desc, TextureParams texParams /*= TextureParams()*/, unsigned int texSlot /*= 0*/) {
 		LOG_ON_CONDITION(!m_IsCreated, LOG_ERROR, "Texture already created", return);
 
 		m_IsCreated = CreateTexture(desc);
-		m_BindSlot = bindSlot;
+		m_BindSlot = texSlot;
+
+		m_TextureSampler = new D3DSampler2D();
+		m_TextureSampler->Init(texParams);
+	}
+
+	void D3DTexture2D::SetTextureSlot(unsigned int texSlot) {
+		m_BindSlot = texSlot;
+	}
+
+	void D3DTexture2D::SetTextureParams(TextureParams texParams) {
+
 	}
 
 	void D3DTexture2D::Bind() {
 		LOG_ON_CONDITION(m_IsCreated, LOG_ERROR, "Binding uninitialized texutre", return);
 
 		//Change this so that texture can be used in vertex shader also
+		m_TextureSampler->Bind(m_BindSlot);
 		GetDeviceContext()->PSSetShaderResources(m_BindSlot, 1, m_TextureView.GetAddressOf());
 	}
 
 	void D3DTexture2D::UnBind() {
+		m_TextureSampler->UnBind(m_BindSlot);
 
+		ID3D11ShaderResourceView * const temp[] = { nullptr };
+		GetDeviceContext()->PSSetShaderResources(m_BindSlot, 1, temp);
 	}
 
 	bool D3DTexture2D::CreateTexture(const Texture2DDesc & desc) {

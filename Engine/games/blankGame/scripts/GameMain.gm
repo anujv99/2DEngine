@@ -6,7 +6,7 @@ local MakeBlankGame = function() {
 		Segments = 32,
 		Color = Vec4(1),
 		ThreadId = -1,
-		Box
+		Box,
 	};
 
 	BlankGame.Init = function() {

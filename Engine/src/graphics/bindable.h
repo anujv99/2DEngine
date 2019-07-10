@@ -9,7 +9,6 @@ namespace prev {
 		UNIFORM,
 		VERTEX_LAYOUT, //INPUT_LAYOUT
 		TEXTURE_2D,
-		SAMPLER_2D
 	};
 
 	class Bindable {

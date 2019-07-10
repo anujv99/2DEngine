@@ -3,32 +3,34 @@
 
 namespace prev {
 
-	StrongHandle<Sampler2D> Sampler2D::CreateSampler2D() {
-		return new D3DSampler2D();
-	}
-
-	void D3DSampler2D::Init(const Sampler2DDesc samplerDesc) {
-		LOG_ON_CONDITION(!m_IsCreated, LOG_ERROR, "Sampler state already initialized", return);
+	void D3DSampler2D::Init(const TextureParams samplerDesc) {
+		if (m_IsCreated) {
+			m_SamplerState.Reset();
+			m_IsCreated = false;
+		}
 		m_IsCreated = CreateSamplerState(samplerDesc);
 	}
 
-	void D3DSampler2D::Bind() {
+	void D3DSampler2D::Bind(unsigned int slot) {
 		LOG_ON_CONDITION(m_IsCreated, LOG_ERROR, "Binding uninitialized sampler state", return);
 
-		GetDeviceContext()->PSSetSamplers(0, 1, m_SamplerState.GetAddressOf());
+		GetDeviceContext()->PSSetSamplers(slot, 1, m_SamplerState.GetAddressOf());
 	}
 
-	void D3DSampler2D::UnBind() {
+	void D3DSampler2D::UnBind(unsigned int slot) {
+		LOG_ON_CONDITION(m_IsCreated, LOG_ERROR, "UnBinding uninitialized sampler state", return);
 
+		ID3D11SamplerState * const temp[] = { nullptr };
+		GetDeviceContext()->PSSetSamplers(slot, 1, temp);
 	}
 
-	bool D3DSampler2D::CreateSamplerState(const Sampler2DDesc samplerDesc) {
+	bool D3DSampler2D::CreateSamplerState(const TextureParams samplerDesc) {
 		D3D11_SAMPLER_DESC sd = {};
 		sd.Filter			= GetTextureFilter(samplerDesc.Filtering);
 		sd.AddressU			= GetTextureAdressMode(samplerDesc.Wrapping);
 		sd.AddressV			= GetTextureAdressMode(samplerDesc.Wrapping);
 		sd.AddressW			= GetTextureAdressMode(samplerDesc.Wrapping);
-		sd.MaxAnisotropy = 16;
+		sd.MaxAnisotropy	= 16;
 
 		HRESULT hr = GetDevice()->CreateSamplerState(&sd, m_SamplerState.GetAddressOf());
 		if (FAILED(hr)) {
