@@ -7,3 +7,9 @@
 [submodule "Engine/vendor/box2d"]
 	path = Engine/vendor/box2d
 	url = https://github.com/preversewharf45/Box2D
+[submodule "Engine/vendor/freetype"]
+	path = Engine/vendor/freetype
+	url = https://github.com/preversewharf45/freetype2
+[submodule "Engine/vendor/freetype-gl"]
+	path = Engine/vendor/freetype-gl
+	url = https://github.com/preversewharf45/freetype-gl

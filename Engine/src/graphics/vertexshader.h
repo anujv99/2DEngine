@@ -10,9 +10,9 @@ namespace prev {
 	public:
 		static const unsigned int MVP_RESERVED_SLOT = 0;
 
-		virtual ~VertexShader() {}
+		virtual ~VertexShader();
 
-		virtual void Bind() override = 0;
+		virtual void Bind() override;
 		virtual void UnBind() override = 0;
 		virtual void Init(const std::string & shaderCode) = 0;
 		virtual int GetUniformLocation(const std::string & uniformName) = 0;
@@ -28,6 +28,8 @@ namespace prev {
 		void UpdateMVP();
 
 		static StrongHandle<VertexShader> CreateVertexShader(const std::string & shaderName);
+	protected:
+		virtual void ShaderBind() = 0;
 	protected:
 		std::string m_ShaderName;
 	};

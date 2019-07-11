@@ -11,7 +11,7 @@ namespace prev {
 		D3DPixelShader(const std::string & shaderName) : PixelShader(shaderName), m_IsShaderCreated(false) {}
 
 		// Inherited via VertexShader
-		virtual void Bind() override;
+		virtual void ShaderBind() override;
 		virtual void UnBind() override;
 		virtual void Init(const std::string & shaderCode) override;
 		virtual int GetUniformLocation(const std::string & uniformName) override;

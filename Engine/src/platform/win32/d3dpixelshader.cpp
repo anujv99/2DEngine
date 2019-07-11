@@ -9,7 +9,7 @@ namespace prev {
 		return new D3DPixelShader(shaderName);
 	}
 
-	void D3DPixelShader::Bind() {
+	void D3DPixelShader::ShaderBind() {
 		LOG_ON_CONDITION(m_IsShaderCreated, LOG_ERROR, "Binding uninitialized pixel shader", return);
 		GetDeviceContext()->PSSetShader(m_PixelShader.Get(), nullptr, 0);
 	}

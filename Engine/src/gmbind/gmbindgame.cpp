@@ -6,7 +6,7 @@
 #include "gm/gmVariable.h"
 
 #include "game/sprite.h"
-#include "renderer/spriterenderer.h"
+#include "renderer/renderer.h"
 
 #include "gmbindfuncgen.h"
 
@@ -23,22 +23,22 @@ GM_REG_NAMESPACE(Sprite) {
 	GM_MEMFUNC_DECL(Draw) {
 		GM_CHECK_NUM_PARAMS(0);
 		GM_GET_THIS_PTR(Sprite, ptr);
-		SpriteRenderer::Ref().Submit(*ptr, 0);
+		Renderer::Ref().Submit(*ptr);
 		return GM_OK;
 	}
 
 	GM_SETDOT_FUNC_BEGIN(Sprite)
-		GM_SETDOT_PARAM_CUSTOM("Position", GM_OP_VEC2(result, 1); ptr->SetPosition(result))
-		GM_SETDOT_PARAM_CUSTOM("Dimension", GM_OP_VEC2(result, 1); ptr->SetDimension(result))
-		GM_SETDOT_PARAM_CUSTOM("Rotation", GM_OP_FLOAT(result, 1); ptr->SetRotation(result))
-		GM_SETDOT_PARAM_CUSTOM("Color", GM_OP_VEC4(result, 1); ptr->SetColor(Vec4(result)))
+		GM_SETDOT_PARAM_VEC2("Position", Position)
+		GM_SETDOT_PARAM_VEC2("Dimension", Dimension)
+		GM_SETDOT_PARAM_FLOAT("Rotation", Rotation)
+		GM_SETDOT_PARAM_VEC4("Color", Color)
 	GM_SETDOT_FUNC_END(Sprite)
 
 	GM_GETDOT_FUNC_BEGIN(Sprite)
-		GM_GETDOT_PARAM_CUSTOM("Position", a_operands[0].SetVec2(ptr->GetPosition()))
-		GM_GETDOT_PARAM_CUSTOM("Dimension", a_operands[0].SetVec2(ptr->GetDimension()))
-		GM_GETDOT_PARAM_CUSTOM("Rotation", a_operands[0].SetFloat(ptr->GetRotation()))
-		GM_GETDOT_PARAM_CUSTOM("Color", a_operands[0].SetVec4(ptr->GetColor().ToVec4()))
+		GM_GETDOT_PARAM_VEC2("Position", Position)
+		GM_GETDOT_PARAM_VEC2("Dimension", Dimension)
+		GM_GETDOT_PARAM_FLOAT("Rotation", Rotation)
+		GM_GETDOT_PARAM_VEC4("Color", Color.ToVec4())
 	GM_GETDOT_FUNC_END(Sprite)
 }
 

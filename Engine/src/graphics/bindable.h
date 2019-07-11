@@ -9,6 +9,7 @@ namespace prev {
 		UNIFORM,
 		VERTEX_LAYOUT, //INPUT_LAYOUT
 		TEXTURE_2D,
+		SHADER_PROGRAM
 	};
 
 	class Bindable {

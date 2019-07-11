@@ -18,14 +18,14 @@
 
 #include <imgui.h>
 
-#include "renderer/spriterenderer.h"
+#include "renderer/renderer.h"
 #include "game/particlesystem.h"
-#include "renderer/particlerenderer.h"
 
 #include <Box2D/Box2D.h>
 #include "physics/box2dmanager.h"
 #include "physics/box2ddebugdraw.h"
 #include "graphics/texture2d.h"
+#include "graphics/font.h"
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
@@ -62,8 +62,7 @@ namespace prev {
 		VirtualMachine::CreateInst();
 		VirtualMachine::Ref().RunMain();
 
-		SpriteRenderer::CreateInst();
-		ParticleRenderer::CreateInst();
+		Renderer::CreateInst();
 		Box2DManager::CreateInst();
 
 		Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
@@ -80,7 +79,7 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
-		
+		StrongHandle<Font> font = new Font("test", "res/fonts/Slabo.ttf", 60);
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
@@ -89,8 +88,7 @@ namespace prev {
 		m_DefCamera.End();
 
 		Box2DManager::DestroyInst();
-		ParticleRenderer::DestroyInst();
-		SpriteRenderer::DestroyInst();
+		Renderer::DestroyInst();
 		VirtualMachine::DestroyInst();
 		Profiler::DestroyInst();
 		LayerStack::DestroyInst();
@@ -124,7 +122,7 @@ namespace prev {
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
-			SpriteRenderer::Ref().Render(0);
+			Renderer::Ref().Present();
 
 			PROFILER_BEGIN("App::Gui");
 			Gui();
@@ -138,6 +136,9 @@ namespace prev {
 			EventHandler::Ref().FlushEventQueue();
 
 			PROFILER_ROOT_END;
+
+			LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
+			GLOBAL_DRAW_CALL_COUNT = 0;
 		}
 	}
 

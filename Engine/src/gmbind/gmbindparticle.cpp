@@ -6,9 +6,10 @@
 #include "gm/gmVariable.h"
 
 #include "game/particlesystem.h"
-#include "renderer/particlerenderer.h"
 
 #include "gmbindfuncgen.h"
+#include "imgui.h"
+#include "renderer/renderer.h"
 
 using namespace prev;
 
@@ -25,7 +26,7 @@ GM_REG_NAMESPACE(ParticleSystem) {
 	GM_MEMFUNC_DECL(Draw) {
 		GM_CHECK_NUM_PARAMS(0);
 		GM_GET_THIS_PTR(ParticleSystem, ps);
-		ParticleRenderer::Ref().Render(*ps);
+		Renderer::Ref().Submit(*ps);
 		return GM_OK;
 	}
 

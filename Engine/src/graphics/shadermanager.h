@@ -8,6 +8,9 @@ namespace prev {
 	class ShaderManager : public Singleton<ShaderManager> {
 		friend class Singleton<ShaderManager>;
 	public:
+		StrongHandle<VertexShader> GetBoundVertexShader();
+		StrongHandle<PixelShader> GetBoundPixelShader();
+
 		StrongHandle<VertexShader> GetVertexShader(const std::string & shaderName);
 		StrongHandle<PixelShader> GetPixelShader(const std::string & shaderName);
 
@@ -32,6 +35,9 @@ namespace prev {
 		// map of hash(fileName) -> pair(shader, fileName)
 		std::unordered_map<uint32_t, StrongHandle<VertexShader>> m_VertexShaders;
 		std::unordered_map<uint32_t, StrongHandle<PixelShader>> m_PixelShaders;
+
+		StrongHandle<VertexShader> m_BoundVertexShader;
+		StrongHandle<PixelShader> m_BoundPixelShader;
 	};
 
 }

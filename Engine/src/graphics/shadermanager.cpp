@@ -4,12 +4,22 @@
 namespace prev {
 
 	ShaderManager::ShaderManager() {
+		m_BoundVertexShader = nullptr;
+		m_BoundPixelShader = nullptr;
 		LOG_TRACE("Shader Manager Initialized");
 	}
 
 	ShaderManager::~ShaderManager() {
 		m_VertexShaders.clear();
 		m_PixelShaders.clear();
+	}
+
+	StrongHandle<VertexShader> ShaderManager::GetBoundVertexShader() {
+		return m_BoundVertexShader;
+	}
+
+	StrongHandle<PixelShader> ShaderManager::GetBoundPixelShader() {
+		return m_BoundPixelShader;
 	}
 
 	StrongHandle<VertexShader> ShaderManager::GetVertexShader(const std::string & shaderName) {

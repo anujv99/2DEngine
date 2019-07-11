@@ -61,7 +61,28 @@ namespace prev {
 	}
 
 	void D3DTexture2D::SetTextureParams(TextureParams texParams) {
+		m_TextureSampler->Init(texParams);
+	}
 
+	void D3DTexture2D::SetData(const void * pixels) {
+		///https://github.com/TheCherno/Sparky
+
+		D3D11_MAPPED_SUBRESOURCE msr;
+		ZeroMemory(&msr, sizeof(msr));
+
+		Microsoft::WRL::ComPtr<ID3D11Resource> textureRes;
+		m_TextureView->GetResource(textureRes.GetAddressOf());
+		GetDeviceContext()->Map(textureRes.Get(), 0u, D3D11_MAP_WRITE_DISCARD, 0u, &msr);
+
+		auto texDesc = GetTextureDesc();
+
+		for (unsigned int i = 0; i < texDesc.Width * texDesc.Height * GetStrideFromFormat(texDesc.Format); i += 4) {
+			((byte *)msr.pData)[i + 0] = 0xff;
+			((byte *)msr.pData)[i + 1] = 0xff;
+			((byte *)msr.pData)[i + 2] = 0xff;
+			((byte *)msr.pData)[i + 3] = ((byte *)pixels)[i / 4];
+		}
+		GetDeviceContext()->Unmap(textureRes.Get(), 0u);
 	}
 
 	void D3DTexture2D::Bind() {
@@ -88,9 +109,9 @@ namespace prev {
 		textureDesc.Format					= GetTextureFormat(desc.TexFormat);
 		textureDesc.SampleDesc.Count		= 1;
 		textureDesc.SampleDesc.Quality		= 0;
-		textureDesc.Usage					= D3D11_USAGE_DEFAULT;
+		textureDesc.Usage					= D3D11_USAGE_DYNAMIC;
 		textureDesc.BindFlags				= D3D11_BIND_SHADER_RESOURCE;
-		textureDesc.CPUAccessFlags			= 0;
+		textureDesc.CPUAccessFlags			= D3D11_CPU_ACCESS_WRITE;
 		textureDesc.MiscFlags				= 0;
 
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> d3dtexure;
@@ -121,6 +142,28 @@ namespace prev {
 		case prev::PV_TEXTURE_FORMAT_RGBA8: return DXGI_FORMAT_R8G8B8A8_UNORM;
 		default: return DXGI_FORMAT_UNKNOWN;
 		}
+	}
+
+	unsigned int D3DTexture2D::GetStrideFromFormat(DXGI_FORMAT format) {
+		switch (format) {
+		case DXGI_FORMAT_R8G8B8A8_UNORM: return 4;
+		default: return 0;
+		}
+	}
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> D3DTexture2D::GetTexture2D() {
+		Microsoft::WRL::ComPtr<ID3D11Resource> textureRes;
+		m_TextureView->GetResource(textureRes.GetAddressOf());
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+		textureRes->QueryInterface<ID3D11Texture2D>(texture.GetAddressOf());
+		return texture;
+	}
+
+	D3D11_TEXTURE2D_DESC D3DTexture2D::GetTextureDesc() {
+		D3D11_TEXTURE2D_DESC texDesc;
+		GetTexture2D()->GetDesc(&texDesc);
+		return texDesc;
 	}
 
 }

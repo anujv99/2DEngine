@@ -31,6 +31,7 @@ namespace prev {
 		virtual void Init(const Texture2DDesc desc, TextureParams texParams = TextureParams(), unsigned int texSlot = 0) = 0;
 		virtual void SetTextureSlot(unsigned int texSlot) = 0;
 		virtual void SetTextureParams(TextureParams texParams) = 0;
+		virtual void SetData(const void * pixels) = 0;
 
 		virtual void Bind() override = 0;
 		virtual void UnBind() override = 0;

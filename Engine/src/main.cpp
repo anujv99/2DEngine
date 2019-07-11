@@ -4,7 +4,9 @@
 
 using namespace prev;
 
-int main() {
+int main(_In_opt_ int argc, _In_opt_ char * argv[]) {
+	//_CrtSetBreakAlloc(1467);
+
 	PrevMemoryInit();
 
 	Logger::CreateInst();

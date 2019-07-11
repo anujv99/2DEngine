@@ -45,6 +45,7 @@ namespace prev {
 		switch (filerType) {
 		case prev::PV_TEXTURE_FILTER_DEFAULT: return D3D11_FILTER_MAXIMUM_ANISOTROPIC;
 		case prev::PV_TEXTURE_FILTER_NEAREST: return D3D11_FILTER_MIN_MAG_MIP_POINT;
+		case prev::PV_TEXTURE_FILTER_LINEAR: return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		default: return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		}
 	}
@@ -52,6 +53,7 @@ namespace prev {
 	D3D11_TEXTURE_ADDRESS_MODE D3DSampler2D::GetTextureAdressMode(TextureWrapType wrapType) {
 		switch (wrapType) {
 		case prev::PV_TEXTURE_WRAP_DEFAULT: return D3D11_TEXTURE_ADDRESS_WRAP;
+		case prev::PV_TEXTURE_WRAP_CLAMP: return D3D11_TEXTURE_ADDRESS_CLAMP;
 		default: return D3D11_TEXTURE_ADDRESS_WRAP;
 		}
 	}

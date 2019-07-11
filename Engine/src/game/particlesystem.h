@@ -5,7 +5,7 @@
 namespace prev {
 
 	class ParticleSystem : public HandledObject<ParticleSystem> {
-		friend class ParticleRenderer;
+		friend class Renderer;
 	public:
 		ParticleSystem(unsigned int numParticles);
 		~ParticleSystem();

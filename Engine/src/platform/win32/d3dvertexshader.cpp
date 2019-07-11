@@ -9,7 +9,7 @@ namespace prev {
 		return new D3DVertexShader(shaderName);
 	}
 
-	void D3DVertexShader::Bind() {
+	void D3DVertexShader::ShaderBind() {
 		LOG_ON_CONDITION(m_IsShaderCreated, LOG_ERROR, "Binding uninitialized vertex shader", return);
 		GetDeviceContext()->VSSetShader(m_VertexShader.Get(), nullptr, 0);
 	}

@@ -20,12 +20,14 @@ namespace prev {
 	};
 
 	enum TextureWrapType {
-		PV_TEXTURE_WRAP_DEFAULT
+		PV_TEXTURE_WRAP_DEFAULT,
+		PV_TEXTURE_WRAP_CLAMP
 	};
 
 	enum TextureFilterType {
 		PV_TEXTURE_FILTER_DEFAULT,
-		PV_TEXTURE_FILTER_NEAREST
+		PV_TEXTURE_FILTER_NEAREST,
+		PV_TEXTURE_FILTER_LINEAR,
 	};
 
 	enum BlendOption {

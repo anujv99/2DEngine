@@ -9,4 +9,9 @@ namespace prev {
 		LOG_TRACE("Pixel Shader : {} successfully loaded", shaderName);
 	}
 
+	void PixelShader::Bind() {
+		ShaderBind();
+		ShaderManager::Ref().m_BoundPixelShader = this;
+	}
+
 }

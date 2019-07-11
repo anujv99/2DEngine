@@ -11,6 +11,15 @@ namespace prev {
 		LOG_TRACE("Vertex Shader : {} successfully loaded", shaderName);
 	}
 
+	VertexShader::~VertexShader() {
+		LOG_TRACE("Vertex Shader : {} successfully Released", m_ShaderName);
+	}
+
+	void VertexShader::Bind() {
+		ShaderManager::Ref().m_BoundVertexShader = this;
+		ShaderBind();
+	}
+
 	void VertexShader::UpdateMVP() {
 		if (MVP::Ref().IsDirty()) {
 			RenderState::Ref().GetMVPUniform()->Update(&MVP::Ref().Get(), sizeof(Mat4));
