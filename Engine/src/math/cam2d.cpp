@@ -33,6 +33,10 @@ namespace prev {
 		);
 	}
 
+	Vec2 Cam2D::GetScreenMapRatio() {
+		return GetVirtualScale() / ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+	}
+
 	prev::Vec2 Cam2D::MapMouseCoords(Vec2 mouseCoords) const {
 		Vec2 newMousePos = mouseCoords; //Assume TopLeft is (0, 0)
 

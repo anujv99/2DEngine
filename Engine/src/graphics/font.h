@@ -11,11 +11,16 @@ namespace ftgl {
 namespace prev {
 
 	class Font : public HandledObject<Font> {
+		friend class Renderer;
 	public:
 		Font(const std::string & name, const std::string & fileName, float size);
 		~Font();
 
 		inline StrongHandle<Texture2D> GetTexture() { return m_Texture; }
+
+		inline void SetScale(Vec2 scale) { m_Scale = scale; }
+	private:
+		void UpdateAtlas();
 	private:
 		ftgl::texture_atlas_t * m_FontAtlas;
 		ftgl::texture_font_t * m_Font;

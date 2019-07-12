@@ -2,11 +2,17 @@
 #include "font.h"
 
 #include <freetype-gl.h>
+#include "application.h"
+
+#include "math/screenspace.h"
 
 namespace prev {
 
 	Font::Font(const std::string & name, const std::string & fileName, float size) :
 		m_FontName(name), m_FontFile(fileName), m_Size(size), m_Scale(1.0f), m_Texture(nullptr), m_FontAtlas(nullptr), m_Font(nullptr) {
+
+		size = ScreenToPixels(Vec2(size)).y;
+		m_Size = size;
 
 		m_FontAtlas = ftgl::texture_atlas_new(512, 512, 1);
 		m_Font = ftgl::texture_font_new_from_file(m_FontAtlas, size, fileName.c_str());
@@ -27,6 +33,10 @@ namespace prev {
 	Font::~Font() {
 		ftgl::texture_atlas_delete(m_FontAtlas);
 		ftgl::texture_font_delete(m_Font);
+	}
+
+	void Font::UpdateAtlas() {
+		m_Texture->SetData(m_FontAtlas->data);
 	}
 
 }

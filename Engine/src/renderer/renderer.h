@@ -2,15 +2,16 @@
 
 #include "graphics/vertexlayout.h"
 #include "graphics/vertexbuffer.h"
+#include "graphics/shadermanager.h"
+#include "graphics/font.h"
 
+#include "game/label.h"
 #include "game/sprite.h"
 #include "game/particlesystem.h"
 
-#include "graphics/shadermanager.h"
-
 namespace prev {
 
-	// batches will be separated by textures and shaders
+	// batches will be separated by shaders
 
 	static const unsigned int DEFAULT_DRAW_GROUP = 0u;
 
@@ -23,6 +24,7 @@ namespace prev {
 	public:
 		void Submit(const Sprite & sprite, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
 		void Submit(const ParticleSystem & system, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
+		void Submit(const Label & label, StrongHandle<Font> font, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
 		void Present();
 	private:
 		void CreateVertexLayoutDefault();
@@ -30,6 +32,8 @@ namespace prev {
 		SpriteGroup * GetDrawGroup(StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader);
 
 		void DrawGroup(SpriteGroup * group);
+
+		unsigned int SubmitTexture(SpriteGroup * group, StrongHandle<Texture2D> texture);
 	private:
 
 		struct SpriteVertices {
@@ -53,6 +57,7 @@ namespace prev {
 			Vec2 Position;
 			Vec2 UV;
 			SpriteColor Color;
+			int TexID = -1;
 		};
 
 		int a = sizeof(SpriteVertex);
@@ -61,6 +66,8 @@ namespace prev {
 		struct SpriteGroup {
 			SpriteVertex * MappedBuffer;
 			unsigned int MappedBufferIndex;
+
+			std::vector<StrongHandle<Texture2D>> Textures;
 
 			StrongHandle<VertexLayout> VertexLayout;
 			StrongHandle<VertexShader> VertexShader;

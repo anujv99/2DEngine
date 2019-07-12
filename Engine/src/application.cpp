@@ -26,15 +26,13 @@
 #include "physics/box2ddebugdraw.h"
 #include "graphics/texture2d.h"
 #include "graphics/font.h"
+#include "math/screenspace.h"
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	// Just used for initialization
-	static constexpr float S_DEFCAMERA_SCALE_Y	=  10.0f;
-	static constexpr float S_DEFCAMERA_NEAR		= -150.0f;
-	static constexpr float S_DEFCAMERA_FAR		=  150.0f;
+	static StrongHandle<Font> font;
 
 	Application::Application() {
 		Timer::FPSCounter(false);
@@ -79,7 +77,7 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
-		StrongHandle<Font> font = new Font("test", "res/fonts/Slabo.ttf", 60);
+		font = new Font("rip", "res/fonts/Roboto-Regular.ttf", 2.0f);
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
@@ -119,6 +117,11 @@ namespace prev {
 			VirtualMachine::Ref().Render();
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
+
+			static Label l; l = "Hello World";
+			l.SetColor(Vec4(1, 1, 1, 1));
+
+			Renderer::Ref().Submit(l, font);
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 

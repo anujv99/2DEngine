@@ -6,6 +6,7 @@ cbuffer MVP : register(b0) {
 struct VSOut {
 	float2 texCoords : TEXCOORD;
 	float4 color : OUT_COLOR;
+	int texID : OUT_TEXTUREID;
 	float4 position : SV_POSITION;
 };
 
