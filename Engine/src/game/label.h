@@ -6,6 +6,12 @@
 
 namespace prev {
 
+	enum LabelAlignment {
+		PV_LABEL_ALIGNMENT_LEFT,
+		PV_LABEL_ALIGNMENT_RIGHT,
+		PV_LABEL_ALIGNMENT_MIDDLE,
+	};
+
 	struct Label : public Sprite {
 		inline void operator=(const std::string & text) {
 			m_Text = text;
@@ -17,18 +23,11 @@ namespace prev {
 
 		inline void SetDirty(bool dirty) const { m_IsChanged = dirty; }
 		inline bool GetDirty() const { return m_IsChanged; }
-
-		inline void SetPosition(Vec2 pos) { m_Position = pos; }
-		inline Vec2 GetPosition() const { return m_Position; }
-
-		inline void SetColor(Vec4 col) { m_Color = col; }
-		inline SpriteColor GetColor() const { return m_Color; }
+	public:
+		LabelAlignment Alignment = PV_LABEL_ALIGNMENT_RIGHT;
 	private:
 		std::string m_Text;
 		mutable bool m_IsChanged = false;
-
-		Vec2 m_Position;
-		SpriteColor m_Color;
 	};
 
 }

@@ -13,7 +13,7 @@ namespace prev {
 	prev::Mat4 MVP::Get() {
 		if (Model().IsDirty() || View().IsDirty() || Projection().IsDirty()) {
 			Mat4 viewInv = prev::inverseRT(View().Get());
-			m_MVPCache = Projection().Get() * Model().Get();
+			m_MVPCache = Projection().Get() * View().Get() * Model().Get();
 			Model().SetDirtyOff();
 			Projection().SetDirtyOff();
 			View().SetDirtyOff();

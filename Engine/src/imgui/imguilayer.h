@@ -28,6 +28,8 @@ namespace prev {
 		static void DeleteImGui();
 		static void Start();
 		static void End();
+	public:
+		static bool IsImGuiInitialized();
 	};
 
 }

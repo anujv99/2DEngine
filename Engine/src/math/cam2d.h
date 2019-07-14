@@ -15,11 +15,7 @@ namespace prev {
 		inline Vec2 GetBottomLeft() const { return m_BottomLeft; }
 		inline Vec2 GetTopRight() const { return m_TopRight; }
 
-		inline Vec2 GetVirtualScale() const { return m_TopRight - m_BottomLeft; }
-		inline Vec2 GetInverseVirtualScale() const { return Vec2(1.0f) / (m_TopRight - m_BottomLeft); }
-
 		void UpdateMatrix();
-		Vec2 GetScreenMapRatio();
 
 		//Only works with raw mouse pos i.e. TopLeft = (0.0f, 0.0f) BottomRight = WindowSize
 		Vec2 MapMouseCoords(Vec2 mouseCoords) const;
@@ -28,6 +24,8 @@ namespace prev {
 	public:
 		void SetPos(Vec2 pos);
 	private:
+		Mat4 m_ViewMatrix;
+
 		Vec2 m_BottomLeft;
 		Vec2 m_TopRight;
 

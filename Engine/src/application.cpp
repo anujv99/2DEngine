@@ -32,8 +32,6 @@ extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	static StrongHandle<Font> font;
-
 	Application::Application() {
 		Timer::FPSCounter(false);
 		EventHandler::CreateInst();
@@ -68,7 +66,7 @@ namespace prev {
 
 		float defCameraXScale = aspect * S_DEFCAMERA_SCALE_Y;
 
-		m_DefCamera.SetScreenSpace(
+		m_DefCamera.SetScreenSpace (
 			Vec2(-defCameraXScale / 2, -S_DEFCAMERA_SCALE_Y / 2),
 			Vec2(defCameraXScale / 2, S_DEFCAMERA_SCALE_Y / 2)
 		);
@@ -77,14 +75,11 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
-		font = new Font("rip", "res/fonts/Roboto-Regular.ttf", 2.0f);
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
 	Application::~Application() {
-
 		m_DefCamera.End();
-
 		Box2DManager::DestroyInst();
 		Renderer::DestroyInst();
 		VirtualMachine::DestroyInst();
@@ -107,7 +102,9 @@ namespace prev {
 			Timer::Update();
 
 			GraphicsContext::Ref().BeginFrame();
-			LayerStack::Ref().GetImGuiLayer()->StartFrame();
+
+			if (LayerStack::Ref().GetImGuiLayer())
+				LayerStack::Ref().GetImGuiLayer()->StartFrame();
 
 			LayerStack::Ref().OnUpdate();
 
@@ -118,20 +115,19 @@ namespace prev {
 
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
-			static Label l; l = "Hello World";
-			l.SetColor(Vec4(1, 1, 1, 1));
-
-			Renderer::Ref().Submit(l, font);
-
 			////////////////////////////////////////TESTING////////////////////////////////////////
 
+			PROFILER_BEGIN("App::Present");
 			Renderer::Ref().Present();
+			PROFILER_END("App::Present");
 
 			PROFILER_BEGIN("App::Gui");
 			Gui();
 			PROFILER_END("App::Gui");
 
-			LayerStack::Ref().GetImGuiLayer()->EndFrame();
+			if (LayerStack::Ref().GetImGuiLayer())
+				LayerStack::Ref().GetImGuiLayer()->EndFrame();
+
 			GraphicsContext::Ref().EndFrame();
 
 			Window::Ref().PollEvents();
@@ -140,7 +136,7 @@ namespace prev {
 
 			PROFILER_ROOT_END;
 
-			LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
+			//LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
 			GLOBAL_DRAW_CALL_COUNT = 0;
 		}
 	}

@@ -12,6 +12,8 @@ namespace prev {
 	static constexpr unsigned int MAX_NUM_VERTICES					= MAX_NUM_SPRITES * MAX_NUM_VERTICES_PER_SPRTIE;
 	static constexpr unsigned int MAX_NUM_TEXTURES					= 32;
 
+	static constexpr float FONT_TEXTURE_PADDING						= 0.001f;
+
 	Renderer::SpriteVertices::SpriteVertices(Vec2 center, Vec2 dimension, float rotation) {
 		static const Vec2 squareVertices[] = {
 			{ -0.5f,  0.5f }, //ToLeft
@@ -149,12 +151,14 @@ namespace prev {
 		SpriteGroup * group = GetDrawGroup(vShader, pShader);
 		int texID = SubmitTexture(group, font->m_Texture);
 
-		const Vec2 & scale = font->m_Scale;
-		float x = label.GetPosition().x;
+		const Vec2 & scale = label.Dimension;
+		float x = label.Position.x;
 
 		ftgl::texture_font_t * ftFont = font->m_Font;
 
 		std::string & text = label.GetText();
+
+		float xSize = font->GetWidth(label);
 
 		for (unsigned int i = 0; i < text.length(); i++) {
 			char c = text[i];
@@ -167,14 +171,31 @@ namespace prev {
 				}
 
 				float x0 = x + PixelsToScreenX(glyph->offset_x) * scale.x;
-				float y0 = label.GetPosition().y + PixelsToScreenY(glyph->offset_y) * scale.y;
+				float y0 = label.Position.y + PixelsToScreenY(glyph->offset_y) * scale.y;
 				float x1 = x0 + PixelsToScreenX(glyph->width) * scale.x;
 				float y1 = y0 - PixelsToScreenY(glyph->height) * scale.y;
 
 				float u0 = glyph->s0;
 				float v0 = glyph->t0;
-				float u1 = glyph->s1;
-				float v1 = glyph->t1;
+				float u1 = glyph->s1 - FONT_TEXTURE_PADDING;
+				float v1 = glyph->t1 - FONT_TEXTURE_PADDING;
+
+				switch (label.Alignment) {
+				case PV_LABEL_ALIGNMENT_LEFT:
+				{
+					x0 -= xSize;
+					x1 -= xSize;
+					break;
+				}
+				case PV_LABEL_ALIGNMENT_MIDDLE:
+				{
+					x0 -= xSize / 2.0f;
+					x1 -= xSize / 2.0f;
+					break;
+				}
+				default:
+					break;
+				}
 
 				SpriteVertex drawVertices[6];
 				drawVertices[0].Position = { x0, y1 };
@@ -191,12 +212,12 @@ namespace prev {
 				drawVertices[4].UV = { u1, v1 };
 				drawVertices[5].UV = { u1, v0 };
 
-				drawVertices[0].Color = label.GetColor();
-				drawVertices[1].Color = label.GetColor();
-				drawVertices[2].Color = label.GetColor();
-				drawVertices[3].Color = label.GetColor();
-				drawVertices[4].Color = label.GetColor();
-				drawVertices[5].Color = label.GetColor();
+				drawVertices[0].Color = label.Color;
+				drawVertices[1].Color = label.Color;
+				drawVertices[2].Color = label.Color;
+				drawVertices[3].Color = label.Color;
+				drawVertices[4].Color = label.Color;
+				drawVertices[5].Color = label.Color;
 
 				drawVertices[0].TexID = texID;
 				drawVertices[1].TexID = texID;
@@ -249,9 +270,10 @@ namespace prev {
 		group->VertexShader->UpdateMVP();
 
 		for (size_t i = 0; i < group->Textures.size(); i++) {
+			group->Textures[i]->SetTextureSlot(i);
 			group->Textures[i]->Bind();
 		}
-
+		
 		drawBuffer->Draw(numVertices, 0);
 
 		group->Textures.clear();
@@ -264,6 +286,12 @@ namespace prev {
 	unsigned int Renderer::SubmitTexture(SpriteGroup * group, StrongHandle<Texture2D> texture) {
 		if ((unsigned int)group->Textures.size() >= MAX_NUM_TEXTURES)
 			DrawGroup(group);
+
+		for (size_t i = 0; i < group->Textures.size(); i++) {
+			if (group->Textures[i] == texture) {
+				return i;
+			}
+		}
 
 		group->Textures.push_back(texture);
 		return (unsigned int)group->Textures.size() - 1;

@@ -65,7 +65,6 @@ namespace prev {
 	}
 
 	void D3DTexture2D::SetData(const void * pixels) {
-		///https://github.com/TheCherno/Sparky
 
 		D3D11_MAPPED_SUBRESOURCE msr;
 		ZeroMemory(&msr, sizeof(msr));

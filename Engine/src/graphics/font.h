@@ -2,6 +2,7 @@
 
 #include "math/vec2.h"
 #include "texture2d.h"
+#include "game/label.h"
 
 namespace ftgl {
 	struct texture_atlas_t;
@@ -18,7 +19,9 @@ namespace prev {
 
 		inline StrongHandle<Texture2D> GetTexture() { return m_Texture; }
 
-		inline void SetScale(Vec2 scale) { m_Scale = scale; }
+		float GetWidth(const Label & label);
+		float GetHeight(const Label & label);
+		Vec2 GetSize(const Label & label);
 	private:
 		void UpdateAtlas();
 	private:
@@ -26,7 +29,6 @@ namespace prev {
 		ftgl::texture_font_t * m_Font;
 
 		float m_Size;
-		Vec2 m_Scale;
 		std::string m_FontName;
 		std::string m_FontFile;
 

@@ -16,7 +16,13 @@ float4 main(VSIn vsi) : SV_TARGET{
 	} else {
 		switch (vsi.texID) {
 		case 0:
-			outCol = tex[0].Sample(splr[0], vsi.texCoords);
+			outCol = tex[0].Sample(splr[0], vsi.texCoords) * vsi.color;
+			break;
+		case 1:
+			outCol = tex[1].Sample(splr[1], vsi.texCoords) * vsi.color;
+			break;
+		case 2:
+			outCol = tex[2].Sample(splr[2], vsi.texCoords) * vsi.color;
 			break;
 		}
 	}

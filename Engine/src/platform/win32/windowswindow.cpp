@@ -4,6 +4,7 @@
 #include "systemres/resource.h"
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "examples/imgui_impl_win32.h"
 
 #include <comdef.h>
@@ -22,9 +23,11 @@ extern LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPAR
 namespace prev {
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-
-		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-			return 0;
+		
+		if (GImGui) {
+			if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+				return 0;
+		}
 
 		switch (msg) {
 			case WM_SETCURSOR:

@@ -83,8 +83,10 @@
 #define GM_SETDOT_PARAM_CUSTOM(NAME, OPERATION)		else if (strcmp(memStr, NAME) == 0) { OPERATION; }
 
 //GETDOT PARAMS
+
+#define GM_GETDOT_PARAM_STR(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) {\
+												a_operands[0].SetString(a_thread->GetMachine()->AllocStringObject(ptr->PARAM));	}
 #define GM_GETDOT_PARAM_USER_PTR(NAME, PARAM)		else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetUser(ptr->PARAM);	}
-#define GM_GETDOT_PARAM_STR(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetString(ptr->PARAM);	}
 #define GM_GETDOT_PARAM_INT(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetInt(ptr->PARAM);		}
 #define GM_GETDOT_PARAM_FLOAT(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetFloat(ptr->PARAM);	}
 #define GM_GETDOT_PARAM_VEC4(NAME, PARAM)			else if (strcmp(memStr, NAME) == 0) { a_operands[0].SetVec4(ptr->PARAM);	}

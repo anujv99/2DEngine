@@ -18,11 +18,12 @@ namespace prev {
 		static float GetTimeMs();
 		static float GetDeltaTime();
 		static void FPSCounter(bool isVisible);
+		inline static unsigned int GetFPS() { return s_PrevFPS; }
 		inline static bool IsLoggingFPSCounter() {return s_ShouldShowFPS; }
 	private:
 		static std::chrono::duration<float> s_DeltaTime;
 		static pv_time_point m_Time, s_StartTime;
-		static unsigned int s_FPS;
+		static unsigned int s_FPS, s_PrevFPS;
 		static unsigned long long int s_LastTimeSec;
 		static bool s_ShouldShowFPS;
 	};

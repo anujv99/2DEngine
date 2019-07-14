@@ -16,6 +16,8 @@
 
 namespace prev {
 
+#define IM_CALL(CALL) ImGui::PushID(a_thread->GetInstruction()); (CALL); ImGui::PopID();
+
 	void OutputGmTable(gmTableObject * table, gmUserArray * selectArr, int level, bool showFunctions) {
 		if (level >= selectArr->Size()) return;
 
@@ -131,7 +133,7 @@ namespace prev {
 			GM_CHECK_INT_PARAM(min, 2);
 			GM_CHECK_INT_PARAM(max, 3);
 
-			ImGui::SliderInt(name, &val, min, max);
+			IM_CALL(ImGui::SliderInt(name, &val, min, max));
 			a_thread->PushInt(val);
 
 			return GM_OK;
@@ -144,7 +146,7 @@ namespace prev {
 			GM_CHECK_INT_PARAM(min, 2);
 			GM_CHECK_INT_PARAM(max, 3);
 
-			ImGui::SliderInt2(name, &val[0], min, max);
+			IM_CALL(ImGui::SliderInt2(name, &val[0], min, max))
 			a_thread->PushVec2i(val);
 
 			return GM_OK;
@@ -157,7 +159,7 @@ namespace prev {
 			GM_CHECK_FLOAT_OR_INT_PARAM(min, 2);
 			GM_CHECK_FLOAT_OR_INT_PARAM(max, 3);
 
-			ImGui::SliderFloat(name, &val, min, max);
+			IM_CALL(ImGui::SliderFloat(name, &val, min, max));
 			a_thread->PushFloat(val);
 
 			return GM_OK;
@@ -170,7 +172,7 @@ namespace prev {
 			GM_CHECK_FLOAT_OR_INT_PARAM(min, 2);
 			GM_CHECK_FLOAT_OR_INT_PARAM(max, 3);
 
-			ImGui::SliderFloat2(name, &val[0], min, max);
+			IM_CALL(ImGui::SliderFloat2(name, &val[0], min, max));
 			a_thread->PushVec2(val);
 
 			return GM_OK;
@@ -187,7 +189,8 @@ namespace prev {
 				power = temp;
 			}
 
-			ImGui::DragFloat2(name, &val[0], power);
+			IM_CALL(ImGui::DragFloat2(name, &val[0], power));
+
 			a_thread->PushVec2(val);
 
 			return GM_OK;
@@ -200,7 +203,7 @@ namespace prev {
 			GM_CHECK_FLOAT_OR_INT_PARAM(min, 2);
 			GM_CHECK_FLOAT_OR_INT_PARAM(max, 3);
 
-			ImGui::SliderFloat3(name, &val[0], min, max);
+			IM_CALL(ImGui::SliderFloat3(name, &val[0], min, max));
 			a_thread->PushVec3(val);
 
 			return GM_OK;
@@ -213,7 +216,7 @@ namespace prev {
 			GM_CHECK_FLOAT_OR_INT_PARAM(min, 2);
 			GM_CHECK_FLOAT_OR_INT_PARAM(max, 3);
 
-			ImGui::SliderFloat4(name, &val[0], min, max);
+			IM_CALL(ImGui::SliderFloat4(name, &val[0], min, max));
 			a_thread->PushVec4(val);
 
 			return GM_OK;
@@ -224,7 +227,7 @@ namespace prev {
 			GM_CHECK_STRING_PARAM(name, 0);
 			GM_VEC3_PARAM(val, 1);
 
-			ImGui::ColorPicker3(name, &val[0]);
+			IM_CALL(ImGui::ColorPicker3(name, &val[0]));
 			a_thread->PushVec3(val);
 
 			return GM_OK;
@@ -235,7 +238,7 @@ namespace prev {
 			GM_CHECK_STRING_PARAM(name, 0);
 			GM_VEC4_PARAM(val, 1);
 
-			ImGui::ColorPicker4(name, &val[0]);
+			IM_CALL(ImGui::ColorPicker4(name, &val[0]));
 			a_thread->PushVec4(val);
 
 			return GM_OK;
@@ -246,7 +249,7 @@ namespace prev {
 			GM_CHECK_STRING_PARAM(name, 0);
 			GM_VEC3_PARAM(val, 1);
 
-			ImGui::ColorEdit3(name, &val[0]);
+			IM_CALL(ImGui::ColorEdit3(name, &val[0]));
 			a_thread->PushVec3(val);
 
 			return GM_OK;
@@ -257,7 +260,7 @@ namespace prev {
 			GM_CHECK_STRING_PARAM(name, 0);
 			GM_VEC4_PARAM(val, 1);
 
-			ImGui::ColorEdit4(name, &val[0]);
+			IM_CALL(ImGui::ColorEdit4(name, &val[0]));
 			a_thread->PushVec4(val);
 			return GM_OK;
 		}
@@ -268,7 +271,7 @@ namespace prev {
 			GM_CHECK_STRING_PARAM(buff, 1);
 
 			std::string buffer(buff);
-			ImGui::InputText(name, &buffer);
+			IM_CALL(ImGui::InputText(name, &buffer));
 			a_thread->PushNewString(buffer.c_str(), (int)buffer.size());
 
 			return GM_OK;
@@ -291,7 +294,7 @@ namespace prev {
 		GM_MEMFUNC_DECL(Button) {
 			GM_CHECK_NUM_PARAMS(1);
 			GM_CHECK_STRING_PARAM(name, 0);
-			a_thread->PushInt(ImGui::Button(name));
+			IM_CALL(a_thread->PushInt(ImGui::Button(name)));
 			return GM_OK;
 		}
 

@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "imguilayer.h" 
 
-#include "imgui.h"
+#include <imgui.h>
+#include <imgui_internal.h>
 
 namespace prev {
 
@@ -126,6 +127,10 @@ namespace prev {
 			}
 		}
 
+	}
+
+	bool ImGuiLayer::IsImGuiInitialized() {
+		return GImGui != nullptr;
 	}
 
 }

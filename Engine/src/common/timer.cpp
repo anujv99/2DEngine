@@ -16,6 +16,7 @@ namespace prev {
 	pv_time_point Timer::s_StartTime = std::chrono::high_resolution_clock::now();
 
 	unsigned int Timer::s_FPS						= 0;
+	unsigned int Timer::s_PrevFPS					= 0;
 	unsigned long long int Timer::s_LastTimeSec		= 0;
 	bool Timer::s_ShouldShowFPS						= false;
 
@@ -31,6 +32,7 @@ namespace prev {
 					Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "[FPS = {0}]", s_FPS);
 				);
 			}
+			s_PrevFPS = s_FPS;
 			s_FPS = 0;
 		}
 	}

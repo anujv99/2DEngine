@@ -31,20 +31,26 @@ local MakeImGuiManager = function() {
 	};
 
 	ImGuiManager.Draw = function() {
-		global g_Rendering;
-		g_Rendering = true;
 
-		for (i = 0; i < .GuiTable.Size(); i += 1) {
-			local gui = .GuiTable[i];
+		global g_ImGui;
 
-			local obj = gui.Object;
-			local func = gui.Function;
-			local arg = gui.Argument;
+		if (g_ImGui) {
+			global g_Rendering;
+			g_Rendering = true;
 
-			obj:func(arg);
+			for (i = 0; i < .GuiTable.Size(); i += 1) {
+				local gui = .GuiTable[i];
+
+				local obj = gui.Object;
+				local func = gui.Function;
+				local arg = gui.Argument;
+
+				obj:func(arg);
+			}
+
+			g_Rendering = false;
 		}
 
-		g_Rendering = false;
 		.Clear();
 	};
 

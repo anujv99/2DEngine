@@ -149,6 +149,10 @@ namespace prev {
 
 	void VirtualMachine::InitGlobals() {
 		m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(0));
+		if (ImGuiLayer::IsImGuiInitialized())
+			m_VM->GetGlobals()->Set(m_VM, "g_ImGui", gmVariable(1));
+		else
+			m_VM->GetGlobals()->Set(m_VM, "g_ImGui", gmVariable(0));
 	}
 
 	void VirtualMachine::InitGuiSettings() {

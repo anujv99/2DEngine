@@ -7,10 +7,12 @@ namespace prev {
 
 	void Cam2D::Begin() {
 		MVP::Ref().Projection().Push();
+		MVP::Ref().View().Push();
 		UpdateMatrix();
 	}
 
 	void Cam2D::End() {
+		MVP::Ref().View().Pop();
 		MVP::Ref().Projection().Pop();
 	}
 
@@ -31,10 +33,7 @@ namespace prev {
 				m_NearFar.x, m_NearFar.y
 			)
 		);
-	}
-
-	Vec2 Cam2D::GetScreenMapRatio() {
-		return GetVirtualScale() / ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+		MVP::Ref().View().Load(m_ViewMatrix);
 	}
 
 	prev::Vec2 Cam2D::MapMouseCoords(Vec2 mouseCoords) const {
@@ -61,7 +60,8 @@ namespace prev {
 	}
 
 	void Cam2D::SetPos(Vec2 pos) {
-		m_Position = pos;
+		m_ViewMatrix = Translate(Identity(), -Vec3(pos.x, pos.y, 0.0f));
+		UpdateMatrix();
 	}
 
 }

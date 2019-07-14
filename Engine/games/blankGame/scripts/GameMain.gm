@@ -7,6 +7,8 @@ local MakeBlankGame = function() {
 		Color = Vec4(1),
 		ThreadId = -1,
 		Box,
+		Font,
+		Label,
 	};
 
 	BlankGame.Init = function() {
@@ -16,7 +18,13 @@ local MakeBlankGame = function() {
 		.Box.Color = Vec4(0.8f, 0.4f, 0.1f, 1.0f);
 		.Box.Position = Vec2(0.0f);
 		.Box.Dimension = Vec2(1.0f);
-		.Ps = ParticleSystem(1024);
+
+		.Font = Font("Test", "res/fonts/IndieFlower-Regular.ttf", 0.5f);
+		.Label = Label();
+		.Label.Text = "Hello World";
+		.Label.Position = Vec2(0.0f);
+		.Label.Scale = Vec2(1.0f);
+		.Label.Color = Vec4(0.0f, 1.0f, 1.0f, 1.0f);
 	};
 
 	BlankGame.Update = function() {
@@ -42,15 +50,25 @@ local MakeBlankGame = function() {
 		Gui.Text("[F3] Profiler");
 
 		Gui.Separator();
+		Gui.Text("Box Props");
 		.Box.Position = Gui.DragVec2("Pos", .Box.Position, 0.01);
 		.Box.Dimension = Gui.DragVec2("Dimen", .Box.Dimension, 0.01);
 		.Box.Rotation = Gui.SliderFloat("Rot", .Box.Rotation, -180, 180);
 		.Box.Color = Gui.ColorEdit4("Col", .Box.Color);
+
+		Gui.Separator();
+		Gui.Text("Text Props");
+		.Label.Position = Gui.DragVec2("Pos", .Label.Position, 0.01);
+		.Label.Scale = Gui.DragVec2("Scale", .Label.Scale, 0.01);
+		.Label.Color = Gui.ColorEdit4("Col", .Label.Color);
+		.Label.Text = Gui.TextInput("Message", .Label.Text);
+
 		Gui.End();
 	};
 
 	BlankGame.Draw = function() {
 		.Box.Draw();
+		.Font.Print(.Label);
 	};
 
 	return BlankGame;
