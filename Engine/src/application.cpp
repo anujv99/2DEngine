@@ -11,22 +11,20 @@
 
 #include "math/mvp.h"
 #include "math/mat4.h"
+#include "math/screenspace.h"
 
 #include "common/profiler.h"
 
 #include "vm/virtualmachine.h"
 
-#include <imgui.h>
-
 #include "renderer/renderer.h"
-#include "game/particlesystem.h"
+#include "renderer/fbopass.h"
 
-#include <Box2D/Box2D.h>
 #include "physics/box2dmanager.h"
 #include "physics/box2ddebugdraw.h"
+
 #include "graphics/texture2d.h"
 #include "graphics/font.h"
-#include "math/screenspace.h"
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
@@ -39,6 +37,7 @@ namespace prev {
 		auto dis = GraphicsContext::GetDisplayModes();
 		unsigned int selectedDis = 0;
 		dis[selectedDis].SetWindowStyle(WindowStyle::BORDERLESS);
+		dis[selectedDis].SetMultisample(4);
 		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
@@ -59,6 +58,8 @@ namespace prev {
 		VirtualMachine::Ref().RunMain();
 
 		Renderer::CreateInst();
+		FramebufferPass::CreateInst();
+
 		Box2DManager::CreateInst();
 
 		Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
@@ -75,12 +76,14 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
+
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
 	Application::~Application() {
 		m_DefCamera.End();
 		Box2DManager::DestroyInst();
+		FramebufferPass::DestroyInst();
 		Renderer::DestroyInst();
 		VirtualMachine::DestroyInst();
 		Profiler::DestroyInst();
@@ -102,7 +105,7 @@ namespace prev {
 			Timer::Update();
 
 			GraphicsContext::Ref().BeginFrame();
-
+			
 			if (LayerStack::Ref().GetImGuiLayer())
 				LayerStack::Ref().GetImGuiLayer()->StartFrame();
 
@@ -138,6 +141,7 @@ namespace prev {
 
 			//LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
 			GLOBAL_DRAW_CALL_COUNT = 0;
+
 		}
 	}
 

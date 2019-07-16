@@ -25,12 +25,11 @@ namespace prev {
 	}
 
 	bool D3DSampler2D::CreateSamplerState(const TextureParams samplerDesc) {
-		D3D11_SAMPLER_DESC sd = {};
-		sd.Filter			= GetTextureFilter(samplerDesc.Filtering);
-		sd.AddressU			= GetTextureAdressMode(samplerDesc.Wrapping);
-		sd.AddressV			= GetTextureAdressMode(samplerDesc.Wrapping);
-		sd.AddressW			= GetTextureAdressMode(samplerDesc.Wrapping);
-		sd.MaxAnisotropy	= 16;
+		D3D11_SAMPLER_DESC sd	= {};
+		sd.Filter				= GetTextureFilter(samplerDesc.Filtering);
+		sd.AddressU				= GetTextureAdressMode(samplerDesc.Wrapping);
+		sd.AddressV				= GetTextureAdressMode(samplerDesc.Wrapping);
+		sd.AddressW				= GetTextureAdressMode(samplerDesc.Wrapping);
 
 		HRESULT hr = GetDevice()->CreateSamplerState(&sd, m_SamplerState.GetAddressOf());
 		if (FAILED(hr)) {

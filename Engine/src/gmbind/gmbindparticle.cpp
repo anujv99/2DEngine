@@ -34,6 +34,7 @@ GM_REG_NAMESPACE(ParticleSystem) {
 	GM_GEN_MEMFUNC_VOID_VOID(ParticleSystem, Gui)
 
 	GM_SETDOT_FUNC_BEGIN(ParticleSystem)
+		GM_SETDOT_PARAM_INT("NumPerEmission", m_NumParticlesPerEmission)
 		GM_SETDOT_PARAM_FLOAT("Life", m_LifeSpan)
 		GM_SETDOT_PARAM_FLOAT("LifeVariance", m_LifeSpanVaraince)
 		GM_SETDOT_PARAM_VEC2("Position", m_StartPosition)
@@ -58,6 +59,7 @@ GM_REG_NAMESPACE(ParticleSystem) {
 	GM_SETDOT_FUNC_END(ParticleSystem)
 
 	GM_GETDOT_FUNC_BEGIN(ParticleSystem)
+		GM_GETDOT_PARAM_INT("NumPerEmission", m_NumParticlesPerEmission)
 		GM_GETDOT_PARAM_FLOAT("Life", m_LifeSpan)
 		GM_GETDOT_PARAM_FLOAT("LifeVariance", m_LifeSpanVaraince)
 		GM_GETDOT_PARAM_VEC2("Position", m_StartPosition)

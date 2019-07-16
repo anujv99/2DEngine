@@ -55,7 +55,9 @@ namespace prev {
 
 	}
 
-	void Renderer::Submit(const Sprite & sprite, StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {
+	void Renderer::Submit(const Sprite & sprite, StrongHandle<Texture2D> texture, 
+		StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {
+
 		SpriteVertices vertices(sprite.Position, sprite.Dimension, sprite.Rotation);
 		static TextureCoordinates defaultUvs(Vec2(0, 1), Vec2(0, 1));
 
@@ -82,6 +84,16 @@ namespace prev {
 		drawVertices[5].Color = sprite.Color;
 
 		SpriteGroup * drawGroup = GetDrawGroup(vShader, pShader);
+
+		if (texture != nullptr) {
+			auto texID = SubmitTexture(drawGroup, texture);
+			drawVertices[0].TexID = texID;
+			drawVertices[1].TexID = texID;
+			drawVertices[2].TexID = texID;
+			drawVertices[3].TexID = texID;
+			drawVertices[4].TexID = texID;
+			drawVertices[5].TexID = texID;
+		}
 
 		std::memcpy(
 			drawGroup->MappedBuffer + drawGroup->MappedBufferIndex,

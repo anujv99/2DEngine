@@ -99,6 +99,41 @@ namespace prev {
 		GetDeviceContext()->PSSetShaderResources(m_BindSlot, 1, temp);
 	}
 
+	D3DTexture2D::D3DTexture2D(D3D11_TEXTURE2D_DESC desc) : m_IsCreated(false), m_BindSlot(0u), m_TextureSampler(nullptr) {
+
+		desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> d3dtexure;
+		HRESULT hr = GetDevice()->CreateTexture2D(&desc, nullptr, d3dtexure.GetAddressOf());
+		if (FAILED(hr)) {
+			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Unable to create texutre2d");
+			return;
+		}
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format						= desc.Format;
+		srvDesc.ViewDimension				= D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MostDetailedMip	= 0;
+		srvDesc.Texture2D.MipLevels			= 1;
+
+		hr = GetDevice()->CreateShaderResourceView(d3dtexure.Get(), &srvDesc, m_TextureView.GetAddressOf());
+		if (FAILED(hr)) {
+			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Unable to create texutre2d view");
+			return;
+		}
+
+		TextureParams params;
+		params.Filtering	= PV_TEXTURE_FILTER_LINEAR;
+		params.Wrapping		= PV_TEXTURE_WRAP_CLAMP;
+
+		m_TextureSampler = new D3DSampler2D();
+		m_TextureSampler->Init(params);
+
+		m_IsCreated = true;
+	}
+
+	D3DTexture2D::~D3DTexture2D() {}
+
 	bool D3DTexture2D::CreateTexture(const Texture2DDesc & desc) {
 		D3D11_TEXTURE2D_DESC textureDesc	= {};
 		textureDesc.Width					= (UINT)desc.TextureSize.x;

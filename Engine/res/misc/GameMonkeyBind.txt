@@ -1,0 +1,58 @@
+
+-------------------------------------------------
+PARTCLES
+--------
+-> Functions
+	-> Draw			(void) -> void
+	-> Update		(void) -> void
+	-> Gui			(void) -> void [Appendable -> (dosen't Begin or End)]
+-> SetDot Members (GetDot Same)     
+	-> NumPerEmission 			: int
+	-> Life 					: float
+	-> LifeVariance 			: float
+	-> Position 				: Vec2
+	-> PositionVariance 		: Vec2
+	-> StartScale 				: Vec2
+	-> StartScaleVariance		: Vec2
+	-> EndScale					: Vec2
+	-> EndScaleVariance         : Vec2
+	-> Velocity                 : Vec2
+	-> VelocityVariance         : Vec2
+	-> Acceleration             : Vec2
+	-> AttractorPosition        : Vec2
+	-> AttractorStrenght		: float
+	-> StartColor				: Vec3
+	-> StartColorVariance       : Vec3
+	-> EndColor                 : Vec3
+	-> EndColorVariance         : Vec3
+	-> StartAlpha				: float
+	-> StartAlphaVarian	        : float
+	-> EndAlpha	                : float
+	-> EndAlphaVariance			: float
+-------------------------------------------------
+
+-------------------------------------------------
+INPUT
+--------
+-> Functions
+	-> GetMousePos				(void) -> Vec2
+	-> GetMouseDelta			(void) -> Vec2
+	-> GetMouseScrollDelta		(void) -> Vec2
+	-> IsMouseDown				(int) -> bool
+	-> IsMousePressed			(int) -> bool
+	-> IsMouseUp				(int) -> bool
+	-> IsMouseReleased			(int) -> bool
+	-> IsKeyDown				(int) -> bool
+	-> IsKeyPressed				(int) -> bool
+	-> IsKeyUp					(int) -> bool
+	-> IsKeyReleased			(int) -> bool
+-------------------------------------------------
+
+
+
+
+
+
+
+
+

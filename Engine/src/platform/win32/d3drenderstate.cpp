@@ -121,6 +121,8 @@ namespace prev {
 	}
 
 	void D3DRenderSate::SetBlendFunction(const BlendFunction & blendFunc) {
+		//https://stackoverflow.com/questions/14491824/dx11-alpha-blending-when-rendering-to-a-texture
+
 		D3D11_BLEND_DESC bd;
 		bd.AlphaToCoverageEnable						= FALSE;
 		bd.IndependentBlendEnable						= FALSE;
@@ -128,8 +130,8 @@ namespace prev {
 		bd.RenderTarget[0].SrcBlend						= MapBlendOption(blendFunc.SrcBlend);
 		bd.RenderTarget[0].DestBlend					= MapBlendOption(blendFunc.DestBlend);
 		bd.RenderTarget[0].BlendOp						= MapBlendOperation(blendFunc.Operation);
-		bd.RenderTarget[0].SrcBlendAlpha				= D3D11_BLEND_ZERO;
-		bd.RenderTarget[0].DestBlendAlpha				= D3D11_BLEND_ZERO;
+		bd.RenderTarget[0].SrcBlendAlpha				= D3D11_BLEND_ONE;
+		bd.RenderTarget[0].DestBlendAlpha				= D3D11_BLEND_ONE;
 		bd.RenderTarget[0].BlendOpAlpha					= D3D11_BLEND_OP_ADD;
 		bd.RenderTarget[0].RenderTargetWriteMask		= D3D11_COLOR_WRITE_ENABLE_ALL;
 

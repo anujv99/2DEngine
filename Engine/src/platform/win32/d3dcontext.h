@@ -16,6 +16,8 @@ namespace prev {
 
 		inline ID3D11Device * GetDevice() { return m_Device.Get(); }
 		inline ID3D11DeviceContext * GetDeviceContext() { return m_DeviceContext.Get(); }
+
+		void BindDefaultRenderTarget();
 	private:
 		DXGI_MODE_DESC GetDisplayModeDesc(const DisplayMode & displayMode);
 
@@ -32,6 +34,8 @@ namespace prev {
 		Microsoft::WRL::ComPtr<ID3D11Texture2D>				m_DepthStencilBuffer;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState>		m_DepthStencilState;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>		m_DepthStencilView;
+	private:
+		unsigned int m_NumSamples;
 	};
 
 }

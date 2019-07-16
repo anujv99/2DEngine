@@ -22,9 +22,13 @@ namespace prev {
 		Renderer();
 		~Renderer();
 	public:
-		void Submit(const Sprite & sprite, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
+		void Submit(const Sprite & sprite, StrongHandle<Texture2D> texture = nullptr, 
+			StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
+
 		void Submit(const ParticleSystem & system, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
-		void Submit(const Label & label, StrongHandle<Font> font, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
+
+		void Submit(const Label & label, StrongHandle<Font> font, 
+			StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
 		void Present();
 	private:
 		void CreateVertexLayoutDefault();

@@ -7,24 +7,18 @@ local MakeBlankGame = function() {
 		Color = Vec4(1),
 		ThreadId = -1,
 		Box,
-		Font,
-		Label,
+		Ps,
 	};
 
 	BlankGame.Init = function() {
 		print("This is a blank game");
 		.ThreadId = this:thread(.Update);
 		.Box = Sprite();
-		.Box.Color = Vec4(0.8f, 0.4f, 0.1f, 1.0f);
+		.Box.Color = Vec4(0.8f, 0.4f, 0.1f, 0.5f);
 		.Box.Position = Vec2(0.0f);
 		.Box.Dimension = Vec2(1.0f);
 
-		.Font = Font("Test", "res/fonts/IndieFlower-Regular.ttf", 0.5f);
-		.Label = Label();
-		.Label.Text = "Hello World";
-		.Label.Position = Vec2(0.0f);
-		.Label.Scale = Vec2(1.0f);
-		.Label.Color = Vec4(0.0f, 1.0f, 1.0f, 1.0f);
+		.Ps = ParticleSystem(1024);
 	};
 
 	BlankGame.Update = function() {
@@ -35,6 +29,13 @@ local MakeBlankGame = function() {
 			if (Input.IsKeyPressed(Input.KEY_ESCAPE)) {
 				break;
 			}
+
+			if (Input.IsMousePressed(0)) {
+				.Ps.NumPerEmission = 100;
+			} else {
+				.Ps.NumPerEmission = 0;
+			}
+			.Ps.Update();
 
 			yield();
 		}
@@ -57,18 +58,14 @@ local MakeBlankGame = function() {
 		.Box.Color = Gui.ColorEdit4("Col", .Box.Color);
 
 		Gui.Separator();
-		Gui.Text("Text Props");
-		.Label.Position = Gui.DragVec2("Pos", .Label.Position, 0.01);
-		.Label.Scale = Gui.DragVec2("Scale", .Label.Scale, 0.01);
-		.Label.Color = Gui.ColorEdit4("Col", .Label.Color);
-		.Label.Text = Gui.TextInput("Message", .Label.Text);
-
+		.Ps.Gui();
+		
 		Gui.End();
 	};
 
 	BlankGame.Draw = function() {
+		.Ps.Draw();
 		.Box.Draw();
-		.Font.Print(.Label);
 	};
 
 	return BlankGame;

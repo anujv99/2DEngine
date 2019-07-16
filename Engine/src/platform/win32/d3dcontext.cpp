@@ -55,6 +55,8 @@ namespace prev {
 
 	D3DContext::D3DContext(HWND hWnd, const DisplayMode & displayMode) {
 		DXGI_MODE_DESC displayModeDesc = GetDisplayModeDesc(displayMode);
+		m_NumSamples = displayMode.GetSamples();
+
 		if (m_IsContextCreated == false) {
 			return;
 		}
@@ -90,6 +92,10 @@ namespace prev {
 
 	void D3DContext::EndFrame() {
 		m_SwapChain->Present(1u, 0u);
+	}
+
+	void D3DContext::BindDefaultRenderTarget() {
+		m_DeviceContext->OMSetRenderTargets(1u, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 	}
 
 	DXGI_MODE_DESC D3DContext::GetDisplayModeDesc(const DisplayMode & displayMode) {
@@ -130,7 +136,7 @@ namespace prev {
 		DXGI_SWAP_CHAIN_DESC scd;
 
 		scd.BufferDesc			= displayMode;
-		scd.SampleDesc.Count	= 4;
+		scd.SampleDesc.Count	= m_NumSamples;
 		scd.SampleDesc.Quality	= 0;
 		scd.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		scd.BufferCount			= 1;
@@ -199,7 +205,7 @@ namespace prev {
 		rd.SlopeScaledDepthBias		= 0.0f;
 		rd.DepthClipEnable			= FALSE;
 		rd.ScissorEnable			= TRUE;
-		rd.MultisampleEnable		= FALSE;
+		rd.MultisampleEnable		= m_NumSamples == 1 ? FALSE : TRUE;
 		rd.AntialiasedLineEnable	= FALSE;
 
 		HRESULT hr = m_Device->CreateRasterizerState(&rd, m_RasterizerState.GetAddressOf());
@@ -238,7 +244,7 @@ namespace prev {
 		dbd.MipLevels				= 1;
 		dbd.ArraySize				= 1;
 		dbd.Format					= DXGI_FORMAT_D32_FLOAT;
-		dbd.SampleDesc.Count		= 4;
+		dbd.SampleDesc.Count		= m_NumSamples;
 		dbd.SampleDesc.Quality		= 0;
 		dbd.Usage					= D3D11_USAGE_DEFAULT;
 		dbd.BindFlags				= D3D11_BIND_DEPTH_STENCIL;
@@ -255,7 +261,10 @@ namespace prev {
 		ZeroMemory(&dsvd, sizeof(dsvd));
 
 		dsvd.Format					= DXGI_FORMAT_D32_FLOAT;
-		dsvd.ViewDimension			= D3D11_DSV_DIMENSION_TEXTURE2DMS;
+		if (m_NumSamples > 1)
+			dsvd.ViewDimension			= D3D11_DSV_DIMENSION_TEXTURE2DMS;
+		else
+			dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		dsvd.Texture2D.MipSlice		= 0;
 
 		hr = m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &dsvd, m_DepthStencilView.GetAddressOf());

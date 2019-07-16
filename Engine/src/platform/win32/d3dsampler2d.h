@@ -5,7 +5,7 @@
 
 namespace prev {
 
-	class D3DSampler2D {
+	class D3DSampler2D : public HandledObject<D3DSampler2D> {
 	public:
 		D3DSampler2D() : m_IsCreated(false) {}
 		~D3DSampler2D() {}

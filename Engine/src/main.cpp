@@ -5,7 +5,7 @@
 using namespace prev;
 
 int main(_In_opt_ int argc, _In_opt_ char * argv[]) {
-	//_CrtSetBreakAlloc(24006);
+	//_CrtSetBreakAlloc(1273);
 
 	PrevMemoryInit();
 

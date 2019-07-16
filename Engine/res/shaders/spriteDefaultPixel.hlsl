@@ -9,7 +9,7 @@ struct VSIn {
 	float4 position : SV_POSITION;
 };
 
-float4 main(VSIn vsi) : SV_TARGET{
+float4 main(VSIn vsi) : SV_TARGET {
 	float4 outCol;
 	if (vsi.texID < 0) {
 		outCol = vsi.color;
@@ -23,6 +23,15 @@ float4 main(VSIn vsi) : SV_TARGET{
 			break;
 		case 2:
 			outCol = tex[2].Sample(splr[2], vsi.texCoords) * vsi.color;
+			break;
+		case 3:
+			outCol = tex[3].Sample(splr[3], vsi.texCoords) * vsi.color;
+			break;
+		case 4:
+			outCol = tex[4].Sample(splr[4], vsi.texCoords) * vsi.color;
+			break;
+		case 5:
+			outCol = tex[5].Sample(splr[5], vsi.texCoords) * vsi.color;
 			break;
 		}
 	}

@@ -17,13 +17,17 @@ namespace prev {
 		WindowStyle GetWindowStyle() const { return Style; }
 		bool IsWindowFullscreen() const { return Style == WindowStyle::FULLSCREEN; }
 
-		void SetWindowStyle(WindowStyle style) { Style = style; }
+		inline void SetWindowStyle(WindowStyle style) { Style = style; }
+		inline void SetMultisample(unsigned int numSamples) { Samples = numSamples; }
+		inline unsigned int GetSamples() const {return Samples; }
+		inline bool IsMultisampled() const { return Samples != 1; }
 	private:
 		DisplayMode() :
-			WindowSize(0, 0), Style(WindowStyle::WINDOWED) {}
+			WindowSize(0, 0), Style(WindowStyle::WINDOWED), Samples(1u) {}
 	private:
 		Vec2i WindowSize;
 		WindowStyle Style;
+		unsigned int Samples;
 	};
 
 	class Window : public Singleton<Window> {
