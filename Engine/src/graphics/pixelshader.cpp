@@ -10,8 +10,33 @@ namespace prev {
 	}
 
 	void PixelShader::Bind() {
+		if (ShaderManager::Ref().m_BoundPixelShader == (const PixelShader *)this) {
+			return;
+		}
 		ShaderBind();
+		for (auto & uniform : m_ShaderUniforms) {
+			uniform.second->Bind();
+		}
 		ShaderManager::Ref().m_BoundPixelShader = this;
+	}
+
+	void PixelShader::SetUniform(std::string uniformName, void * data, unsigned int dataSize) {
+		int uniformLocation = GetUniformLocation(uniformName);
+		if (uniformLocation < 0) {
+			LOG_WARN("Uniform with name : {}, not used", uniformName);
+			return;
+		}
+
+		auto it = m_ShaderUniforms.find(uniformLocation);
+		if (it != m_ShaderUniforms.end()) {
+			it->second->Update(data, (size_t)dataSize);
+			return;
+		}
+
+		StrongHandle<Uniform> uniform = Uniform::CreateUniform();
+		uniform->Init(data, dataSize, uniformLocation, PIXEL_SHADER);
+
+		m_ShaderUniforms.insert(std::make_pair(uniformLocation, uniform));
 	}
 
 }

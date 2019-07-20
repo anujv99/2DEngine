@@ -30,11 +30,6 @@ local MakeBlankGame = function() {
 				break;
 			}
 
-			if (Input.IsMousePressed(0)) {
-				.Ps.NumPerEmission = 100;
-			} else {
-				.Ps.NumPerEmission = 0;
-			}
 			.Ps.Update();
 
 			yield();
@@ -58,6 +53,14 @@ local MakeBlankGame = function() {
 		.Box.Color = Gui.ColorEdit4("Col", .Box.Color);
 
 		Gui.Separator();
+
+		if (Gui.Button("Save")) {
+			SaveParticleSystemToFile(.Ps, "test.ps");
+		}
+
+		if (Gui.Button("Load")) {
+			LoadParticleSystemFromFile(.Ps, "test.ps");
+		}
 		.Ps.Gui();
 		
 		Gui.End();

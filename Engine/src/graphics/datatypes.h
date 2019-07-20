@@ -16,6 +16,8 @@ namespace prev {
 	};
 
 	enum TextureFormat {
+		PV_TEXTURE_FORMAT_R32F,
+		PV_TEXTURE_FORMAT_R32SINT,
 		PV_TEXTURE_FORMAT_RGBA8,
 	};
 

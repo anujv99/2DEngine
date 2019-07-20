@@ -123,7 +123,7 @@ namespace prev {
 		}
 
 		TextureParams params;
-		params.Filtering	= PV_TEXTURE_FILTER_LINEAR;
+		params.Filtering	= PV_TEXTURE_FILTER_NEAREST;
 		params.Wrapping		= PV_TEXTURE_WRAP_CLAMP;
 
 		m_TextureSampler = new D3DSampler2D();
@@ -169,13 +169,6 @@ namespace prev {
 
 		m_TextureDesc = desc;
 		return true;
-	}
-
-	DXGI_FORMAT D3DTexture2D::GetTextureFormat(TextureFormat texFormat) {
-		switch (texFormat) {
-		case prev::PV_TEXTURE_FORMAT_RGBA8: return DXGI_FORMAT_R8G8B8A8_UNORM;
-		default: return DXGI_FORMAT_UNKNOWN;
-		}
 	}
 
 	unsigned int D3DTexture2D::GetStrideFromFormat(DXGI_FORMAT format) {

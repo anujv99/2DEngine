@@ -105,7 +105,7 @@ namespace prev {
 	}
 
 	void Renderer::Submit(const ParticleSystem & system, StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {
-		if (vShader == nullptr) vShader = m_SpriteVertexShaderDefault;
+		if (vShader == nullptr) vShader = m_ParticleVertexShaderDefault;
 		if (pShader == nullptr) pShader = m_ParticlePixelShaderDefault;
 		auto drawGroup = GetDrawGroup(vShader, pShader);
 
@@ -323,6 +323,7 @@ namespace prev {
 		m_SpriteVertexShaderDefault = ShaderManager::Ref().LoadVertexShaderFromFile("SPRITE_VERTEX_SHADER", "res/shaders/spriteDefaultVertex.hlsl");
 		m_SpritePixelShaderDefault = ShaderManager::Ref().LoadPixelShaderFromFile("SPRITE_PIXEL_SHADER", "res/shaders/spriteDefaultPixel.hlsl");
 
+		m_ParticleVertexShaderDefault = ShaderManager::Ref().LoadVertexShaderFromFile("PARTICLE_DEFAULT_PIXEL", "res/shaders/particleDefaultVertex.hlsl");
 		m_ParticlePixelShaderDefault = ShaderManager::Ref().LoadPixelShaderFromFile("PARTICLE_DEFAULT_PIXEL", "res/shaders/particleDefaultPixel.hlsl");
 	}
 

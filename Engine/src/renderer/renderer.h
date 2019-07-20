@@ -87,7 +87,8 @@ namespace prev {
 		StrongHandle<VertexShader> m_SpriteVertexShaderDefault;
 		StrongHandle<PixelShader> m_SpritePixelShaderDefault;
 
-		// default shader for rendering particles - vertex shader is same
+		// default shader for rendering particles
+		StrongHandle<VertexShader> m_ParticleVertexShaderDefault;
 		StrongHandle<PixelShader> m_ParticlePixelShaderDefault;
 	};
 

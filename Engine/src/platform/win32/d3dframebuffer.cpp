@@ -23,13 +23,14 @@ namespace prev {
 		d3dContext->BindDefaultRenderTarget();
 	}
 
-	void D3DFramebuffer::Init(Vec2 size) {
+	void D3DFramebuffer::Init(Vec2 size, TextureFormat format, bool msaa) {
 		LOG_ON_CONDITION(!m_IsCreated, LOG_ERROR, "Framebuffer already created", return);
 
 		unsigned int samples = Window::Ref().GetDisplayMode().GetSamples();
-		m_ISMultisampled = samples != 1;
+		m_ISMultisampled = msaa;
+		m_TextureFormat = GetTextureFormat(format);
 
-		if (samples > 1) {
+		if (msaa) {
 			m_IsCreated = CreateFramebufferMSAA(size, samples);
 		} else {
 			m_IsCreated = CreateFramebufferNoMSAA(size);
@@ -39,6 +40,10 @@ namespace prev {
 	void D3DFramebuffer::Clear() {
 		static float clearColor[] = { 0, 0, 0, 0 };
 		GetDeviceContext()->ClearRenderTargetView(m_RenderTargetView.Get(), clearColor);
+	}
+
+	void D3DFramebuffer::Clear(Vec4 color) {
+		GetDeviceContext()->ClearRenderTargetView(m_RenderTargetView.Get(), &color[0]);
 	}
 
 	Vec2 D3DFramebuffer::GetSize() {
@@ -55,7 +60,7 @@ namespace prev {
 		GetDeviceContext()->ResolveSubresource(
 			m_AntialiasedTexture->GetTexture2D().Get(), 0,
 			m_MultisampledTexture.Get(), 0,
-			DXGI_FORMAT_R32G32B32A32_FLOAT
+			m_TextureFormat
 		);
 	}
 
@@ -67,7 +72,7 @@ namespace prev {
 		textureDesc.Height						= (UINT)size.y;
 		textureDesc.MipLevels					= 1;
 		textureDesc.ArraySize					= 1;
-		textureDesc.Format						= DXGI_FORMAT_R32G32B32A32_FLOAT;
+		textureDesc.Format						= m_TextureFormat;
 		textureDesc.SampleDesc.Count			= numSamples;
 		textureDesc.SampleDesc.Quality			= 0;
 		textureDesc.Usage						= D3D11_USAGE_DEFAULT;
@@ -101,7 +106,7 @@ namespace prev {
 		textureDescaa.Height					= (UINT)size.y;
 		textureDescaa.MipLevels					= 1;
 		textureDescaa.ArraySize					= 1;
-		textureDescaa.Format					= DXGI_FORMAT_R32G32B32A32_FLOAT;
+		textureDescaa.Format					= m_TextureFormat;
 		textureDescaa.SampleDesc.Count			= 1;
 		textureDescaa.SampleDesc.Quality		= 0;
 		textureDescaa.Usage						= D3D11_USAGE_DEFAULT;
@@ -122,7 +127,7 @@ namespace prev {
 		textureDesc.Height						= (UINT)size.y;
 		textureDesc.MipLevels					= 1;
 		textureDesc.ArraySize					= 1;
-		textureDesc.Format						= DXGI_FORMAT_R8G8B8A8_UNORM;
+		textureDesc.Format						= m_TextureFormat;
 		textureDesc.SampleDesc.Count			= 1;
 		textureDesc.SampleDesc.Quality			= 0;
 		textureDesc.Usage						= D3D11_USAGE_DEFAULT;

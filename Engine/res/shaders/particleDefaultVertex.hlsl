@@ -10,10 +10,10 @@ struct VSOut {
 	float4 position : SV_POSITION;
 };
 
-VSOut main(float2 pos : POSITION, float2 uv : TEXCOORDS, float4 col : COLOR) {
+VSOut main(float2 pos : POSITION, float2 uv : TEXCOORDS, float4 col : COLOR, int texID : TEXTUREID) {
 	VSOut vso;
 	vso.position = mul(projection, float4(pos.xy, 0.0f, 1.0f));
 	vso.color = col;
-	vso.texCoords = (uv * float2(1, -1)) + float2(-0.5, 0.5);
+	vso.texCoords = uv * 2.0f - float2(1.0f, 1.0f);
 	return vso;
 }

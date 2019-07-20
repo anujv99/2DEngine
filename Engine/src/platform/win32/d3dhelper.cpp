@@ -13,4 +13,13 @@ namespace prev {
 		return d3dContext->GetDeviceContext();
 	}
 
+	DXGI_FORMAT GetTextureFormat(TextureFormat texFormat) {
+		switch (texFormat) {
+		case PV_TEXTURE_FORMAT_RGBA8: return DXGI_FORMAT_R8G8B8A8_UNORM;
+		case PV_TEXTURE_FORMAT_R32F: return DXGI_FORMAT_R32_FLOAT;
+		case PV_TEXTURE_FORMAT_R32SINT: return DXGI_FORMAT_R32_SINT;
+		default: return DXGI_FORMAT_UNKNOWN;
+		}
+	}
+
 }

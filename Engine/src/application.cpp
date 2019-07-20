@@ -25,10 +25,24 @@
 
 #include "graphics/texture2d.h"
 #include "graphics/font.h"
+#include "imgui.h"
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
+
+	StrongHandle<Framebuffer>	framebuffer;
+	StrongHandle<Framebuffer>	framebuffer2;
+	StrongHandle<Texture2D>		texture;
+	StrongHandle<PixelShader>	pShader;
+	StrongHandle<VertexShader>	vShader;
+
+	StrongHandle<Framebuffer> curr;
+	StrongHandle<Framebuffer> prev;
+	StrongHandle<Framebuffer> temp;
+	StrongHandle<PixelShader> waterRippleTex;
+	StrongHandle<PixelShader> waterRippleVisualizer;
+	StrongHandle<PixelShader> pixelSetter;
 
 	Application::Application() {
 		Timer::FPSCounter(false);
@@ -76,11 +90,50 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
+		framebuffer = Framebuffer::CreateFramebuffer();
+		framebuffer->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, true);
+
+		framebuffer2 = Framebuffer::CreateFramebuffer();
+		framebuffer2->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, true);
+
+		texture = Texture2D::CreateTexture2D();
+		TextureParams params;
+		params.Filtering = PV_TEXTURE_FILTER_LINEAR;
+		params.Wrapping = PV_TEXTURE_WRAP_DEFAULT;
+
+		texture->Init("res/textures/waterNormal.jpg", params);
+
+		pShader = ShaderManager::Ref().LoadPixelShaderFromFile("TEST_PIXEL_SHADER", "res/shaders/waterRipplePixel.hlsl");
+		vShader = ShaderManager::Ref().LoadVertexShaderFromFile("TEST_VERTEX_SHADER", "res/shaders/waterRippleVertex.hlsl");
+
+		//-------------------------------------------------------------------------------------
+
+		curr = Framebuffer::CreateFramebuffer();
+		curr->Init(winSize, PV_TEXTURE_FORMAT_R32F, false);
+		curr->Clear(Vec4(0.0f));
+
+		prev = Framebuffer::CreateFramebuffer();
+		prev->Init(winSize, PV_TEXTURE_FORMAT_R32F, false);
+		prev->Clear(Vec4(0.0f));
+
+		temp = Framebuffer::CreateFramebuffer();
+		temp->Init(winSize, PV_TEXTURE_FORMAT_R32F, false);
+		temp->Clear(Vec4(0.0f));
+
+		waterRippleTex = ShaderManager::Ref().LoadPixelShaderFromFile("TEST_WATER_RIPPLE_PIXEL_SHADER", "res/shaders/waterRippleTexPixel.hlsl");
+		waterRippleVisualizer = ShaderManager::Ref().LoadPixelShaderFromFile("TEST_WATER_RIPPLE_VIS_PIXEL_SHADER", "res/shaders/waterRippleVisualizer.hlsl");
+		pixelSetter = ShaderManager::Ref().LoadPixelShaderFromFile("pixelSetter", "res/shaders/pixelSetter.hlsl");
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
 	Application::~Application() {
+
+		framebuffer = nullptr;
+		texture = nullptr;
+		pShader = nullptr;
+		vShader = nullptr;
+
 		m_DefCamera.End();
 		Box2DManager::DestroyInst();
 		FramebufferPass::DestroyInst();
@@ -113,16 +166,102 @@ namespace prev {
 
 			Box2DManager::Ref().Update();
 
+			//////////////////////////////////////TESTING////////////////////////////////////////
+
+			temp->Bind();
+			temp->Clear();
+
+			curr->GetTexture()->SetTextureSlot(1);
+			curr->GetTexture()->Bind();
+
+			prev->GetTexture()->SetTextureSlot(2);
+			prev->GetTexture()->Bind();
+
+			FramebufferPass::Ref().Pass(temp, nullptr, waterRippleTex);
+
+			temp->UnBind();
+
+			auto temp2 = curr;
+			curr = temp;
+			temp = temp2;
+
+			framebuffer->Bind();
+			framebuffer->Clear();
+
+			static ScissorBox sb;
+			sb.Left = 0.0f;
+			sb.Right = 1600.0f;
+			sb.Bottom = 450.0f;
+			sb.Top = 900.0f;
+
+			RenderState::Ref().SetScissorBox(sb);
+
+			//////////////////////////////////////TESTING////////////////////////////////////////
+
 			VirtualMachine::Ref().Update();
 			VirtualMachine::Ref().Render();
-
-			////////////////////////////////////////TESTING////////////////////////////////////////
-
-			////////////////////////////////////////TESTING////////////////////////////////////////
 
 			PROFILER_BEGIN("App::Present");
 			Renderer::Ref().Present();
 			PROFILER_END("App::Present");
+
+			////////////////////////////////////////TESTING////////////////////////////////////////
+			
+			framebuffer->UnBind();
+			framebuffer2->Bind();
+			framebuffer2->Clear();
+			
+			sb.Bottom = 0.0f;
+			sb.Top = 450.0f;
+			
+			RenderState::Ref().SetScissorBox(sb);
+			
+			texture->SetTextureSlot(1);
+			texture->Bind();
+			
+			curr->GetTexture()->SetTextureSlot(2);
+			curr->GetTexture()->Bind();
+
+			{
+				static float dis = 0.0f;
+				static float amp = 0.0f;
+				static float speed = 50.0f;
+			
+				ImGui::Begin("Test");
+				ImGui::DragFloat("Distortion", &dis, 0.01f);
+				ImGui::DragFloat("Amplitude", &amp, 0.01f);
+				ImGui::DragFloat("Speed", &speed, 0.01f, 1.0f, 100.0f);
+				ImGui::End();
+			
+				pShader->SetUniform("Time", &Vec4(Timer::GetTime() / speed, dis, amp, dis)[0], sizeof(Vec4));
+			}
+			
+			FramebufferPass::Ref().Pass(framebuffer, vShader, pShader);
+			
+			framebuffer2->UnBind();
+			
+			RenderState::Ref().DisableScissors();
+			
+			FramebufferPass::Ref().Pass(framebuffer);
+			FramebufferPass::Ref().Pass(framebuffer2);
+
+			Renderer::Ref().Present();
+			//-------------------------------------------------------------------------------------
+
+			if (Input::Ref().GetMouseDeltaPosition() != Vec2(0.0f, 0.0f)) {
+				curr->Bind();
+				ImmediateGFX::Ref().Color(Vec4(2.0f));
+				ImmediateGFX::Ref().DrawCircle(Input::Ref().GetMousePosition(), 0.01f);
+				curr->UnBind();
+			}
+
+			//FramebufferPass::Ref().Pass(curr, nullptr, waterRippleVisualizer);
+
+			temp2 = curr;
+			curr = prev;
+			prev = temp2;
+
+			////////////////////////////////////////TESTING////////////////////////////////////////
 
 			PROFILER_BEGIN("App::Gui");
 			Gui();
@@ -130,7 +269,7 @@ namespace prev {
 
 			if (LayerStack::Ref().GetImGuiLayer())
 				LayerStack::Ref().GetImGuiLayer()->EndFrame();
-
+ 
 			GraphicsContext::Ref().EndFrame();
 
 			Window::Ref().PollEvents();

@@ -147,6 +147,22 @@ namespace prev {
 		m_BlendFunction = blendFunc;
 	}
 
+	void D3DRenderSate::DisableBlend() {
+		D3D11_BLEND_DESC bd = {};
+		bd.AlphaToCoverageEnable						= FALSE;
+		bd.IndependentBlendEnable						= FALSE;
+		bd.RenderTarget[0].BlendEnable					= FALSE;
+
+		Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
+
+		HRESULT hr = GetDevice()->CreateBlendState(&bd, blendState.GetAddressOf());
+		if (FAILED(hr)) {
+			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Failed to create Blend state");
+		}
+
+		GetDeviceContext()->OMSetBlendState(blendState.Get(), nullptr, 0xffffffff);
+	}
+
 	prev::BlendFunction D3DRenderSate::GetBlendFunction() {
 		return m_BlendFunction;
 	}

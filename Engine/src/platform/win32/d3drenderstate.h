@@ -21,6 +21,7 @@ namespace prev {
 		virtual void DisableScissors() override;
 
 		virtual void SetBlendFunction(const BlendFunction & blendFunc) override;
+		virtual void DisableBlend() override;
 		virtual BlendFunction GetBlendFunction() override;
 	private:
 		D3D_PRIMITIVE_TOPOLOGY MapPrimitiveTopology(PrimitiveTopology prim);

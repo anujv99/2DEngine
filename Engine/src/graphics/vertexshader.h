@@ -2,6 +2,8 @@
 
 #include "bindable.h"
 
+#include "uniform.h"
+
 namespace prev {
 
 	class VertexShader : public HandledObject<VertexShader>, public Bindable {
@@ -25,13 +27,16 @@ namespace prev {
 			return m_ShaderName;
 		}
 
-		void UpdateMVP();
-
 		static StrongHandle<VertexShader> CreateVertexShader(const std::string & shaderName);
+	public:
+		void UpdateMVP();
+		void SetUniform(std::string uniformName, void * data, unsigned int dataSize);
 	protected:
 		virtual void ShaderBind() = 0;
 	protected:
 		std::string m_ShaderName;
+
+		std::unordered_map<unsigned int, StrongHandle<Uniform>> m_ShaderUniforms; // UniformLocation -> Uniform
 	};
 
 }

@@ -2,12 +2,12 @@
 struct VSIn {
 	float2 texCoords : TEXCOORD;
 	float4 color : OUT_COLOR;
+	int texID : OUT_TEXTUREID;
 	float4 position : SV_POSITION;
 };
 
 float4 main(VSIn vsi) : SV_TARGET{
-	float2 uvNorm = vsi.texCoords * 2.0f - float2(1.0f, 1.0f);
-	float len = length(uvNorm);
+	float len = length(vsi.texCoords);
 
 	float alpha = 1.0f - smoothstep(0.0f, 1.0f, len);
 

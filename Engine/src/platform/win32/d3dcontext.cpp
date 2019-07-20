@@ -262,7 +262,7 @@ namespace prev {
 
 		dsvd.Format					= DXGI_FORMAT_D32_FLOAT;
 		if (m_NumSamples > 1)
-			dsvd.ViewDimension			= D3D11_DSV_DIMENSION_TEXTURE2DMS;
+			dsvd.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2DMS;
 		else
 			dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		dsvd.Texture2D.MipSlice		= 0;

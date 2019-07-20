@@ -29,7 +29,6 @@ namespace prev {
 		inline bool IsCreated() const { return m_IsCreated; }
 	private:
 		bool CreateTexture(const Texture2DDesc & desc);
-		DXGI_FORMAT GetTextureFormat(TextureFormat texFormat);
 		unsigned int GetStrideFromFormat(DXGI_FORMAT format);
 		D3D11_TEXTURE2D_DESC GetTextureDesc();
 	private:

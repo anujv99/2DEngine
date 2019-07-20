@@ -15,8 +15,9 @@ namespace prev {
 		// Inherited via Framebuffer
 		virtual void Bind() override;
 		virtual void UnBind() override;
-		virtual void Init(Vec2 size) override;
+		virtual void Init(Vec2 size, TextureFormat format, bool msaa) override;
 		virtual void Clear() override;
+		virtual void Clear(Vec4 color) override;
 		virtual Vec2 GetSize() override;
 		virtual StrongHandle<Texture2D> GetTexture() override;
 	private:
@@ -32,6 +33,7 @@ namespace prev {
 		Vec2 m_TextureSize;
 		bool m_IsCreated;
 		bool m_ISMultisampled;
+		DXGI_FORMAT m_TextureFormat;
 	};
 
 }

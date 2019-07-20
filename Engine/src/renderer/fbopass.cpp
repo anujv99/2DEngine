@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "fbopass.h"
+#include "graphics/renderstate.h"
 
 namespace prev {
 
@@ -57,7 +58,17 @@ namespace prev {
 		vShader->Bind();
 		pShader->Bind();
 
+		BlendFunction bf = RenderState::Ref().GetBlendFunction();
+		BlendFunction nbf;
+		nbf.DestBlend = PV_BLEND_ONE;
+		nbf.SrcBlend = PV_BLEND_ONE;
+		nbf.Operation = PV_BLEND_OP_ADD;
+
+		RenderState::Ref().SetBlendFunction(nbf);
+
 		m_VertexBuffer->Draw(6, 0);
+
+		RenderState::Ref().SetBlendFunction(bf);
 	}
 
 }

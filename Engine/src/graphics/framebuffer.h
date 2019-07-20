@@ -4,6 +4,7 @@
 #include "texture2d.h"
 
 #include "math/vec2.h"
+#include "math/vec4.h"
 
 namespace prev {
 
@@ -16,8 +17,9 @@ namespace prev {
 		virtual void Bind() override = 0;
 		virtual void UnBind() override = 0;
 
-		virtual void Init(Vec2 size) = 0;
+		virtual void Init(Vec2 size, TextureFormat format, bool msaa) = 0;
 		virtual void Clear() = 0;
+		virtual void Clear(Vec4 color) = 0;
 		virtual Vec2 GetSize() = 0;
 		virtual StrongHandle<Texture2D> GetTexture() = 0;
 

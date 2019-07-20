@@ -67,6 +67,7 @@ namespace prev {
 		virtual void DisableScissors() = 0;
 
 		virtual void SetBlendFunction(const BlendFunction & blendFunc) = 0;
+		virtual void DisableBlend() = 0;
 		virtual BlendFunction GetBlendFunction() = 0;
 	private:
 		StrongHandle<Uniform> m_Uniform;
