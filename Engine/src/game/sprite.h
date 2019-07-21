@@ -40,6 +40,7 @@ namespace prev {
 
 	struct Sprite {
 		Vec2			Position;	// Center
+		float			Depth;		// Used for Z buffering
 		Vec2			Dimension;	// Width-Height
 		float			Rotation;	// Degrees
 		SpriteColor		Color;		// RGBA

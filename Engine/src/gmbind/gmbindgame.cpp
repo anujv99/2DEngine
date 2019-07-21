@@ -31,6 +31,7 @@ GM_REG_NAMESPACE(Sprite) {
 
 	GM_SETDOT_FUNC_BEGIN(Sprite)
 		GM_SETDOT_PARAM_VEC2("Position", Position)
+		GM_SETDOT_PARAM_FLOAT("Depth", Depth)
 		GM_SETDOT_PARAM_VEC2("Dimension", Dimension)
 		GM_SETDOT_PARAM_FLOAT("Rotation", Rotation)
 		GM_SETDOT_PARAM_VEC4("Color", Color)
@@ -38,6 +39,7 @@ GM_REG_NAMESPACE(Sprite) {
 
 	GM_GETDOT_FUNC_BEGIN(Sprite)
 		GM_GETDOT_PARAM_VEC2("Position", Position)
+		GM_GETDOT_PARAM_FLOAT("Depth", Depth)
 		GM_GETDOT_PARAM_VEC2("Dimension", Dimension)
 		GM_GETDOT_PARAM_FLOAT("Rotation", Rotation)
 		GM_GETDOT_PARAM_VEC4("Color", Color.ToVec4())

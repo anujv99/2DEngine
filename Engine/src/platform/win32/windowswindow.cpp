@@ -199,8 +199,6 @@ namespace prev {
 			return;
 		}
 
-		::SetCursor(::LoadCursor(m_HInst, MAKEINTRESOURCE(IDC_CARROW)));
-
 		return;
 	}
 
@@ -219,7 +217,7 @@ namespace prev {
 		wc.cbWndExtra			= 0;
 		wc.hInstance			= m_HInst;
 		wc.hIcon				= LoadIcon(NULL, IDI_WINLOGO);
-		wc.hCursor				= LoadCursor(NULL, MAKEINTRESOURCE(IDC_CARROW));
+		wc.hCursor				= LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
 		wc.hbrBackground		= (HBRUSH)GetStockObject(BLACK_BRUSH);
 		wc.lpszMenuName			= NULL;
 		wc.lpszClassName		= WINDOW_CLASS_NAME;

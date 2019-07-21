@@ -10,7 +10,7 @@ namespace prev {
 	static constexpr unsigned int MAX_NUM_SPRITES					= 1024 * 16;
 	static constexpr unsigned int MAX_NUM_VERTICES_PER_SPRTIE		= 6;
 	static constexpr unsigned int MAX_NUM_VERTICES					= MAX_NUM_SPRITES * MAX_NUM_VERTICES_PER_SPRTIE;
-	static constexpr unsigned int MAX_NUM_TEXTURES					= 32;
+	static constexpr unsigned int MAX_NUM_TEXTURES					= 16;
 
 	static constexpr float FONT_TEXTURE_PADDING						= 0.001f;
 
@@ -62,12 +62,12 @@ namespace prev {
 		static TextureCoordinates defaultUvs(Vec2(0, 1), Vec2(0, 1));
 
 		SpriteVertex drawVertices[6];
-		drawVertices[0].Position = vertices.TopLeft;
-		drawVertices[1].Position = vertices.BottomRight;
-		drawVertices[2].Position = vertices.BottomLeft;
-		drawVertices[3].Position = vertices.TopLeft;
-		drawVertices[4].Position = vertices.TopRight;
-		drawVertices[5].Position = vertices.BottomRight;
+		drawVertices[0].Position = Vec3(vertices.TopLeft, sprite.Depth);
+		drawVertices[1].Position = Vec3(vertices.BottomRight, sprite.Depth);
+		drawVertices[2].Position = Vec3(vertices.BottomLeft, sprite.Depth);
+		drawVertices[3].Position = Vec3(vertices.TopLeft, sprite.Depth);
+		drawVertices[4].Position = Vec3(vertices.TopRight, sprite.Depth);
+		drawVertices[5].Position = Vec3(vertices.BottomRight, sprite.Depth);
 
 		drawVertices[0].UV = defaultUvs.TopLeft;
 		drawVertices[1].UV = defaultUvs.BottomRight;
@@ -115,12 +115,12 @@ namespace prev {
 			SpriteVertices vertices(part.Position, Vec2(part.CurrentScale), 0);
 
 			SpriteVertex drawVertices[6];
-			drawVertices[0].Position = vertices.TopLeft;
-			drawVertices[1].Position = vertices.BottomRight;
-			drawVertices[2].Position = vertices.BottomLeft;
-			drawVertices[3].Position = vertices.TopLeft;
-			drawVertices[4].Position = vertices.TopRight;
-			drawVertices[5].Position = vertices.BottomRight;
+			drawVertices[0].Position = Vec3(vertices.TopLeft, 0.0f);
+			drawVertices[1].Position = Vec3(vertices.BottomRight, 0.0f);
+			drawVertices[2].Position = Vec3(vertices.BottomLeft, 0.0f);
+			drawVertices[3].Position = Vec3(vertices.TopLeft, 0.0f);
+			drawVertices[4].Position = Vec3(vertices.TopRight, 0.0f);
+			drawVertices[5].Position = Vec3(vertices.BottomRight, 0.0f);
 
 			drawVertices[0].UV = defaultUvs.TopLeft;
 			drawVertices[1].UV = defaultUvs.BottomRight;
@@ -210,12 +210,12 @@ namespace prev {
 				}
 
 				SpriteVertex drawVertices[6];
-				drawVertices[0].Position = { x0, y1 };
-				drawVertices[1].Position = { x1, y0 };
-				drawVertices[2].Position = { x0, y0 };
-				drawVertices[3].Position = { x0, y1 };
-				drawVertices[4].Position = { x1, y1 };
-				drawVertices[5].Position = { x1, y0 };
+				drawVertices[0].Position = { x0, y1, 0.0f };
+				drawVertices[1].Position = { x1, y0, 0.0f };
+				drawVertices[2].Position = { x0, y0, 0.0f };
+				drawVertices[3].Position = { x0, y1, 0.0f };
+				drawVertices[4].Position = { x1, y1, 0.0f };
+				drawVertices[5].Position = { x1, y0, 0.0f };
 
 				drawVertices[0].UV = { u0, v1 };
 				drawVertices[1].UV = { u1, v0 };
@@ -312,7 +312,7 @@ namespace prev {
 	void Renderer::CreateVertexLayoutDefault() {
 		m_VertexLayoutDefault = VertexLayout::CreateVertexLayout();
 		m_VertexLayoutDefault->BeginEntries();
-		m_VertexLayoutDefault->AddEntry(PV_DATA_TYPE_FLOAT_32, 2, offsetof(SpriteVertex, Position), "POSITION", false);
+		m_VertexLayoutDefault->AddEntry(PV_DATA_TYPE_FLOAT_32, 3, offsetof(SpriteVertex, Position), "POSITION", false);
 		m_VertexLayoutDefault->AddEntry(PV_DATA_TYPE_FLOAT_32, 2, offsetof(SpriteVertex, UV), "TEXCOORDS", false);
 		m_VertexLayoutDefault->AddEntry(PV_DATA_TYPE_UINT_8, 4, offsetof(SpriteVertex, Color), "COLOR", true);
 		m_VertexLayoutDefault->AddEntry(PV_DATA_TYPE_SINT_32, 1, offsetof(SpriteVertex, TexID), "TEXTUREID", false);
@@ -325,6 +325,17 @@ namespace prev {
 
 		m_ParticleVertexShaderDefault = ShaderManager::Ref().LoadVertexShaderFromFile("PARTICLE_DEFAULT_PIXEL", "res/shaders/particleDefaultVertex.hlsl");
 		m_ParticlePixelShaderDefault = ShaderManager::Ref().LoadPixelShaderFromFile("PARTICLE_DEFAULT_PIXEL", "res/shaders/particleDefaultPixel.hlsl");
+
+		m_DefaultTexture = Texture2D::CreateTexture2D();
+		Texture2DDesc desc;
+		desc.TexFormat = PV_TEXTURE_FORMAT_RGBA8;
+		desc.TextureSize = Vec2i(10);
+		m_DefaultTexture->Init(desc);
+
+		for (unsigned int i = 0; i < MAX_NUM_TEXTURES; i++) {
+			m_DefaultTexture->SetTextureSlot(i);
+			m_DefaultTexture->Bind();
+		}
 	}
 
 	prev::Renderer::SpriteGroup * Renderer::GetDrawGroup(StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {

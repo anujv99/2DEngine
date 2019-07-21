@@ -1,6 +1,6 @@
 
-Texture2D tex[32] : register(t0);
-SamplerState splr[32] : register(s0);
+Texture2D tex[16] : register(t0);
+SamplerState splr[16] : register(s0);
 
 struct VSIn {
 	float2 texCoords : TEXCOORD;

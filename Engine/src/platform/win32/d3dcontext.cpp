@@ -223,7 +223,7 @@ namespace prev {
 		D3D11_DEPTH_STENCIL_DESC dsd;
 		ZeroMemory(&dsd, sizeof(dsd));
 
-		dsd.DepthEnable						= FALSE;
+		dsd.DepthEnable						= TRUE;
 		dsd.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
 		dsd.DepthFunc						= D3D11_COMPARISON_LESS_EQUAL;
 		dsd.StencilEnable					= FALSE;

@@ -165,6 +165,24 @@ namespace prev {
 			return GM_OK;
 		}
 
+		GM_MEMFUNC_DECL(DragFloat) {
+			GM_CHECK_NUM_PARAMS(2);
+			GM_CHECK_STRING_PARAM(name, 0);
+			GM_CHECK_FLOAT_PARAM(val, 1);
+
+			float power = 1.0f;
+			if (a_thread->GetNumParams() > 2) {
+				GM_CHECK_FLOAT_OR_INT_PARAM(temp, 2);
+				power = temp;
+			}
+
+			IM_CALL(ImGui::DragFloat(name, &val, power));
+
+			a_thread->PushFloat(val);
+
+			return GM_OK;
+		}
+
 		GM_MEMFUNC_DECL(SliderVec2) {
 			GM_CHECK_NUM_PARAMS(4);
 			GM_CHECK_STRING_PARAM(name, 0);
@@ -306,6 +324,7 @@ namespace prev {
 		GM_LIBFUNC_ENTRY(SliderInt, ImGui)
 		GM_LIBFUNC_ENTRY(SliderVec2i, ImGui)
 		GM_LIBFUNC_ENTRY(SliderFloat, ImGui)
+		GM_LIBFUNC_ENTRY(DragFloat, ImGui)
 		GM_LIBFUNC_ENTRY(SliderVec2, ImGui)
 		GM_LIBFUNC_ENTRY(DragVec2, ImGui)
 		GM_LIBFUNC_ENTRY(SliderVec3, ImGui)

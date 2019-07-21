@@ -58,7 +58,7 @@ namespace prev {
 		};
 
 		struct SpriteVertex {
-			Vec2 Position;
+			Vec3 Position;
 			Vec2 UV;
 			SpriteColor Color;
 			int TexID = -1;
@@ -90,6 +90,9 @@ namespace prev {
 		// default shader for rendering particles
 		StrongHandle<VertexShader> m_ParticleVertexShaderDefault;
 		StrongHandle<PixelShader> m_ParticlePixelShaderDefault;
+
+		// default texture to disable EXECUTION WARNING #352: DEVICE_DRAW_SAMPLER_NOT_SET
+		StrongHandle<Texture2D> m_DefaultTexture;
 	};
 
 }

@@ -8,6 +8,7 @@ inline bool CheckVec3(const Vec3 & _vec) {
 
 inline Vec3::Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
 inline Vec3::Vec3(float _v) : x(_v), y(_v), z(_v) {}
+inline Vec3::Vec3(Vec2 _vec, float _z) : x(_vec.x), y(_vec.y), z(_z) {}
 inline Vec3::Vec3(gmvec3 _vec) : x(_vec.x), y(_vec.y), z(_vec.z) {}
 inline Vec3::Vec3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
 inline Vec3::Vec3(const Vec2 & _vec) : x(_vec.x), y(_vec.y), z(0.0f) {}

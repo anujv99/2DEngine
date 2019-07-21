@@ -20,6 +20,7 @@ namespace prev {
 
 		Vec3();
 		explicit Vec3(float _v);
+		explicit Vec3(Vec2 _vec, float _z);
 		Vec3(gmvec3 _vec);
 		Vec3(float _x, float _y, float _z);
 		explicit Vec3(const Vec2 &_vec);

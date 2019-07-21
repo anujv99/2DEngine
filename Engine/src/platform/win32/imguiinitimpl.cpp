@@ -8,6 +8,8 @@
 
 #include "systemres/resource.h"
 
+#if 0
+
 #undef IDC_ARROW
 #define IDC_ARROW MAKEINTRESOURCEA(IDC_CARROW)
 
@@ -31,6 +33,8 @@
 
 #undef LoadCursor
 #define LoadCursor(h, c) LoadCursorA(GetModuleHandleA(NULL), c)
+
+#endif
 
 #include "examples/imgui_impl_win32.h"
 #include "examples/imgui_impl_win32.cpp"
