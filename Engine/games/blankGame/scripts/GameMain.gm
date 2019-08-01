@@ -37,7 +37,7 @@ local MakeBlankGame = function() {
 				break;
 			}
 
-			//.Ps.Update();
+			.Ps.Update();
 
 			yield();
 		}
@@ -68,7 +68,7 @@ local MakeBlankGame = function() {
 		.Box2.Rotation = Gui.SliderFloat("Rot", .Box2.Rotation, -180, 180);
 		.Box2.Color = Gui.ColorEdit4("Col", .Box2.Color);
 
-		/*
+		
 		Gui.Separator();
 
 		if (Gui.Button("Save")) {
@@ -79,13 +79,13 @@ local MakeBlankGame = function() {
 			LoadParticleSystemFromFile(.Ps, "test.ps");
 		}
 		.Ps.Gui();
-		*/
+		
 		
 		Gui.End();
 	};
 
 	BlankGame.Draw = function() {
-		//.Ps.Draw();
+		.Ps.Draw();
 		.Box.Draw();
 		.Box2.Draw();
 	};

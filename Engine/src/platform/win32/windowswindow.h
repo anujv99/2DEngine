@@ -19,6 +19,7 @@ namespace prev {
 	private:
 		bool RegisterWindowClass(const DisplayMode & displayMode);
 		bool CreateWindowsWindow(const DisplayMode & displayMode);
+		bool RegisterRawInput();
 	private:
 		HWND m_HWnd					= nullptr;
 		HINSTANCE m_HInst			= nullptr;

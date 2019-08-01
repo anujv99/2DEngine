@@ -3,6 +3,7 @@
 #include "math/vecconversion.h"
 #include "math/mvp.h"
 #include "application.h"
+#include "math/screenspace.h"
 
 namespace prev {
 
@@ -61,6 +62,7 @@ namespace prev {
 		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(Input::KeyPressed));
 		dispatcher.Dispatch<KeyReleasedEvent>(BIND_EVENT_FN(Input::KeyReleased));
 		dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN(Input::MouseMoved));
+		dispatcher.Dispatch<MouseMovedRawEvent>(BIND_EVENT_FN(Input::MouseMovedRaw));
 		dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(Input::MouseScrolled));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT_FN(Input::MousePressed));
 		dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT_FN(Input::MouseReleased));
@@ -80,6 +82,11 @@ namespace prev {
 	bool Input::MouseMoved(MouseMovedEvent & e) {
 		const Cam2D & defCamera = Application::Ref().GetDefaultCamera();
 		m_MousePos = defCamera.MapMouseCoords(e.GetMousePos());
+		return false;
+	}
+
+	bool Input::MouseMovedRaw(MouseMovedRawEvent & e) {
+		m_MouseDeltaRaw += ToVec2(e.GetMouseDelta());
 		return false;
 	}
 
@@ -106,6 +113,7 @@ namespace prev {
 	void Input::Update() {
 		m_PrevMousePos = m_MousePos;
 		m_MouseScrollDelta = Vec2i(0);
+		m_MouseDeltaRaw = Vec2(0.0f);
 		std::memcpy(m_PrevKeys, m_Keys, sizeof(m_Keys));
 		std::memcpy(m_PrevMouseButtons, m_MouseButtons, sizeof(m_MouseButtons));
 

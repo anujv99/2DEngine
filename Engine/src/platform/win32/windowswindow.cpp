@@ -30,6 +30,35 @@ namespace prev {
 		}
 
 		switch (msg) {
+			
+			/************************* RAW INPUT MESSAGES *************************/
+			case WM_INPUT:
+			{
+				UINT size = 0u;
+				GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER));
+
+				LPBYTE lpb = new BYTE[size];
+
+				if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &size, sizeof(RAWINPUTHEADER)) != size) {
+					LOG_ERROR("GetRawInputData does not return correct size");
+					break;
+				}
+
+				RAWINPUT * raw = (RAWINPUT *)lpb;
+				if (raw->header.dwType == RIM_TYPEMOUSE) {
+					if (raw->data.mouse.lLastX != 0 || raw->data.mouse.lLastY != 0) {
+						MouseMovedRawEvent e((int)raw->data.mouse.lLastX, -(int)raw->data.mouse.lLastY);
+						REGISTER_EVENT(e);
+					}
+				}
+
+				delete[] lpb;
+
+				break;
+			}
+			/************************* END RAW INPUT MESSAGES *************************/
+
+			/************************* MOUSE MESSAGES *************************/
 			case WM_SETCURSOR:
 			{
 				break;
@@ -108,6 +137,9 @@ namespace prev {
 				REGISTER_EVENT(e);
 				break;
 			}
+			/************************* END MOUSE MESSAGES *************************/
+
+			/************************* KEYBOARD MESSAGES *************************/
 			case WM_KEYDOWN:
 			{
 				bool repeatCount = (lParam & 0x40000000);
@@ -127,6 +159,9 @@ namespace prev {
 				REGISTER_EVENT(e);
 				break;
 			}
+			/************************* END KEYBOARD MESSAGES *************************/
+
+			/************************* WINDOW MESSAGES *************************/
 			case WM_SIZE:
 			{
 				POINTS pt = MAKEPOINTS(lParam);
@@ -147,11 +182,10 @@ namespace prev {
 				REGISTER_EVENT(e);
 				break;
 			}
-			default:
-				return DefWindowProcA(hWnd, msg, wParam, lParam);
+			/************************* END WINDOW MESSAGES *************************/
 		}
 
-		return 0;
+		return DefWindowProcA(hWnd, msg, wParam, lParam);
 	}
 
 	Window * Window::CreateEngineWindow(const DisplayMode & displayMode) {
@@ -199,6 +233,8 @@ namespace prev {
 			return;
 		}
 
+		RegisterRawInput();
+
 		return;
 	}
 
@@ -237,7 +273,6 @@ namespace prev {
 	}
 
 	bool WindowsWindow::CreateWindowsWindow(const DisplayMode & displayMode) {
-
 		RECT rect;
 		rect.left		= 100;
 		rect.top		= 100;
@@ -279,8 +314,23 @@ namespace prev {
 		return true;
 	}
 
+	bool WindowsWindow::RegisterRawInput() {
+		RAWINPUTDEVICE rid[1]	= {};
+		rid[0].usUsagePage		= 0x01;
+		rid[0].usUsage			= 0x02;
+		rid[0].dwFlags			= 0l;
+		rid[0].hwndTarget		= nullptr;
+
+		if (RegisterRawInputDevices(rid, std::size(rid), sizeof(rid[0])) == FALSE) {
+			ERROR_TRACE(ERR_WINDOW_INTERNAL_ERROR, "Unable to register raw input device");
+			return false;
+		}
+
+		return true;
+	}
+
 	void WindowsWindow::PollEvents() {
-		if (PeekMessageA(&m_Message, m_HWnd, 0u, 0u, PM_REMOVE)) {
+		while (PeekMessageA(&m_Message, m_HWnd, 0u, 0u, PM_REMOVE)) {
 			TranslateMessage(&m_Message);
 			DispatchMessageA(&m_Message);
 		}

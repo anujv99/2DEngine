@@ -19,6 +19,7 @@ namespace prev {
 
 		//Only works with raw mouse pos i.e. TopLeft = (0.0f, 0.0f) BottomRight = WindowSize
 		Vec2 MapMouseCoords(Vec2 mouseCoords) const;
+
 		//Only works with raw mouse pos i.e. TopLeft = (0, 0) BottomRight = WindowSize
 		Vec2 MapMouseCoords(Vec2i mouseCoords) const;
 	public:

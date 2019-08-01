@@ -236,6 +236,8 @@ namespace prev {
 
 		m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 1u);
 
+		//Move DepthStencilState to render state
+
 		D3D11_TEXTURE2D_DESC dbd;
 		ZeroMemory(&dbd, sizeof(dbd));
 
@@ -264,7 +266,7 @@ namespace prev {
 		if (m_NumSamples > 1)
 			dsvd.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2DMS;
 		else
-			dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			dsvd.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2D;
 		dsvd.Texture2D.MipSlice		= 0;
 
 		hr = m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &dsvd, m_DepthStencilView.GetAddressOf());

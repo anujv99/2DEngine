@@ -31,7 +31,17 @@ extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
+	StrongHandle<Framebuffer> fbo1;
+
+	StrongHandle<Framebuffer> blurA;
+	StrongHandle<Framebuffer> blurB;
+
+	StrongHandle<PixelShader> bloomExtract;
+	StrongHandle<PixelShader> bloomFinal;
+	StrongHandle<PixelShader> blur;
+
 	Application::Application() {
+
 		Timer::FPSCounter(false);
 		EventHandler::CreateInst();
 
@@ -77,6 +87,19 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
+		fbo1 = Framebuffer::CreateFramebuffer();
+		fbo1->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_ENABLE_MSAA | FRAMEBUFFER_ALLOCATE_DEPTH_BUFFER);
+
+		bloomExtract = ShaderManager::Ref().LoadPixelShaderFromFile("BLOOM_EXTRACT", "res/shaders/bloomExtract.hlsl");
+
+		blurA = Framebuffer::CreateFramebuffer();
+		blurB = Framebuffer::CreateFramebuffer();
+
+		blurA->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_ENABLE_MSAA);
+		blurB->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_ENABLE_MSAA);
+
+		blur = ShaderManager::Ref().LoadPixelShaderFromFile("BLUR", "res/shaders/blur.hlsl");
+		bloomFinal = ShaderManager::Ref().LoadPixelShaderFromFile("bloomFinal", "res/shaders/bloomFinal.hlsl");
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
@@ -119,12 +142,77 @@ namespace prev {
 			VirtualMachine::Ref().Render();
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
+			fbo1->Bind();
+			fbo1->Clear();
+
+			static Sprite s;
+			s.Depth = 0.0f;
+			s.Position += Input::Ref().GetMouseDeltaRaw();
+			Renderer::Ref().Submit(s);
+
+			LOG_INFO("{}", s.Position);
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
 
 			PROFILER_BEGIN("App::Present");
 			Renderer::Ref().Present();
 			PROFILER_END("App::Present");
+
+			//////////////////////////////////////TESTING////////////////////////////////////////
+
+			fbo1->UnBind();
+
+			blurA->Bind();
+			blurA->Clear();
+
+			FramebufferPass::Ref().Pass(fbo1, nullptr, bloomExtract);
+
+			blurA->UnBind();
+
+			auto thisFBO = blurB;
+
+			struct cbuffer {
+				int a;
+				float b[3];
+			};
+
+			static cbuffer buff;
+
+			for (int i = 0; i < 10; i++) {
+				if (thisFBO == blurB) {
+					blurB->Bind();
+					blurB->Clear();
+
+					buff.a = 0;
+					blur->SetUniform("Misc", &buff, sizeof(buff));
+
+					FramebufferPass::Ref().Pass(blurA, nullptr, blur);
+					blurB->UnBind();
+					thisFBO = blurA;
+				} else {
+					blurA->Bind();
+					blurA->Clear();
+
+					buff.a = 1;
+					blur->SetUniform("Misc", &buff, sizeof(buff));
+
+					FramebufferPass::Ref().Pass(blurB, nullptr, blur);
+					blurA->UnBind();
+					thisFBO = blurB;
+				}
+			}
+
+			if (thisFBO == blurB)
+				thisFBO = blurA;
+			else
+				thisFBO = blurB;
+
+			thisFBO->GetTexture()->SetTextureSlot(1);
+			thisFBO->GetTexture()->Bind();
+
+			FramebufferPass::Ref().Pass(fbo1, nullptr, bloomFinal);
+
+			//////////////////////////////////////TESTING////////////////////////////////////////
 
 			PROFILER_BEGIN("App::Gui");
 			Gui();

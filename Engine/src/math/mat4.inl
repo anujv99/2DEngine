@@ -191,13 +191,16 @@ inline Mat4 Ortho(const float _left, const float _right, const float _bottom, co
 	const float n_minus_f_inv = 1.f / (_near - _far);
 
 	return Mat4(
-		Vec4(2.f * r_minus_l_inv, 0.f, 0.f, 0.f),
-		Vec4(0.f, 2.f * t_minus_b_inv, 0.f, 0.f),
-		Vec4(0.f, 0.f, 2.f * n_minus_f_inv, 0.f),
+		Vec4(2.0f * r_minus_l_inv, 0.0f, 0.0f, 0.0f),
+		Vec4(0.0f, 2.0f * t_minus_b_inv, 0.0f, 0.0f),
+		Vec4(0.0f, 0.0f, 1.0f * n_minus_f_inv, 0.0f),
 		Vec4(
 			-(_right + _left)   * r_minus_l_inv,
 			-(_top   + _bottom) * t_minus_b_inv,
-			 (_far   + _near)   * n_minus_f_inv, 1.f));
+			0.5f + (_far   + _near)   * n_minus_f_inv,
+			1.0f
+		)
+	);
 }
 
 inline Vec3 GetTranslation(const Mat4 & _mat) {

@@ -23,6 +23,7 @@ namespace prev {
 		virtual void UnBind() override;
 	public:
 		D3DTexture2D(D3D11_TEXTURE2D_DESC desc);
+		D3DTexture2D(D3D11_TEXTURE2D_DESC desc, D3D11_SHADER_RESOURCE_VIEW_DESC vDesc);
 
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> GetTexture2D();
 

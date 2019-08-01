@@ -25,6 +25,26 @@ namespace prev {
 		Vec2i m_MousePos;
 	};
 
+	class MouseMovedRawEvent : public Event {
+	public:
+		MouseMovedRawEvent(int x, int y) :
+			m_MouseDelta(x, y) {
+		}
+
+		inline Vec2i GetMouseDelta() const { return m_MouseDelta; }
+
+		virtual std::string ToString() const override {
+			std::stringstream ss;
+			ss << "MouseMovedRawEvent: " << m_MouseDelta.x << ", " << m_MouseDelta.y;
+			return ss.str();
+		}
+
+		EVENT_CLASS_TYPE(MouseMovedRaw)
+		EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
+	private:
+		Vec2i m_MouseDelta;
+	};
+
 	class MouseScrolledEvent : public Event {
 	public:
 		MouseScrolledEvent(int xOffset, int yOffset) :

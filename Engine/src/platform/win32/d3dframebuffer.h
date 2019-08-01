@@ -15,20 +15,26 @@ namespace prev {
 		// Inherited via Framebuffer
 		virtual void Bind() override;
 		virtual void UnBind() override;
-		virtual void Init(Vec2 size, TextureFormat format, bool msaa) override;
+		virtual void Init(Vec2 size, TextureFormat format, unsigned int flags) override;
 		virtual void Clear() override;
 		virtual void Clear(Vec4 color) override;
 		virtual Vec2 GetSize() override;
 		virtual StrongHandle<Texture2D> GetTexture() override;
+		virtual StrongHandle<Texture2D> GetDepthTexture() override;
 	private:
 		void ResolveTexture();
 		bool CreateFramebufferMSAA(Vec2 size, unsigned int numSamples);
 		bool CreateFramebufferNoMSAA(Vec2 size);
+
+		bool CreateDepthBuffer(Vec2 size, unsigned int numSamples);
 	private:
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_MultisampledTexture;
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D>				m_MultisampledTexture;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>		m_RenderTargetView;
+
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>		m_DepthView;
 		
 		StrongHandle<D3DTexture2D> m_AntialiasedTexture;
+		StrongHandle<D3DTexture2D> m_DepthTexture;
 
 		Vec2 m_TextureSize;
 		bool m_IsCreated;
