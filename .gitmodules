@@ -10,3 +10,6 @@
 [submodule "Engine/vendor/freetype-gl"]
 	path = Engine/vendor/freetype-gl
 	url = https://github.com/preversewharf45/freetype-gl
+[submodule "Engine/vendor/box2d"]
+	path = Engine/vendor/box2d
+	url = https://github.com/preversewharf45/Box2D
