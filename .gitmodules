@@ -4,9 +4,6 @@
 [submodule "Engine/vendor/imgui"]
 	path = Engine/vendor/imgui
 	url = https://github.com/preversewharf45/imgui/
-[submodule "Engine/vendor/box2d"]
-	path = Engine/vendor/box2d
-	url = https://github.com/preversewharf45/Box2D
 [submodule "Engine/vendor/freetype"]
 	path = Engine/vendor/freetype
 	url = https://github.com/preversewharf45/freetype2
