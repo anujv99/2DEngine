@@ -167,4 +167,21 @@ namespace prev {
 		return m_BlendFunction;
 	}
 
+	void D3DRenderSate::DisableDepthWrite() {
+		GetDeviceContext()->OMGetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.GetAddressOf());
+		GetDeviceContext()->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
+	}
+
+	void D3DRenderSate::EnableDepthWrite() {
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTarget;
+		GetDeviceContext()->OMGetRenderTargets(1, renderTarget.GetAddressOf(), nullptr);
+		if (renderTarget == m_RenderTargetView) {
+			GetDeviceContext()->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+		} else {
+			LOG_ERROR("Enabling Depth to a wrong rendertarget");
+		}
+		m_RenderTargetView = nullptr;
+		m_DepthStencilView = nullptr;
+	}
+
 }

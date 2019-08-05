@@ -13,15 +13,15 @@ workspace "2DEngine"
     IncludeDirs = {}
     IncludeDirs["spdlog"] = "Engine/vendor/spdlog/include"
 	IncludeDirs["imgui"] = "Engine/vendor/imgui"
-	IncludeDirs["box2d"] = "Engine/vendor/box2d"
 	IncludeDirs["freetype"] = "Engine/vendor/freetype/include"
 	IncludeDirs["freetypegl"] = "Engine/vendor/freetype-gl"
+	IncludeDirs["Chipmunk2D"] = "Engine/vendor/Chipmunk2D/include"
 
     include "Engine/vendor/spdlog"
 	include "Engine/vendor/imgui"
-	include "Engine/vendor/box2d"
 	include "Engine/vendor/freetype"
 	include "Engine/vendor/freetype-gl"
+	include "Engine/vendor/Chipmunk2D"
 
     project "Engine"
         location "Engine"
@@ -39,20 +39,20 @@ workspace "2DEngine"
 		
         links {
 			"ImGui",
-			"Box2D",
 			"freetype",
 			"freetype-gl",
             "d3d11.lib",
             "dxgi.lib",
             "d3dcompiler.lib",
+			"Chipmunk2D",
         }
 
         includedirs {
             "%{IncludeDirs.spdlog}",
             "%{IncludeDirs.imgui}",
-            "%{IncludeDirs.box2d}",
             "%{IncludeDirs.freetype}",
             "%{IncludeDirs.freetypegl}",
+            "%{IncludeDirs.Chipmunk2D}",
 			"%{prj.name}/src",
 			"%{prj.name}"
         }

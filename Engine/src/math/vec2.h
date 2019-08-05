@@ -7,8 +7,6 @@
 
 #include "gm/gmMathVector.h"
 
-struct b2Vec2;
-
 namespace prev {
 
 	class Vec2 {
@@ -22,7 +20,6 @@ namespace prev {
 		Vec2();
 		explicit Vec2(float _v);
 		Vec2(gmvec2 _vec);
-		Vec2(b2Vec2 _vec);
 		Vec2(float _x, float _y);
 
 		float & operator[](unsigned int _index) { ASSERT(_index < 2); return (&x)[_index]; }

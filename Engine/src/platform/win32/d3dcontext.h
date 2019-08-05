@@ -8,6 +8,7 @@
 namespace prev {
 
 	class D3DContext : public GraphicsContext {
+		friend class D3DRenderSate;
 	public:
 		D3DContext(HWND hWnd, const DisplayMode & displayMode);
 

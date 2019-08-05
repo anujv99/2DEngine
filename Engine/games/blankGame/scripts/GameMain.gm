@@ -8,7 +8,8 @@ local MakeBlankGame = function() {
 		ThreadId = -1,
 		Box,
 		Box2,
-		Ps,
+		Fon,
+		Lab,
 	};
 
 	BlankGame.Init = function() {
@@ -25,7 +26,10 @@ local MakeBlankGame = function() {
 		.Box2.Position = Vec2(0.0f);
 		.Box2.Dimension = Vec2(1.0f);
 
-		.Ps = ParticleSystem(1024);
+		.Fon = Font("TestFont", "res/fonts/Slabo.ttf", 0.5f);
+		.Lab = Label();
+		.Lab.Text = "Noob";
+		.Lab.Color = Vec4(0.8f, 0.1f, 0.4f, 1.0f);
 	};
 
 	BlankGame.Update = function() {
@@ -36,8 +40,6 @@ local MakeBlankGame = function() {
 			if (Input.IsKeyPressed(Input.KEY_ESCAPE)) {
 				break;
 			}
-
-			.Ps.Update();
 
 			yield();
 		}
@@ -68,26 +70,13 @@ local MakeBlankGame = function() {
 		.Box2.Rotation = Gui.SliderFloat("Rot", .Box2.Rotation, -180, 180);
 		.Box2.Color = Gui.ColorEdit4("Col", .Box2.Color);
 
-		
-		Gui.Separator();
-
-		if (Gui.Button("Save")) {
-			SaveParticleSystemToFile(.Ps, "test.ps");
-		}
-
-		if (Gui.Button("Load")) {
-			LoadParticleSystemFromFile(.Ps, "test.ps");
-		}
-		.Ps.Gui();
-		
-		
 		Gui.End();
 	};
 
 	BlankGame.Draw = function() {
-		.Ps.Draw();
 		.Box.Draw();
 		.Box2.Draw();
+		.Fon.Print(.Lab);
 	};
 
 	return BlankGame;
