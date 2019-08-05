@@ -62,19 +62,13 @@ namespace prev {
 		virtual void SetViewport(const Viewport & viewport) = 0;
 		virtual Viewport GetViewport() const = 0;
 
-		//Scissor test
 		virtual void SetScissorBox(const ScissorBox & sBox) = 0;
 		virtual ScissorBox GetScissorBox() = 0;
 		virtual void DisableScissors() = 0;
 
-		//Blending
 		virtual void SetBlendFunction(const BlendFunction & blendFunc) = 0;
 		virtual void DisableBlend() = 0;
 		virtual BlendFunction GetBlendFunction() = 0;
-
-		//Depth test
-		virtual void DisableDepthWrite() = 0;
-		virtual void EnableDepthWrite() = 0;
 	private:
 		StrongHandle<Uniform> m_Uniform;
 	private:

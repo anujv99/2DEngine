@@ -152,11 +152,9 @@ namespace prev {
 
 		BlendFunction pbf = RenderState::Ref().GetBlendFunction();
 		RenderState::Ref().SetBlendFunction(bf);
-		RenderState::Ref().DisableDepthWrite();
 
 		DrawGroup(drawGroup);
 
-		RenderState::Ref().EnableDepthWrite();
 		RenderState::Ref().SetBlendFunction(pbf);
 	}
 

@@ -9,5 +9,6 @@ struct VSIn {
 
 float4 main(VSIn vsi) : SV_TARGET {
 	float4 outCol = tex.Sample(splr, vsi.texCoords);
-	return outCol;
+	if (outCol.a < 0.4) discard;
+	return float4(1.0, 1.0, 1.0, 1.0);
 }

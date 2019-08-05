@@ -4,6 +4,8 @@
 #include "math/vec3.h"
 #include "math/vec4.h"
 
+#include "Box2D/Box2D.h"
+
 namespace prev {
 
 	typedef unsigned int SpriteTextureID;
