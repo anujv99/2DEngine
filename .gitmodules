@@ -13,3 +13,6 @@
 [submodule "Engine/vendor/box2d"]
 	path = Engine/vendor/box2d
 	url = https://github.com/preversewharf45/Box2D
+[submodule "Engine/vendor/entityx"]
+	path = Engine/vendor/entityx
+	url = https://github.com/preversewharf45/entityx

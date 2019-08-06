@@ -16,12 +16,14 @@ workspace "2DEngine"
 	IncludeDirs["box2d"] = "Engine/vendor/box2d"
 	IncludeDirs["freetype"] = "Engine/vendor/freetype/include"
 	IncludeDirs["freetypegl"] = "Engine/vendor/freetype-gl"
+	IncludeDirs["entityx"] = "Engine/vendor/entityx"
 
     include "Engine/vendor/spdlog"
 	include "Engine/vendor/imgui"
 	include "Engine/vendor/box2d"
 	include "Engine/vendor/freetype"
 	include "Engine/vendor/freetype-gl"
+	include "Engine/vendor/entityx"
 
     project "Engine"
         location "Engine"
@@ -42,6 +44,7 @@ workspace "2DEngine"
 			"Box2D",
 			"freetype",
 			"freetype-gl",
+			"entityx",
             "d3d11.lib",
             "dxgi.lib",
             "d3dcompiler.lib",
@@ -53,6 +56,7 @@ workspace "2DEngine"
             "%{IncludeDirs.box2d}",
             "%{IncludeDirs.freetype}",
             "%{IncludeDirs.freetypegl}",
+            "%{IncludeDirs.entityx}",
 			"%{prj.name}/src",
 			"%{prj.name}"
         }
