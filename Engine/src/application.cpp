@@ -27,18 +27,15 @@
 #include "graphics/font.h"
 #include "imgui.h"
 
+#include "game/ecs.h"
+#include "game/predefinedsystems.h"
+
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	StrongHandle<Framebuffer> fbo1;
-
-	StrongHandle<Framebuffer> blurA;
-	StrongHandle<Framebuffer> blurB;
-
-	StrongHandle<PixelShader> bloomExtract;
-	StrongHandle<PixelShader> bloomFinal;
-	StrongHandle<PixelShader> blur;
+	StrongHandle<ECS> ecs = nullptr;
+	StrongHandle<Entity> e = nullptr;
 
 	Application::Application() {
 
@@ -87,12 +84,18 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
+		ecs = new ECS();
 		
+		e = ecs->CreateEntity();
+		e->AddComponent<GameObject>();
+		e->AddComponent<Color>();
+		e->AddComponent<Renderable>();
+
+		ecs->AddSystem<RendererSystem>();
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
 	Application::~Application() {
-
 		m_DefCamera.End();
 		Box2DManager::DestroyInst();
 		FramebufferPass::DestroyInst();
@@ -129,6 +132,15 @@ namespace prev {
 			VirtualMachine::Ref().Render();
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
+			ecs->Update(Timer::GetDeltaTime());
+
+			GameObject & obj = e->GetComponent<GameObject>();
+
+			ImGui::Begin("Test");
+			ImGui::DragFloat3("Pos", &obj.Position[0], 0.01f);
+			ImGui::DragFloat2("Dimen", &obj.Dimension[0], 0.01f);
+			ImGui::DragFloat("Rot", &obj.Rotation);
+			ImGui::End();
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
 
