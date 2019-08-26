@@ -39,14 +39,14 @@ namespace prev {
 	};
 
 	struct Sprite {
-		Vec2			Position = Vec2(0.0f);					// Center
-		float			Depth = 0.0f;							// Used for Z buffering
-		Vec2			Dimension = Vec2(1.0f);					// Width-Height
-		float			Rotation = 0.0f;						// Degrees
-		SpriteColor		Color = SpriteColor(Vec4(1.0f));		// RGBA
+		Vec2			Position		= Vec2(0.0f);					// Center
+		float			Depth			= 0.0f;							// Used for Z buffering
+		Vec2			Dimension		= Vec2(1.0f);					// Width-Height
+		float			Rotation		= 0.0f;							// Degrees
+		SpriteColor		Color			= SpriteColor(Vec4(1.0f));		// RGBA
 
-		Vec2			Uvx;		// Texture Coordinated in x direction x => left, y => right
-		Vec2			Uvy;		// Texture Coordinated in y direction x => bottom, y => top
+		Vec2			Uvx				= Vec2(0.0f, 1.0f);				// Texture Coordinated in x direction x => left, y => right
+		Vec2			Uvy				= Vec2(0.0f, 1.0f);				// Texture Coordinated in y direction x => bottom, y => top
 	};
 
 }

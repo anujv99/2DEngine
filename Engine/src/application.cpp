@@ -23,19 +23,18 @@
 #include "physics/box2dmanager.h"
 #include "physics/box2ddebugdraw.h"
 
+#include "graphics/tiledtexture.h"
 #include "graphics/texture2d.h"
 #include "graphics/font.h"
-#include "imgui.h"
 
-#include "game/ecs.h"
-#include "game/predefinedsystems.h"
+#include "game/square.h"
+#include "imgui.h"
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	StrongHandle<ECS> ecs = nullptr;
-	StrongHandle<Entity> e = nullptr;
+	StrongHandle<TiledTexture> tex;
 
 	Application::Application() {
 
@@ -84,14 +83,9 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
-		ecs = new ECS();
-		
-		e = ecs->CreateEntity();
-		e->AddComponent<GameObject>();
-		e->AddComponent<Color>();
-		e->AddComponent<Renderable>();
 
-		ecs->AddSystem<RendererSystem>();
+		tex = new TiledTexture("res/textures/tile.png", Vec2i(8, 6));
+
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
@@ -132,15 +126,21 @@ namespace prev {
 			VirtualMachine::Ref().Render();
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
-			ecs->Update(Timer::GetDeltaTime());
 
-			GameObject & obj = e->GetComponent<GameObject>();
+			static Sprite s;
+
+			static int x = 0u;
+			static int y = 0u;
 
 			ImGui::Begin("Test");
-			ImGui::DragFloat3("Pos", &obj.Position[0], 0.01f);
-			ImGui::DragFloat2("Dimen", &obj.Dimension[0], 0.01f);
-			ImGui::DragFloat("Rot", &obj.Rotation);
+			ImGui::SliderInt("x", &x, 0, 7);
+			ImGui::SliderInt("y", &y, 0, 5);
 			ImGui::End();
+
+			s.Uvx = tex->GetTextureCoordX(x);
+			s.Uvy = tex->GetTextureCoordY(y);
+
+			Renderer::Ref().Submit(s, tex->GetTexture());
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
 

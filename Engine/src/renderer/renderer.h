@@ -8,6 +8,7 @@
 #include "game/label.h"
 #include "game/sprite.h"
 #include "game/particlesystem.h"
+#include "game/drawable.h"
 
 namespace prev {
 
@@ -24,6 +25,8 @@ namespace prev {
 	public:
 		void Submit(const Sprite & sprite, StrongHandle<Texture2D> texture = nullptr, 
 			StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
+
+		void Submit(const Drawable & sprite, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
 
 		void Submit(const ParticleSystem & system, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
 

@@ -9,6 +9,8 @@ local MakeBlankGame = function() {
 		Box,
 		Box2,
 		Ps,
+		Fnt,
+		Tex,
 	};
 
 	BlankGame.Init = function() {
@@ -26,6 +28,14 @@ local MakeBlankGame = function() {
 		.Box2.Dimension = Vec2(1.0f);
 
 		.Ps = ParticleSystem(1024);
+
+		.Fnt = Font("testFont", "res/fonts/Minecraftia.ttf", 0.5f);
+
+		.Tex = Label();
+		.Tex.Position = Vec2(0.0f);
+		.Tex.Scale = Vec2(1.0f);
+		.Tex.Rotation = 0.0f;
+		.Tex.Text = "[=]";
 	};
 
 	BlankGame.Update = function() {
@@ -68,7 +78,14 @@ local MakeBlankGame = function() {
 		.Box2.Rotation = Gui.SliderFloat("Rot", .Box2.Rotation, -180, 180);
 		.Box2.Color = Gui.ColorEdit4("Col", .Box2.Color);
 
-		
+		Gui.Separator();
+
+		Gui.Text("Text Props");
+		.Tex.Position = Gui.DragVec2("Pos", .Tex.Position, 0.01);
+		.Tex.Scale = Gui.DragVec2("Dimen", .Tex.Scale, 0.01);
+		.Tex.Color = Gui.ColorEdit4("Col", .Tex.Color);
+		.Tex.Text = Gui.TextInput("Text", .Tex.Text);
+
 		Gui.Separator();
 
 		if (Gui.Button("Save")) {
@@ -88,6 +105,7 @@ local MakeBlankGame = function() {
 		.Ps.Draw();
 		.Box.Draw();
 		.Box2.Draw();
+		.Fnt.Print(.Tex);
 	};
 
 	return BlankGame;

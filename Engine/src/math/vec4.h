@@ -22,6 +22,7 @@ namespace prev {
 		Vec4(gmvec4 _vec);
 		Vec4(float _x, float _y, float _z, float _w);
 		explicit Vec4(const Vec2 & _vec);
+		explicit Vec4(const Vec2 & _vec1, const Vec2 & _vec2);
 		explicit Vec4(const Vec3 & _vec);
 		explicit Vec4(const Vec3 & _vec, float _w);
 

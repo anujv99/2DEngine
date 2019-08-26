@@ -59,9 +59,12 @@ namespace prev {
 		StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {
 
 		SpriteVertices vertices(sprite.Position, sprite.Dimension, sprite.Rotation);
-		static TextureCoordinates defaultUvs(Vec2(0, 1), Vec2(0, 1));
+		TextureCoordinates defaultUvs(sprite.Uvx, sprite.Uvy);
 
-		SpriteVertex drawVertices[6];
+		SpriteGroup * drawGroup = GetDrawGroup(vShader, pShader);
+
+		SpriteVertex * drawVertices = drawGroup->MappedBuffer + drawGroup->MappedBufferIndex;
+
 		drawVertices[0].Position = Vec3(vertices.TopLeft, sprite.Depth);
 		drawVertices[1].Position = Vec3(vertices.BottomRight, sprite.Depth);
 		drawVertices[2].Position = Vec3(vertices.BottomLeft, sprite.Depth);
@@ -83,8 +86,6 @@ namespace prev {
 		drawVertices[4].Color = sprite.Color;
 		drawVertices[5].Color = sprite.Color;
 
-		SpriteGroup * drawGroup = GetDrawGroup(vShader, pShader);
-
 		if (texture != nullptr) {
 			auto texID = SubmitTexture(drawGroup, texture);
 			drawVertices[0].TexID = texID;
@@ -93,15 +94,16 @@ namespace prev {
 			drawVertices[3].TexID = texID;
 			drawVertices[4].TexID = texID;
 			drawVertices[5].TexID = texID;
+		} else {
+			drawVertices[0].TexID = -1;
+			drawVertices[1].TexID = -1;
+			drawVertices[2].TexID = -1;
+			drawVertices[3].TexID = -1;
+			drawVertices[4].TexID = -1;
+			drawVertices[5].TexID = -1;
 		}
 
-		std::memcpy(
-			drawGroup->MappedBuffer + drawGroup->MappedBufferIndex,
-			drawVertices,
-			sizeof(drawVertices)
-		);
-
-		drawGroup->MappedBufferIndex += (unsigned int)std::size(drawVertices);
+		drawGroup->MappedBufferIndex += 6u;
 	}
 
 	void Renderer::Submit(const ParticleSystem & system, StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {
@@ -114,7 +116,7 @@ namespace prev {
 		for (auto & part : system.m_Particles) {
 			SpriteVertices vertices(part.Position, Vec2(part.CurrentScale), 0);
 
-			SpriteVertex drawVertices[6];
+			SpriteVertex * drawVertices = drawGroup->MappedBuffer + drawGroup->MappedBufferIndex;
 			drawVertices[0].Position = Vec3(vertices.TopLeft, 0.0f);
 			drawVertices[1].Position = Vec3(vertices.BottomRight, 0.0f);
 			drawVertices[2].Position = Vec3(vertices.BottomLeft, 0.0f);
@@ -136,13 +138,7 @@ namespace prev {
 			drawVertices[4].Color = Vec4(part.CurrentColor, part.CurrentAlpha);
 			drawVertices[5].Color = Vec4(part.CurrentColor, part.CurrentAlpha);
 
-			std::memcpy(
-				drawGroup->MappedBuffer + drawGroup->MappedBufferIndex,
-				drawVertices,
-				sizeof(drawVertices)
-			);
-
-			drawGroup->MappedBufferIndex += (unsigned int)std::size(drawVertices);
+			drawGroup->MappedBufferIndex += 6u;
 		}
 
 		BlendFunction bf;
@@ -256,6 +252,61 @@ namespace prev {
 			label.SetDirty(false);
 		}
 
+	}
+
+	void Renderer::Submit(const Drawable & sprite, StrongHandle<VertexShader> vShader /*= nullptr*/, StrongHandle<PixelShader> pShader /*= nullptr*/) {
+
+		Vec3 pos = sprite.GetPosition();
+		Vec2 dimen = sprite.GetDimension();
+		float rot = sprite.GetRotation();
+		SpriteColor col = sprite.GetColor();
+
+		SpriteVertices vertices(pos.xy(), dimen, rot);
+		static TextureCoordinates defaultUvs(Vec2(0, 1), Vec2(0, 1));
+
+		SpriteGroup * drawGroup = GetDrawGroup(vShader, pShader);
+
+		SpriteVertex * drawVertices = drawGroup->MappedBuffer + drawGroup->MappedBufferIndex;
+
+		drawVertices[0].Position = Vec3(vertices.TopLeft, pos.z);
+		drawVertices[1].Position = Vec3(vertices.BottomRight, pos.z);
+		drawVertices[2].Position = Vec3(vertices.BottomLeft, pos.z);
+		drawVertices[3].Position = Vec3(vertices.TopLeft, pos.z);
+		drawVertices[4].Position = Vec3(vertices.TopRight, pos.z);
+		drawVertices[5].Position = Vec3(vertices.BottomRight, pos.z);
+
+		drawVertices[0].UV = defaultUvs.TopLeft;
+		drawVertices[1].UV = defaultUvs.BottomRight;
+		drawVertices[2].UV = defaultUvs.BottomLeft;
+		drawVertices[3].UV = defaultUvs.TopLeft;
+		drawVertices[4].UV = defaultUvs.TopRight;
+		drawVertices[5].UV = defaultUvs.BottomRight;
+
+		drawVertices[0].Color = col;
+		drawVertices[1].Color = col;
+		drawVertices[2].Color = col;
+		drawVertices[3].Color = col;
+		drawVertices[4].Color = col;
+		drawVertices[5].Color = col;
+
+		if (sprite.GetTexture() != nullptr) {
+			auto texID = SubmitTexture(drawGroup, sprite.GetTexture());
+			drawVertices[0].TexID = texID;
+			drawVertices[1].TexID = texID;
+			drawVertices[2].TexID = texID;
+			drawVertices[3].TexID = texID;
+			drawVertices[4].TexID = texID;
+			drawVertices[5].TexID = texID;
+		} else {
+			drawVertices[0].TexID = -1;
+			drawVertices[1].TexID = -1;
+			drawVertices[2].TexID = -1;
+			drawVertices[3].TexID = -1;
+			drawVertices[4].TexID = -1;
+			drawVertices[5].TexID = -1;
+		}
+
+		drawGroup->MappedBufferIndex += 6u;
 	}
 
 	void Renderer::Present() {

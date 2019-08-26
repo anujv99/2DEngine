@@ -8,7 +8,7 @@
 
 namespace prev {
 
-	static constexpr const unsigned int TEXTURE_SIZE = 512;
+	static constexpr const unsigned int TEXTURE_SIZE = 1024;
 
 	Font::Font(const std::string & name, const std::string & fileName, float size) :
 		m_FontName(name), m_FontFile(fileName), m_Size(size), m_Texture(nullptr), m_FontAtlas(nullptr), m_Font(nullptr) {
