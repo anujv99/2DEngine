@@ -9,10 +9,12 @@ namespace prev {
 
 	void D3DConstantBuffer::Bind() {
 		LOG_ON_CONDITION(m_IsCreated, LOG_ERROR, "Constant Buffer already initialized", return);
-		if (m_ShaderType == BindableType::VERTEX_SHADER)
+		if (m_ShaderType == VERTEX_SHADER)
 			GetDeviceContext()->VSSetConstantBuffers(m_BufferSlot, 1, m_Buffer.GetAddressOf());
-		else if (m_ShaderType == BindableType::PIXEL_SHADER)
+		else if (m_ShaderType == PIXEL_SHADER)
 			GetDeviceContext()->PSSetConstantBuffers(m_BufferSlot, 1, m_Buffer.GetAddressOf());
+		else if (m_ShaderType == COMPUTE_SHADER)
+			GetDeviceContext()->CSSetConstantBuffers(m_BufferSlot, 1, m_Buffer.GetAddressOf());
 	}
 
 	void D3DConstantBuffer::UnBind() {
@@ -21,7 +23,7 @@ namespace prev {
 	void D3DConstantBuffer::Init(const void * data, unsigned int dataBytes, unsigned int uniformLocation, BindableType shaderType) {
 		LOG_ON_CONDITION(!m_IsCreated, LOG_ERROR, "Constant Buffer already initialized", return);
 		LOG_ON_CONDITION(
-			shaderType == BindableType::VERTEX_SHADER || shaderType == BindableType::PIXEL_SHADER,
+			shaderType == VERTEX_SHADER || shaderType == PIXEL_SHADER || shaderType == COMPUTE_SHADER,
 			LOG_ERROR,
 			"Please pass proper shader type for the uniform",
 			return
@@ -54,7 +56,7 @@ namespace prev {
 
 	void D3DConstantBuffer::ChangeBindingShader(BindableType shaderType) {
 		LOG_ON_CONDITION(
-			shaderType == BindableType::VERTEX_SHADER || shaderType == BindableType::PIXEL_SHADER,
+			shaderType == VERTEX_SHADER || shaderType == PIXEL_SHADER || shaderType == COMPUTE_SHADER,
 			LOG_ERROR,
 			"Please pass proper shader type for the uniform",
 			return

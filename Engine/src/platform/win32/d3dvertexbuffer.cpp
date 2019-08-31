@@ -46,12 +46,10 @@ namespace prev {
 		}
 		}
 
-		CreateBuffer(data);
-
-		m_IsInitialized = true;
+		m_IsInitialized = CreateBuffer(data);;
 	}
 
-	void D3DVertexBuffer::CreateBuffer(const void * data) {
+	bool D3DVertexBuffer::CreateBuffer(const void * data) {
 		D3D11_BUFFER_DESC vbd;
 		vbd.ByteWidth				= m_TotalBytes;
 		vbd.BindFlags				= D3D11_BIND_VERTEX_BUFFER;
@@ -64,9 +62,9 @@ namespace prev {
 
 		if (data != nullptr) {
 			D3D11_SUBRESOURCE_DATA vbsd;
-			vbsd.pSysMem = data;
-			vbsd.SysMemPitch = 0;
-			vbsd.SysMemSlicePitch = 0;
+			vbsd.pSysMem			= data;
+			vbsd.SysMemPitch		= 0;
+			vbsd.SysMemSlicePitch	= 0;
 
 			hr = GetDevice()->CreateBuffer(&vbd, &vbsd, m_Buffer.GetAddressOf());
 		} else {
@@ -75,8 +73,10 @@ namespace prev {
 
 		if (FAILED(hr)) {
 			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Unable to create vertex buffer");
-			return;
+			return false;
 		}
+
+		return true;
 	}
 
 	void D3DVertexBuffer::Draw(unsigned int numVertices, unsigned int vertexOffset) {
@@ -107,11 +107,11 @@ namespace prev {
 		GetDeviceContext()->IASetVertexBuffers(0, 1, m_Buffer.GetAddressOf(), (UINT *)&m_StrideBytes, &OFFSET);
 	}
 
-	void D3DVertexBuffer::UnBind() {
-	}
+	void D3DVertexBuffer::UnBind() {}
 
 	void D3DVertexBuffer::SubData(const void * data, unsigned int numBytes, unsigned int byteOffset) {
-		ASSERT(m_BufferUsage == D3D11_USAGE_DYNAMIC || m_BufferUsage == D3D11_USAGE_DEFAULT);
+		LOG_ON_CONDITION(m_BufferUsage == D3D11_USAGE_DYNAMIC || m_BufferUsage == D3D11_USAGE_DEFAULT, LOG_ERROR, "Cannot use SubData on buffer with Static usage");
+		LOG_ON_CONDITION(m_IsInitialized, LOG_ERROR, "Buffer not initialized", return)
 
 		D3D11_MAPPED_SUBRESOURCE msr;
 

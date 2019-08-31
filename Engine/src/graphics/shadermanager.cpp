@@ -22,6 +22,10 @@ namespace prev {
 		return m_BoundPixelShader;
 	}
 
+	prev::StrongHandle<prev::ComputeShader> ShaderManager::GetBoundComputeShader() {
+		return m_BoundComputeShader;
+	}
+
 	StrongHandle<VertexShader> ShaderManager::GetVertexShader(const std::string & shaderName) {
 		uint32_t shaderHash = HashString(shaderName);
 
@@ -50,6 +54,19 @@ namespace prev {
 
 	}
 
+	prev::StrongHandle<prev::ComputeShader> ShaderManager::GetComputeShader(const std::string & shaderName) {
+		uint32_t shaderHash = HashString(shaderName);
+
+		auto it = m_ComputeShaders.find(shaderHash);
+		if (it != m_ComputeShaders.end()) {
+			return it->second;
+		} else {
+			ERROR_TRACE(ERR_SHADER_NOT_FOUND, "Compute shader with the name : " + shaderName + " Not found");
+			ASSERT(false);
+			return nullptr;
+		}
+	}
+
 	StrongHandle<VertexShader> ShaderManager::LoadVertexShaderFromFile(const std::string & shaderName, const std::string & filePath) {
 		std::string vShaderSource = ReadFile(filePath);
 		ASSERT(vShaderSource.size() > 0);
@@ -64,6 +81,14 @@ namespace prev {
 		StrongHandle<PixelShader> pShader = PixelShader::CreatePixelShader(shaderName);
 		pShader->Init(pShaderSource);
 		return pShader;
+	}
+
+	prev::StrongHandle<prev::ComputeShader> ShaderManager::LoadComputeShaderFromFile(const std::string & shaderName, const std::string & filePath) {
+		std::string cShaderSource = ReadFile(filePath);
+		ASSERT(cShaderSource.size() > 0);
+		StrongHandle<ComputeShader> cShader = ComputeShader::CreateComputeShader(shaderName);
+		cShader->Init(cShaderSource);
+		return cShader;
 	}
 
 	void ShaderManager::RegisterVertexShader(StrongHandle<VertexShader> vertexShader, const std::string & shaderName) {
@@ -119,6 +144,35 @@ namespace prev {
 			return;
 		} else {
 			ERROR_TRACE(ERR_SHADER_NOT_FOUND, "Pixel shader with the name : " + shaderName + " not found");
+			ASSERT(false);
+			return;
+		}
+	}
+
+	void ShaderManager::RegisterComputeShader(StrongHandle<ComputeShader> computeShader, const std::string & shaderName) {
+		ASSERT(computeShader != nullptr);
+		ASSERT(shaderName.size() > 0);
+
+		uint32_t shaderhash = HashString(shaderName);
+		if (m_ComputeShaders.find(shaderhash) != m_ComputeShaders.end()) {
+			ERROR_TRACE(ERR_SHADER_ALREADY_PRESENT, "Comptue shader with the name : " + shaderName + " already present in the map");
+			ASSERT(false);
+			return;
+		} else {
+			m_ComputeShaders.insert(std::make_pair(shaderhash, computeShader));
+			return;
+		}
+	}
+
+	void ShaderManager::ReleaseComputeShader(const std::string & shaderName) {
+		uint32_t shaderhash = HashString(shaderName);
+
+		auto it = m_ComputeShaders.find(shaderhash);
+		if (it != m_ComputeShaders.end()) {
+			m_ComputeShaders.erase(it);
+			return;
+		} else {
+			ERROR_TRACE(ERR_SHADER_NOT_FOUND, "Compute shader with the name : " + shaderName + " not found");
 			ASSERT(false);
 			return;
 		}

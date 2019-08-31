@@ -3,15 +3,19 @@
 
 #include "utils/input.h"
 
-#include "graphics/window.h"
 #include "graphics/graphicscontext.h"
-#include "graphics/renderstate.h"
-#include "graphics/immediategfx.h"
+#include "graphics/computebuffer.h"
 #include "graphics/shadermanager.h"
+#include "graphics/tiledtexture.h"
+#include "graphics/immediategfx.h"
+#include "graphics/renderstate.h"
+#include "graphics/texture2d.h"
+#include "graphics/window.h"
+#include "graphics/font.h"
 
-#include "math/mvp.h"
-#include "math/mat4.h"
 #include "math/screenspace.h"
+#include "math/mat4.h"
+#include "math/mvp.h"
 
 #include "common/profiler.h"
 
@@ -20,21 +24,27 @@
 #include "renderer/renderer.h"
 #include "renderer/fbopass.h"
 
-#include "physics/box2dmanager.h"
 #include "physics/box2ddebugdraw.h"
-
-#include "graphics/tiledtexture.h"
-#include "graphics/texture2d.h"
-#include "graphics/font.h"
+#include "physics/box2dmanager.h"
 
 #include "game/square.h"
 #include "imgui.h"
+
+//-----------------TEMP------------------
+#include "platform/win32/d3dhelper.h"
+#include "utils/datafile.h"
+//---------------------------------------
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	StrongHandle<TiledTexture> tex;
+	StrongHandle<ComputeBuffer> cb1 = nullptr;
+	StrongHandle<ComputeBuffer> cb2 = nullptr;
+	StrongHandle<ComputeShader> cs = nullptr;
+
+	static const constexpr unsigned int TILES_X = 64u;
+	static const constexpr unsigned int TILES_Y = 64u;
 
 	Application::Application() {
 
@@ -84,12 +94,39 @@ namespace prev {
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
-		tex = new TiledTexture("res/textures/tile.png", Vec2i(8, 6));
+		float data[TILES_X * TILES_Y];
+
+		for (unsigned int i = 0; i < TILES_X * TILES_Y; i++) {
+			data[i] = 0;
+		}
+
+		cb1 = ComputeBuffer::CreateComputeBuffer();
+		cb1->Init(data, TILES_X * TILES_Y, sizeof(data[0]));
+		cb1->SetBindSlot(0);
+
+		cb2 = ComputeBuffer::CreateComputeBuffer();
+		cb2->Init(data, TILES_X * TILES_Y, sizeof(data[0]));
+		cb2->SetBindSlot(1);
+
+		cs = ShaderManager::Ref().LoadComputeShaderFromFile("TEST_SHADER", "res/computeshader/test.hlsl");
+
+		struct data {
+			unsigned int size[2];
+			float damping[2];
+		} d;
+
+		d = { TILES_X, TILES_Y, 0.95f, 0 };
+
+		cs->SetUniform("Size", &d, sizeof(d));
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
 	Application::~Application() {
+		cb1 = nullptr;
+		cb2 = nullptr;
+		cs = nullptr;
+
 		m_DefCamera.End();
 		Box2DManager::DestroyInst();
 		FramebufferPass::DestroyInst();
@@ -126,21 +163,44 @@ namespace prev {
 			VirtualMachine::Ref().Render();
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
+			{
+				TIME_THIS_SCOPE_MS;
 
-			static Sprite s;
+				cb1->Bind();
+				cb2->Bind();
 
-			static int x = 0u;
-			static int y = 0u;
+				cs->Bind();
 
-			ImGui::Begin("Test");
-			ImGui::SliderInt("x", &x, 0, 7);
-			ImGui::SliderInt("y", &y, 0, 5);
-			ImGui::End();
+				cs->Dispatch(TILES_X, TILES_Y, 1);
 
-			s.Uvx = tex->GetTextureCoordX(x);
-			s.Uvy = tex->GetTextureCoordY(y);
+				float * data = (float *)cb2->Map();
 
-			Renderer::Ref().Submit(s, tex->GetTexture());
+				if (Input::Ref().IsMouseButtonDown(0))
+					data[TILES_X / 2 + TILES_Y / 2 * TILES_Y] = 1.0f;
+
+				for (unsigned int i = 0; i < TILES_X; i++) {
+					for (unsigned int j = 0; j < TILES_Y; j++) {
+
+						static float scale = 2.0f;
+
+						static Sprite s;
+						s.Position = Vec2((float)i / ((float)TILES_X / scale), (float)j / ((float)TILES_Y / scale));
+						s.Dimension = Vec2(scale / TILES_X);
+						s.Color = Vec4(data[i + j * TILES_Y]);
+
+						Renderer::Ref().Submit(s);
+					}
+				}
+
+				cb2->UnMap();
+
+				StrongHandle<ComputeBuffer> temp = cb1;
+				cb1 = cb2;
+				cb2 = temp;
+
+				cb1->SetBindSlot(0);
+				cb2->SetBindSlot(1);
+			}
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
 
