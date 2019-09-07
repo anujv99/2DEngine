@@ -31,20 +31,29 @@
 #include "imgui.h"
 
 //-----------------TEMP------------------
-#include "platform/win32/d3dhelper.h"
-#include "utils/datafile.h"
 //---------------------------------------
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	StrongHandle<ComputeBuffer> cb1 = nullptr;
-	StrongHandle<ComputeBuffer> cb2 = nullptr;
-	StrongHandle<ComputeShader> cs = nullptr;
+	static constexpr const unsigned int TILE_X = 1200;
+	static constexpr const unsigned int TILE_Y = 700;
 
-	static const constexpr unsigned int TILES_X = 64u;
-	static const constexpr unsigned int TILES_Y = 64u;
+	static constexpr const unsigned int THREAD_X = TILE_X / 100;
+	static constexpr const unsigned int THREAD_Y = TILE_Y / 10;
+
+	StrongHandle<ComputeShader> cs = nullptr;
+	StrongHandle<ComputeBuffer> b1 = nullptr;
+	StrongHandle<ComputeBuffer> b2 = nullptr;
+	StrongHandle<PixelShader>	ps = nullptr;
+	StrongHandle<VertexShader>	vs = nullptr;
+
+	struct {
+		unsigned int Size[2];
+		float Damping;
+		float Padding;
+	} d;
 
 	Application::Application() {
 
@@ -94,38 +103,37 @@ namespace prev {
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
-		float data[TILES_X * TILES_Y];
+		cs = ShaderManager::Ref().LoadComputeShaderFromFile("TEST_COMPUTE", "res/shaders/testCompute.hlsl");
 
-		for (unsigned int i = 0; i < TILES_X * TILES_Y; i++) {
-			data[i] = 0;
-		}
+		b1 = ComputeBuffer::CreateComputeBuffer();
+		b1->Init(nullptr, TILE_X * TILE_Y, sizeof(float));
+		b1->SetBindSlot(1);
 
-		cb1 = ComputeBuffer::CreateComputeBuffer();
-		cb1->Init(data, TILES_X * TILES_Y, sizeof(data[0]));
-		cb1->SetBindSlot(0);
+		b2 = ComputeBuffer::CreateComputeBuffer();
+		b2->Init(nullptr, TILE_X * TILE_Y, sizeof(float));
+		b2->SetBindSlot(2);
 
-		cb2 = ComputeBuffer::CreateComputeBuffer();
-		cb2->Init(data, TILES_X * TILES_Y, sizeof(data[0]));
-		cb2->SetBindSlot(1);
+		d.Damping = 1.0f;
+		d.Size[0] = TILE_X;
+		d.Size[1] = TILE_Y;
+		
+		cs->SetUniform("Data", &d, sizeof(d));
 
-		cs = ShaderManager::Ref().LoadComputeShaderFromFile("TEST_SHADER", "res/computeshader/test.hlsl");
+		ps = ShaderManager::Ref().LoadPixelShaderFromFile("TEST_PIXEL", "res/shaders/testPixel.hlsl");
+		vs = ShaderManager::Ref().LoadVertexShaderFromFile("TEST_VERTEX", "res/shaders/testVertex.hlsl");
 
-		struct data {
-			unsigned int size[2];
-			float damping[2];
-		} d;
-
-		d = { TILES_X, TILES_Y, 0.95f, 0 };
-
-		cs->SetUniform("Size", &d, sizeof(d));
+		unsigned int tempData[4] = { TILE_X, TILE_Y, 0u, 0u };
+		ps->SetUniform("Data", &tempData, sizeof(tempData));
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
 	Application::~Application() {
-		cb1 = nullptr;
-		cb2 = nullptr;
 		cs = nullptr;
+		b1 = nullptr;
+		b2 = nullptr;
+		ps = nullptr;
+		vs = nullptr;
 
 		m_DefCamera.End();
 		Box2DManager::DestroyInst();
@@ -146,6 +154,7 @@ namespace prev {
 
 	void Application::Run() {
 		while (m_ApplicationRunning) {
+
 			PROFILER_ROOT_BEGIN;
 
 			Timer::Update();
@@ -163,43 +172,67 @@ namespace prev {
 			VirtualMachine::Ref().Render();
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
-			{
-				TIME_THIS_SCOPE_MS;
 
-				cb1->Bind();
-				cb2->Bind();
+			{
+				b1->Bind();
+				b2->Bind();
 
 				cs->Bind();
+				cs->Dispatch(THREAD_X, THREAD_Y, 1);
 
-				cs->Dispatch(TILES_X, TILES_Y, 1);
+				b1->UnBind();
+				b2->UnBind();
 
-				float * data = (float *)cb2->Map();
+				StrongHandle<ComputeBuffer> temp = b1;
+				b1 = b2;
+				b2 = temp;
 
-				if (Input::Ref().IsMouseButtonDown(0))
-					data[TILES_X / 2 + TILES_Y / 2 * TILES_Y] = 1.0f;
+				b1->SetBindSlot(1);
+				b2->SetBindSlot(2);
 
-				for (unsigned int i = 0; i < TILES_X; i++) {
-					for (unsigned int j = 0; j < TILES_Y; j++) {
+				//------------------------------------------------------------------------------
 
-						static float scale = 2.0f;
+				//float * d = (float *)b2->Map();
+				//
+				//static Sprite s;
+				//
+				//float scale = 4.0f;
+				//
+				//for (unsigned int i = 0; i < TILE_X; i++) {
+				//	for (unsigned int j = 0; j < TILE_Y; j++) {
+				//		s.Dimension = Vec2(scale / TILE_X, scale / TILE_Y);
+				//		s.Position = s.Dimension * Vec2(i, j) * Vec2(1.4f);
+				//		s.Color = Vec4(d[i + j * TILE_Y]);
+				//		Renderer::Ref().Submit(s);
+				//	}
+				//}
+				//
+				//if (Input::Ref().IsMouseButtonPressed(0)) {
+				//	d[(TILE_X / 2) + (TILE_Y / 2) * TILE_X] = 2.0f;
+				//}
+				//
+				//b2->UnMap();
 
-						static Sprite s;
-						s.Position = Vec2((float)i / ((float)TILES_X / scale), (float)j / ((float)TILES_Y / scale));
-						s.Dimension = Vec2(scale / TILES_X);
-						s.Color = Vec4(data[i + j * TILES_Y]);
-
-						Renderer::Ref().Submit(s);
-					}
+				if (Input::Ref().IsMouseButtonDown(0)) {
+					float * d = (float *)b2->Map();
+					d[(TILE_X / 2) + (TILE_Y / 2) * TILE_X] = 10.0f;
+					b2->UnMap();
 				}
+				
+				Sprite quad;
+				quad.Uvx = Vec2(0, TILE_X);
+				quad.Uvy = Vec2(0, TILE_Y);
 
-				cb2->UnMap();
+				quad.Dimension *= 2.0f;
 
-				StrongHandle<ComputeBuffer> temp = cb1;
-				cb1 = cb2;
-				cb2 = temp;
+				b2->BindToPixelShader(10);
 
-				cb1->SetBindSlot(0);
-				cb2->SetBindSlot(1);
+				Renderer::Ref().Submit(quad, nullptr, vs, ps);
+
+				Renderer::Ref().Present();
+
+				//------------------------------------------------------------------------------
+
 			}
 
 			//////////////////////////////////////TESTING////////////////////////////////////////

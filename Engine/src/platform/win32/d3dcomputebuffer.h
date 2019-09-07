@@ -13,6 +13,7 @@ namespace prev {
 		// Inherited via ComputeBuffer
 		virtual void Bind() override;
 		virtual void UnBind() override;
+		virtual void BindToPixelShader(unsigned int slot) override;
 		virtual void Init(const void * data, unsigned int numElements, unsigned int strideBytes) override;
 		virtual void SubData(const void * data, unsigned int numBytes, unsigned int byteOffset) override;
 		virtual void * Map() override;
@@ -22,6 +23,7 @@ namespace prev {
 		inline virtual unsigned int GetBindSlot() const override { return m_BindSlot; }
 	private:
 		bool CreateBuffer(const void * data);
+		bool CreateShaderResource();
 	private:
 		UINT m_StrideBytes;
 		UINT m_NumElements;
@@ -32,6 +34,7 @@ namespace prev {
 
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
 		Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_UnorderedView;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_ShaderResource;
 		D3D11_MAPPED_SUBRESOURCE m_MappedBuffer;
 	};
 
