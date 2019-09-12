@@ -16,8 +16,14 @@ namespace prev {
 	}
 
 	void VertexShader::Bind() {
-		ShaderManager::Ref().m_BoundVertexShader = this;
+		if (ShaderManager::Ref().m_BoundVertexShader == (const VertexShader *)this) {
+			return;
+		}
 		ShaderBind();
+		for (auto & uniform : m_ShaderUniforms) {
+			uniform.second->Bind();
+		}
+		ShaderManager::Ref().m_BoundVertexShader = this;
 	}
 
 	void VertexShader::UpdateMVP() {

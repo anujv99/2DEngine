@@ -37,8 +37,8 @@ extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	static constexpr const unsigned int TILE_X = 1200;
-	static constexpr const unsigned int TILE_Y = 700;
+	static constexpr const unsigned int TILE_X = 800;
+	static constexpr const unsigned int TILE_Y = 400;
 
 	static constexpr const unsigned int THREAD_X = TILE_X / 100;
 	static constexpr const unsigned int THREAD_Y = TILE_Y / 10;
@@ -46,6 +46,7 @@ namespace prev {
 	StrongHandle<ComputeShader> cs = nullptr;
 	StrongHandle<ComputeBuffer> b1 = nullptr;
 	StrongHandle<ComputeBuffer> b2 = nullptr;
+	StrongHandle<Framebuffer>	fm = nullptr;
 	StrongHandle<PixelShader>	ps = nullptr;
 	StrongHandle<VertexShader>	vs = nullptr;
 
@@ -113,17 +114,21 @@ namespace prev {
 		b2->Init(nullptr, TILE_X * TILE_Y, sizeof(float));
 		b2->SetBindSlot(2);
 
-		d.Damping = 1.0f;
+		d.Damping = 0.98f;
 		d.Size[0] = TILE_X;
 		d.Size[1] = TILE_Y;
 		
 		cs->SetUniform("Data", &d, sizeof(d));
 
-		ps = ShaderManager::Ref().LoadPixelShaderFromFile("TEST_PIXEL", "res/shaders/testPixel.hlsl");
-		vs = ShaderManager::Ref().LoadVertexShaderFromFile("TEST_VERTEX", "res/shaders/testVertex.hlsl");
+		fm = Framebuffer::CreateFramebuffer();
+		fm->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_NO_FLAGS);
 
-		unsigned int tempData[4] = { TILE_X, TILE_Y, 0u, 0u };
-		ps->SetUniform("Data", &tempData, sizeof(tempData));
+		ps = ShaderManager::Ref().LoadPixelShaderFromFile("TEST_PIXEL", "res/shaders/testFboPixel.hlsl");
+		vs = ShaderManager::Ref().LoadVertexShaderFromFile("TEST_VERTEX", "res/shaders/testFboVertex.hlsl");
+
+		unsigned int size[4] = { TILE_X, TILE_Y, 0u, 0u };
+		vs->SetUniform("VData", size, sizeof(size));
+		ps->SetUniform("PData", size, sizeof(size));
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 	}
@@ -132,6 +137,7 @@ namespace prev {
 		cs = nullptr;
 		b1 = nullptr;
 		b2 = nullptr;
+		fm = nullptr;
 		ps = nullptr;
 		vs = nullptr;
 
@@ -168,6 +174,9 @@ namespace prev {
 
 			Box2DManager::Ref().Update();
 
+			fm->Bind();		//TEMP
+			fm->Clear();	//TEMP
+
 			VirtualMachine::Ref().Update();
 			VirtualMachine::Ref().Render();
 
@@ -178,10 +187,11 @@ namespace prev {
 				b2->Bind();
 
 				cs->Bind();
+
 				cs->Dispatch(THREAD_X, THREAD_Y, 1);
 
-				b1->UnBind();
 				b2->UnBind();
+				b1->UnBind();
 
 				StrongHandle<ComputeBuffer> temp = b1;
 				b1 = b2;
@@ -192,46 +202,30 @@ namespace prev {
 
 				//------------------------------------------------------------------------------
 
-				//float * d = (float *)b2->Map();
-				//
-				//static Sprite s;
-				//
-				//float scale = 4.0f;
-				//
-				//for (unsigned int i = 0; i < TILE_X; i++) {
-				//	for (unsigned int j = 0; j < TILE_Y; j++) {
-				//		s.Dimension = Vec2(scale / TILE_X, scale / TILE_Y);
-				//		s.Position = s.Dimension * Vec2(i, j) * Vec2(1.4f);
-				//		s.Color = Vec4(d[i + j * TILE_Y]);
-				//		Renderer::Ref().Submit(s);
-				//	}
-				//}
-				//
-				//if (Input::Ref().IsMouseButtonPressed(0)) {
-				//	d[(TILE_X / 2) + (TILE_Y / 2) * TILE_X] = 2.0f;
-				//}
-				//
-				//b2->UnMap();
-
 				if (Input::Ref().IsMouseButtonDown(0)) {
+
+					Vec2 pos = Input::Ref().GetMousePosition();
+					pos = ScreenToPixels(pos);
+					pos += ToVec2(Window::Ref().GetDisplayMode().GetWindowSize() / 2);
+					pos = Vec2(pos.x, Window::Ref().GetDisplayMode().GetWindowSize().y - pos.y);
+					pos = Clamp(pos, Vec2(0.0f), ToVec2(Window::Ref().GetDisplayMode().GetWindowSize()));
+					pos /= ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+					pos *= Vec2((float)TILE_X, (float)TILE_Y);
+
 					float * d = (float *)b2->Map();
-					d[(TILE_X / 2) + (TILE_Y / 2) * TILE_X] = 10.0f;
+					d[((int)pos.x) + ((int)pos.y) * TILE_X] = 1.0f;
 					b2->UnMap();
 				}
 				
-				Sprite quad;
-				quad.Uvx = Vec2(0, TILE_X);
-				quad.Uvy = Vec2(0, TILE_Y);
-
-				quad.Dimension *= 2.0f;
-
-				b2->BindToPixelShader(10);
-
-				Renderer::Ref().Submit(quad, nullptr, vs, ps);
+				//------------------------------------------------------------------------------
 
 				Renderer::Ref().Present();
 
-				//------------------------------------------------------------------------------
+				fm->UnBind();
+
+				b2->BindToPixelShader(10);
+
+				FramebufferPass::Ref().Pass(fm, vs, ps);
 
 			}
 

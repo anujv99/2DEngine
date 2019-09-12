@@ -166,7 +166,7 @@ inline Vec2 Lerp(const Vec2 & _v1, const Vec2 & _v2, float _v) {
 }
 
 inline Vec2 Clamp(const Vec2 & _vec, const Vec2 & _min, const Vec2 & _max) {
-	return Vec2(std::clamp(_vec.x, _min.x, _max.y), std::clamp(_vec.y, _min.y, _max.y));
+	return Vec2(std::clamp(_vec.x, _min.x, _max.x), std::clamp(_vec.y, _min.y, _max.y));
 }
 
 inline Vec2 Saturate(const Vec2 & _vec) {

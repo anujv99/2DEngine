@@ -11,6 +11,7 @@
 namespace prev {
 
 	enum FramebufferFlags {
+		FRAMEBUFFER_NO_FLAGS				= 0u,
 		FRAMEBUFFER_ENABLE_MSAA				= BIT(0),
 		FRAMEBUFFER_ALLOCATE_DEPTH_BUFFER	= BIT(1),
 		FRAMEBUFFER_MSAA_16x				= BIT(2),
@@ -31,7 +32,7 @@ namespace prev {
 
 		//By default MSAA is determined by the window,
 		//And no depth buffer is created
-		virtual void Init(Vec2 size, TextureFormat format, unsigned int flags) = 0;
+		virtual void Init(Vec2 size, TextureFormat format, FramebufferFlags flags) = 0;
 		virtual void Clear() = 0;
 		virtual void Clear(Vec4 color) = 0;
 		virtual Vec2 GetSize() = 0;

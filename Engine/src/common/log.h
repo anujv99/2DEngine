@@ -4,6 +4,8 @@
 
 #include "common/singleton.h"
 
+#undef LOG_DETAILED
+
 #define ADD_FILE_LINE(x) std::string(\
 										"[ " +\
 										std::string(__FILE__).substr(std::string(__FILE__).find_last_of("\\") + 1) +\
@@ -21,11 +23,11 @@
 		#define LOG_INFO(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, ADD_FILE_LINE(x), __VA_ARGS__)
 		#define LOG_TRACE(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_TRACE, ADD_FILE_LINE(x), __VA_ARGS__)
 	#else
-		#define LOG_CRITICAL(x, ...)	Logger::Ref().Log(User::ENGINE, LOG_LEVEL_CRITICAL, x __VA_ARGS__)
-		#define LOG_ERROR(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, x  __VA_ARGS__)
-		#define LOG_WARN(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_WARN, x  __VA_ARGS__)
-		#define LOG_INFO(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, x __VA_ARGS__)
-		#define LOG_TRACE(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_TRACE, x __VA_ARGS__)
+		#define LOG_CRITICAL(x, ...)	Logger::Ref().Log(User::ENGINE, LOG_LEVEL_CRITICAL, x, __VA_ARGS__)
+		#define LOG_ERROR(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_ERROR, x,  __VA_ARGS__)
+		#define LOG_WARN(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_WARN, x,  __VA_ARGS__)
+		#define LOG_INFO(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, x, __VA_ARGS__)
+		#define LOG_TRACE(x, ...)		Logger::Ref().Log(User::ENGINE, LOG_LEVEL_TRACE, x, __VA_ARGS__)
 	#endif
 
 #elif defined(ENGINE_DEBUG) && !defined(LOG_DISABLED)
