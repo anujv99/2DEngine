@@ -37,8 +37,8 @@ extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	static constexpr const unsigned int TILE_X = 800;
-	static constexpr const unsigned int TILE_Y = 400;
+	static constexpr const unsigned int TILE_X = 1600;
+	static constexpr const unsigned int TILE_Y = 900;
 
 	static constexpr const unsigned int THREAD_X = TILE_X / 100;
 	static constexpr const unsigned int THREAD_Y = TILE_Y / 10;
@@ -102,7 +102,7 @@ namespace prev {
 		m_DefCamera.SetNearFar(S_DEFCAMERA_NEAR, S_DEFCAMERA_FAR);
 		m_DefCamera.Begin();
 
-		////////////////////////////////////////TESTING////////////////////////////////////////
+		////////////////////////////////////////TESTING////////////////////////////////////// //
 
 		cs = ShaderManager::Ref().LoadComputeShaderFromFile("TEST_COMPUTE", "res/shaders/testCompute.hlsl");
 

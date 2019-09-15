@@ -103,8 +103,8 @@ local MakeBlankGame = function() {
 
 	BlankGame.Draw = function() {
 		.Ps.Draw();
-		//.Box.Draw();
-		//.Box2.Draw();
+		.Box.Draw();
+		.Box2.Draw();
 		//.Fnt.Print(.Tex);
 	};
 

@@ -18,5 +18,5 @@ float4 main(VSIn vsi) : SV_TARGET {
 	float offset = b[uint(vsi.screenPos.x) + uint(vsi.screenPos.y) * Size.x] / 10.0f;
 
 	float4 outCol = tex.Sample(splr, vsi.texCoords + float2(offset, offset));
-	return outCol + float4(1.0f, 1.0f, 1.0f, 1.0f) * offset * 10.0f;
+	return outCol + float4(1.0f, 1.0f, 1.0f, 1.0f) * offset;
 }

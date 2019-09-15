@@ -11,6 +11,7 @@
 #include "renderer/renderer.h"
 
 #include "gmbindfuncgen.h"
+#include "gmbindgraphics.h"
 
 using namespace prev;
 
