@@ -33,6 +33,9 @@ namespace prev {
 		virtual void SetTextureParams(TextureParams texParams) = 0;
 		virtual void SetData(const void * pixels) = 0;
 
+		virtual void * Map() = 0;
+		virtual void UnMap() = 0;
+
 		virtual void Bind() override = 0;
 		virtual void UnBind() override = 0;
 

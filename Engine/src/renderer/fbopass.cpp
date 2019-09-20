@@ -60,7 +60,7 @@ namespace prev {
 
 		BlendFunction bf = RenderState::Ref().GetBlendFunction();
 		BlendFunction nbf;
-		nbf.DestBlend = PV_BLEND_ONE;
+		nbf.DestBlend = PV_BLEND_ZERO;
 		nbf.SrcBlend = PV_BLEND_ONE;
 		nbf.Operation = PV_BLEND_OP_ADD;
 

@@ -22,4 +22,13 @@ namespace prev {
 		}
 	}
 
+	TextureFormat GetTextureFormat(DXGI_FORMAT texFormat) {
+		switch (texFormat) {
+		case DXGI_FORMAT_R8G8B8A8_UNORM: return PV_TEXTURE_FORMAT_RGBA8;
+		case DXGI_FORMAT_R32_FLOAT: return PV_TEXTURE_FORMAT_R32F;
+		case DXGI_FORMAT_R32_SINT: return PV_TEXTURE_FORMAT_R32SINT;
+		default: return PV_TEXTURE_FORMAT_UNKNOWN;
+		}
+	}
+
 }

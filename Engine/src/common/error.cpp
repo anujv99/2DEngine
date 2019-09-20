@@ -44,6 +44,10 @@ namespace prev {
 
 	void Error::ErrorDispatcher::Dispatch(Error * error) {
 		switch (error->m_ErrorLevel) {
+		case ERR_WINDOWS_API_INTERNAL_ERROR:
+			error->m_ErrorType = "An internal winapi error has occurred";
+			error->m_ErrorCode = CONVERT_TO_STRING(ERR_WINDOWS_API_INTERNAL_ERROR);
+			break;
 		case ERR_FILE_NOT_FOUND:
 			error->m_ErrorType = "File not found";
 			error->m_ErrorCode = CONVERT_TO_STRING(ERR_FILE_NOT_FOUND);

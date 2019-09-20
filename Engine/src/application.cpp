@@ -4,6 +4,7 @@
 #include "utils/input.h"
 
 #include "graphics/graphicscontext.h"
+#include "graphics/imagecomponent.h"
 #include "graphics/computebuffer.h"
 #include "graphics/shadermanager.h"
 #include "graphics/tiledtexture.h"
@@ -28,9 +29,9 @@
 #include "physics/box2dmanager.h"
 
 #include "game/square.h"
-#include "imgui.h"
 
 //-----------------TEMP------------------
+#include "platform/win32/d3dhelper.h"
 //---------------------------------------
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
@@ -47,6 +48,7 @@ namespace prev {
 	StrongHandle<ComputeBuffer> b1 = nullptr;
 	StrongHandle<ComputeBuffer> b2 = nullptr;
 	StrongHandle<Framebuffer>	fm = nullptr;
+	StrongHandle<Framebuffer>	fb = nullptr;
 	StrongHandle<PixelShader>	ps = nullptr;
 	StrongHandle<VertexShader>	vs = nullptr;
 
@@ -102,6 +104,8 @@ namespace prev {
 		m_DefCamera.SetNearFar(S_DEFCAMERA_NEAR, S_DEFCAMERA_FAR);
 		m_DefCamera.Begin();
 
+		ImageComponent::CreateInst();
+
 		////////////////////////////////////////TESTING////////////////////////////////////// //
 
 		cs = ShaderManager::Ref().LoadComputeShaderFromFile("TEST_COMPUTE", "res/shaders/testCompute.hlsl");
@@ -123,6 +127,9 @@ namespace prev {
 		fm = Framebuffer::CreateFramebuffer();
 		fm->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_NO_FLAGS);
 
+		fb = Framebuffer::CreateFramebuffer();
+		fb->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_NO_FLAGS);
+
 		ps = ShaderManager::Ref().LoadPixelShaderFromFile("TEST_PIXEL", "res/shaders/testFboPixel.hlsl");
 		vs = ShaderManager::Ref().LoadVertexShaderFromFile("TEST_VERTEX", "res/shaders/testFboVertex.hlsl");
 
@@ -131,6 +138,7 @@ namespace prev {
 		ps->SetUniform("PData", size, sizeof(size));
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
+
 	}
 
 	Application::~Application() {
@@ -138,10 +146,13 @@ namespace prev {
 		b1 = nullptr;
 		b2 = nullptr;
 		fm = nullptr;
+		fb = nullptr;
 		ps = nullptr;
 		vs = nullptr;
 
 		m_DefCamera.End();
+
+		ImageComponent::DestroyInst();
 		Box2DManager::DestroyInst();
 		FramebufferPass::DestroyInst();
 		Renderer::DestroyInst();
@@ -225,8 +236,21 @@ namespace prev {
 
 				b2->BindToPixelShader(10);
 
+				fb->Bind();
+				fb->Clear(Vec4(1.0f));
+
 				FramebufferPass::Ref().Pass(fm, vs, ps);
 
+				b2->UnBindFromPixelShader();
+
+				fb->UnBind();
+
+				FramebufferPass::Ref().Pass(fb);
+
+			}
+
+			if (Input::Ref().IsKeyPressed(PV_KEY_S)) {
+				ImageComponent::Ref().SaveAsImage(fb->GetTexture(), "test.png");
 			}
 
 			//////////////////////////////////////TESTING////////////////////////////////////////

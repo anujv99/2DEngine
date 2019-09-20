@@ -73,7 +73,7 @@ workspace "2DEngine"
 		
 		filter "files:Engine/src/gm/**.cpp"
 			flags { "NoPCH" }
-		
+			
         filter "configurations:Debug"
             defines {"ENGINE_DEBUG"}
             runtime "Debug"

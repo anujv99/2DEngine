@@ -12,6 +12,7 @@
 #include <codecvt>
 #include <cmath>
 #include <limits>
+#include <thread>
 
 #include <set>
 #include <vector>

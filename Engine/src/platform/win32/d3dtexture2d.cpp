@@ -84,6 +84,46 @@ namespace prev {
 		GetDeviceContext()->Unmap(textureRes.Get(), 0u);
 	}
 
+	void * D3DTexture2D::Map() {
+		if (m_IsMapped) return m_MappedTexture.pData;
+
+		if (m_StagingTexture == nullptr)
+			CreateStagingTexture();
+
+		if (m_StagingTexture == nullptr) {
+			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Unable to map texture");
+			return nullptr;
+		}
+
+		if (m_TextureResource == nullptr) {
+			m_TextureView->GetResource(m_TextureResource.GetAddressOf());
+		}
+
+		if (m_TextureResource == nullptr) {
+			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Unabel to map texture");
+			return nullptr;
+		}
+
+		GetDeviceContext()->CopyResource(m_StagingTexture.Get(), m_TextureResource.Get());
+
+		HRESULT hr = GetDeviceContext()->Map(m_StagingTexture.Get(), 0u, D3D11_MAP_READ, 0u, &m_MappedTexture);
+		if (FAILED(hr)) {
+			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Unable to map texture");
+			return nullptr;
+		}
+
+		m_IsMapped = true;
+		return m_MappedTexture.pData;
+	}
+
+	void D3DTexture2D::UnMap() {
+		if (!m_IsMapped) return;
+
+		GetDeviceContext()->Unmap(m_StagingTexture.Get(), 0u);
+		m_IsMapped = false;
+		m_TextureResource = nullptr;
+	}
+
 	void D3DTexture2D::Bind() {
 		LOG_ON_CONDITION(m_IsCreated, LOG_ERROR, "Binding uninitialized texutre", return);
 
@@ -129,6 +169,10 @@ namespace prev {
 		m_TextureSampler = new D3DSampler2D();
 		m_TextureSampler->Init(params);
 
+
+		m_TextureDesc.TexFormat = GetTextureFormat(desc.Format);
+		m_TextureDesc.TextureSize = Vec2i(desc.Width, desc.Height);
+		m_IsMapped = false;
 		m_IsCreated = true;
 	}
 
@@ -217,6 +261,40 @@ namespace prev {
 		D3D11_TEXTURE2D_DESC texDesc;
 		GetTexture2D()->GetDesc(&texDesc);
 		return texDesc;
+	}
+
+	void D3DTexture2D::CreateStagingTexture() {
+		D3D11_TEXTURE2D_DESC textureDesc = {};
+		textureDesc.Width = (UINT)m_TextureDesc.TextureSize.x;
+		textureDesc.Height = (UINT)m_TextureDesc.TextureSize.y;
+		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = 1;
+		textureDesc.Format = GetTextureFormat(m_TextureDesc.TexFormat);
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.SampleDesc.Quality = 0;
+		textureDesc.Usage = D3D11_USAGE_STAGING;
+		textureDesc.BindFlags = 0u;
+		textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
+		textureDesc.MiscFlags = 0;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> tex2D;
+
+		HRESULT hr = GetDevice()->CreateTexture2D(&textureDesc, nullptr, tex2D.GetAddressOf());
+		if (FAILED(hr)) {
+			ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Unable to create staging texutre2d");
+			tex2D = nullptr;
+		}
+
+		if (tex2D != nullptr) {
+			HRESULT hr = tex2D->QueryInterface<ID3D11Resource>(m_StagingTexture.GetAddressOf());
+			if (FAILED(hr)) {
+				ERROR_TRACE(ERR_D3D11_INTERNAL_ERROR, "Unable to get resource on staging texture");
+				tex2D = nullptr;
+				m_StagingTexture = nullptr;
+			}
+		}
+
+		return;
 	}
 
 }

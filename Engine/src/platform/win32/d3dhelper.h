@@ -14,5 +14,6 @@ namespace prev {
 	ID3D11Device * GetDevice();
 	ID3D11DeviceContext * GetDeviceContext();
 	DXGI_FORMAT GetTextureFormat(TextureFormat texFormat);
+	TextureFormat GetTextureFormat(DXGI_FORMAT texFormat);
 
 }

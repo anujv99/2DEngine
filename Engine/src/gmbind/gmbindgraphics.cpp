@@ -47,18 +47,3 @@ GM_REG_HANDLED_DESTRUCTOR(Font)
 GM_REG_MEMFUNC(Font, Print)
 GM_REG_MEM_END(Font)
 GM_BIND_DEFINE(Font)
-
-// VERTEX SHADER -----------------------------------------------------------
-
-GM_REG_NAMESPACE(VertexShader) {
-
-	GM_MEMFUNC_DECL(CreateVertexShader) {
-		GM_CHECK_NUM_PARAMS(2);
-		GM_CHECK_STRING_PARAM(name, 0);
-		GM_CHECK_STRING_PARAM(path, 1);
-		StrongHandle<VertexShader> vShader = ShaderManager::Ref().LoadVertexShaderFromFile(name, path);
-		GM_PUSH_USER_HANDLED(VertexShader, vShader);
-		return GM_OK;
-	}
-
-}

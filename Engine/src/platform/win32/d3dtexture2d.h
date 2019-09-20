@@ -9,7 +9,9 @@ namespace prev {
 
 	class D3DTexture2D : public Texture2D {
 	public:
-		D3DTexture2D() : m_IsCreated(false), m_BindSlot(0u), m_TextureSampler(nullptr) {}
+		D3DTexture2D() : m_IsCreated(false), m_IsMapped(false), 
+			m_BindSlot(0u), m_TextureSampler(nullptr), 
+			m_MappedTexture({}), m_TextureResource(nullptr), m_StagingTexture(nullptr) {}
 		~D3DTexture2D();
 
 		// Inherited via Texture2D
@@ -18,6 +20,9 @@ namespace prev {
 		virtual void SetTextureSlot(unsigned int texSlot) override;
 		virtual void SetTextureParams(TextureParams texParams) override;
 		virtual void SetData(const void * pixels) override;
+
+		virtual void * Map() override;
+		virtual void UnMap() override;
 
 		virtual void Bind() override;
 		virtual void UnBind() override;
@@ -32,11 +37,17 @@ namespace prev {
 		bool CreateTexture(const Texture2DDesc & desc);
 		unsigned int GetStrideFromFormat(DXGI_FORMAT format);
 		D3D11_TEXTURE2D_DESC GetTextureDesc();
+
+		void CreateStagingTexture();
 	private:
 		unsigned int m_BindSlot;
-		bool m_IsCreated;
+		bool m_IsCreated, m_IsMapped;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_TextureView;
 		StrongHandle<D3DSampler2D> m_TextureSampler;
+
+		D3D11_MAPPED_SUBRESOURCE m_MappedTexture;
+		Microsoft::WRL::ComPtr<ID3D11Resource> m_TextureResource;
+		Microsoft::WRL::ComPtr<ID3D11Resource> m_StagingTexture;
 	};
 
 }

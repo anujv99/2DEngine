@@ -12,6 +12,7 @@ namespace prev {
 		m_NumElements(0u),
 		m_TotalBytes(0u),
 		m_BindSlot(0u),
+		m_LastPixelShaderBindSlot(-1),
 		m_IsInitialized(false),
 		m_IsMapped(false), 
 		m_MappedBuffer({}),
@@ -34,10 +35,26 @@ namespace prev {
 	void D3DComputeBuffer::BindToPixelShader(unsigned int slot) {
 		LOG_ON_CONDITION(m_IsInitialized, LOG_ERROR, "Buffer not initialized", return);
 
+		if (m_LastPixelShaderBindSlot >= 0) {
+			if (m_LastPixelShaderBindSlot = slot)
+				return;
+			LOG_WARN("Compute Buffer already bound on shader slot {} forcing this to unbind and then binding to slot {}", m_LastPixelShaderBindSlot, slot);
+			UnBindFromPixelShader();
+		}
+
 		if (m_ShaderResource == nullptr)
 			CreateShaderResource();
 
 		GetDeviceContext()->PSSetShaderResources(slot, 1, m_ShaderResource.GetAddressOf());
+		m_LastPixelShaderBindSlot = slot;
+	}
+
+	void D3DComputeBuffer::UnBindFromPixelShader() {
+		if (m_LastPixelShaderBindSlot < 0) return;
+
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv = nullptr;
+		GetDeviceContext()->PSSetShaderResources((UINT)m_LastPixelShaderBindSlot, 1u, srv.GetAddressOf());
+		m_LastPixelShaderBindSlot = -1;
 	}
 
 	void D3DComputeBuffer::Init(const void * data, unsigned int numElements, unsigned int strideBytes) {

@@ -6,13 +6,13 @@
 
 #define GM_BIND_INIT(TYPE, MACHINE) gmf##TYPE::gmBind##TYPE##Lib(MACHINE);
 
-#define GM_TYPE_CLASS gmfUserType
+#define GM_TYPE_CLASS(TYPE) gmfUserType##TYPE
 
 //HEADER
-#define GM_BIND_TYPEID(TYPE) class GM_TYPE_CLASS { public: static int s_gmUserTypeId; };
+#define GM_BIND_TYPEID(TYPE) class GM_TYPE_CLASS(TYPE) { public: static int s_gmUserTypeId; };
 #define GM_BIND_DECL(TYPE) void gmBind##TYPE##Lib(gmMachine * a_machine);
 //CPP
-#define GM_TYPEID(TYPE) (gmf##TYPE::GM_TYPE_CLASS::s_gmUserTypeId)
+#define GM_TYPEID(TYPE) (gmf##TYPE::GM_TYPE_CLASS(TYPE)::s_gmUserTypeId)
 
 #define GM_REG_NAMESPACE(TYPE) namespace gmf##TYPE
 #define GM_MEMFUNC_DECL(FUNC_NAME) static int GM_CDECL gmf##FUNC_NAME(gmThread * a_thread)
@@ -34,7 +34,7 @@
 		a_machine->RegisterLibrary(gm##TYPE##ConstructorEntry, 1);										\
 		GM_TYPEID(TYPE) = a_machine->CreateUserType(#TYPE);												\
 	}																									\
-	int gmf##TYPE::GM_TYPE_CLASS::s_gmUserTypeId = 0;													\
+	int gmf##TYPE::GM_TYPE_CLASS(TYPE)::s_gmUserTypeId = 0;													\
 	void gmBindUser##TYPE##LibFuncs(gmMachine * a_machine) {											\
 		gmType gmTypeId = GM_TYPEID(TYPE);
 

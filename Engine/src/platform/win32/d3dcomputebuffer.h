@@ -14,6 +14,7 @@ namespace prev {
 		virtual void Bind() override;
 		virtual void UnBind() override;
 		virtual void BindToPixelShader(unsigned int slot) override;
+		virtual void UnBindFromPixelShader() override;
 		virtual void Init(const void * data, unsigned int numElements, unsigned int strideBytes) override;
 		virtual void SubData(const void * data, unsigned int numBytes, unsigned int byteOffset) override;
 		virtual void * Map() override;
@@ -29,6 +30,7 @@ namespace prev {
 		UINT m_NumElements;
 		UINT m_TotalBytes;
 		UINT m_BindSlot;
+		INT m_LastPixelShaderBindSlot;
 		bool m_IsInitialized;
 		bool m_IsMapped;
 
