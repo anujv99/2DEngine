@@ -33,7 +33,7 @@ namespace prev {
 
 		for (unsigned int i = 0; i < 128; i++) {
 			char c = (char)i;
-			ftgl::texture_glyph_t * glyph = ftgl::texture_font_get_glyph(m_Font, &c);
+			ftgl::texture_font_get_glyph(m_Font, &c);
 		}
 		m_Texture->SetData(m_FontAtlas->data);
 

@@ -16,7 +16,7 @@ namespace prev {
 	}
 
 	void VertexShader::Bind() {
-		if (ShaderManager::Ref().m_BoundVertexShader == (const VertexShader *)this) {
+		if (ShaderManager::Ref().m_BoundVertexShader.Get() == this) {
 			return;
 		}
 		ShaderBind();

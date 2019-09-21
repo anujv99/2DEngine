@@ -71,7 +71,7 @@ bool ThreadImgui(gmThread * a_thread, void * a_context) {
 	char hint[128] = "unknown";
 
 	if (a_thread->GetMachine()->GetSourceCode(source_id, source, filename)) {
-		const int len = (unsigned int)strlen(filename);
+		const int len = (unsigned int)std::string(filename).size();
 
 		int a = len;
 		int b = len;
@@ -352,7 +352,7 @@ void gmDebuggerFunk::GuiSource() {
 		ImGui::Begin(titleBuffer);
 	}
 
-	int srcLen = (int)strlen(source);
+	int srcLen = (int)std::string(source).size();
 	//int offset = 0;
 	int lineNumber = 1;
 	const char * textPos = source;
@@ -565,7 +565,6 @@ void gmDebuggerFunk::GuiThreadsViewer() {
 
 	// clicked on a thread
 	if (returnThread && returnThread->GetId() != m_debugState.threadId) {
-		gmThread * thr = machine->GetThread(m_debugState.threadId);
 		// NOTE: why was this doing this on press?
 		//if ( thr->GetState() == gmThread::EXCEPTION )
 		//{

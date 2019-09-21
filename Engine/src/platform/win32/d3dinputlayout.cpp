@@ -32,7 +32,7 @@ namespace prev {
 			inputDescs[i].InstanceDataStepRate		= 0u;
 		}
 
-		D3DVertexShader * vShader = (D3DVertexShader *)(vertexShader.Get());
+		D3DVertexShader * vShader = dynamic_cast<D3DVertexShader *>(vertexShader.Get());
 		Microsoft::WRL::ComPtr<ID3DBlob> shaderBytecode = vShader->GetShaderBytecode();
 
 		if (shaderBytecode == nullptr) {

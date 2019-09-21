@@ -37,11 +37,9 @@ namespace prev {
 	}
 
 	prev::Vec2 Cam2D::MapMouseCoords(Vec2 mouseCoords) const {
-		Vec2 newMousePos = mouseCoords; //Assume TopLeft is (0, 0)
-
 		//Mapping coordinates to (0, 1)
 		const Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
-		newMousePos = mouseCoords / winSize;
+		Vec2 newMousePos = mouseCoords / winSize; //Assume TopLeft is (0, 0)
 
 		//Invering Y axis;
 		newMousePos.y = 1.0f - newMousePos.y;

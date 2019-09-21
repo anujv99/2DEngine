@@ -77,7 +77,6 @@ namespace prev {
 		sprintf(buffer, "%s;", cmd.c_str());
 
 		int threadId = GM_INVALID_THREAD;
-		int errors = machine->ExecuteString( buffer, &threadId, false );
 		//machine->ExecuteString(buffer, &threadId, false);
 
 		if (threadId != GM_INVALID_THREAD) {

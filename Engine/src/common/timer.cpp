@@ -39,14 +39,14 @@ namespace prev {
 
 	float Timer::GetTime() {
 		auto currentTime = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_StartTime);
-		return (float)duration.count() / 1000000;
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_StartTime).count();
+		return (float)duration / 1000000;
 	}
 
 	float Timer::GetTimeMs() {
 		auto currentTime = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_StartTime);
-		return (float)duration.count() / 1000;
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - s_StartTime).count();
+		return (float)duration / 1000;
 	}
 
 	float Timer::GetDeltaTime() {

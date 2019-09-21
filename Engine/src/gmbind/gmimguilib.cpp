@@ -40,8 +40,7 @@ namespace prev {
 			const char * strKey = key.AsString(&VirtualMachine::Get()->GetVM(), buffer, sizeof(buffer));
 
 			if (val.IsTable()) {
-				bool dropDownSelected = selected;
-				dropDownSelected = ImGui::CollapsingHeader(strKey) != 0;
+				bool dropDownSelected = ImGui::CollapsingHeader(strKey) != 0;
 
 				// clicked down
 				if (dropDownSelected != selected) {
@@ -60,7 +59,7 @@ namespace prev {
 			}
 
 			// dots
-			int keyLen = (int)strlen(strKey);
+			int keyLen = (int)std::string(strKey).size();
 			int numDots = dotPadding - keyLen;
 			memset(buffer, '.', numDots);
 			buffer[numDots] = 0;

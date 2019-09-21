@@ -121,6 +121,7 @@ namespace prev {
 		d.Damping = 0.98f;
 		d.Size[0] = TILE_X;
 		d.Size[1] = TILE_Y;
+		d.Padding = 0.0f;
 		
 		cs->SetUniform("Data", &d, sizeof(d));
 

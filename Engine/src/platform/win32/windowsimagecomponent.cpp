@@ -242,7 +242,7 @@ namespace prev {
 			return false;
 		}
 
-		if (bitsPerPixel == 0) {
+		if (bitsPerPixel == 0u) {
 			LOG_ERROR("Invalid pixel size for gif ");
 			return false;
 		}
@@ -250,7 +250,6 @@ namespace prev {
 		ComPtr<IWICBitmapFrameEncode> bitmapFrame = nullptr;
 		ComPtr<IPropertyBag2> prop = nullptr;
 		ComPtr<IWICMetadataQueryWriter> frameMeta = nullptr;
-
 		WICPixelFormatGUID guid = formatGUID;
 
 		CHECK_HR(Encoder->CreateNewFrame(bitmapFrame.GetAddressOf(), prop.GetAddressOf()), "Unable to create new frame -> IWICBitmapFrameEncode");
@@ -275,14 +274,10 @@ namespace prev {
 		BYTE * newData = new BYTE[bufferSize];
 		BYTE * temp = (BYTE *)data;
 
-		WICColor colors[256] = { 0 };
-		UINT colIndex = 0u;
 		std::unordered_map<uint32_t, UINT> colorMap;
 
 		for (unsigned int i = 0, j = 0; i < bufferSize; i++, j += 4) {
-
 			UINT col = temp[j] + temp[j + 1] + temp[j + 2];
-
 			newData[i] = (BYTE)(col / 3u);
 		}
 

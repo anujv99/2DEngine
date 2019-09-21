@@ -10,7 +10,7 @@ namespace prev {
 	}
 
 	void PixelShader::Bind() {
-		if (ShaderManager::Ref().m_BoundPixelShader == (const PixelShader *)this) {
+		if (ShaderManager::Ref().m_BoundPixelShader.Get() == this) {
 			return;
 		}
 		ShaderBind();
