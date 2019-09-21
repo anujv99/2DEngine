@@ -177,7 +177,7 @@ namespace prev {
 	}
 
 	D3DTexture2D::D3DTexture2D(D3D11_TEXTURE2D_DESC desc, D3D11_SHADER_RESOURCE_VIEW_DESC vDesc) : 
-		m_IsCreated(false), m_BindSlot(0u), m_TextureSampler(nullptr) {
+		m_IsCreated(false), m_BindSlot(0u), m_TextureSampler(nullptr), m_IsMapped(false) {
 		desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> d3dtexure;

@@ -68,7 +68,7 @@ namespace prev {
 	TimeThis::~TimeThis() {
 		if (!m_LogOnDestruction) return;
 
-		std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_Start;
+		float duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_Start).count();
 
 		LOG_TIMER(
 			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "-----------------------------------");
@@ -79,11 +79,11 @@ namespace prev {
 
 		if (isMS) {
 			LOG_TIMER(
-				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}ms", duration.count() * 1000);
+				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}ms", duration * 1000);
 			);
 		} else {
 			LOG_TIMER(
-				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}s", duration.count());
+				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}s", duration);
 			);
 		}
 

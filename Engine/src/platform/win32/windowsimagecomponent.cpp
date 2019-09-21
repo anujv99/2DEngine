@@ -242,11 +242,6 @@ namespace prev {
 			return false;
 		}
 
-		if (bitsPerPixel == 0u) {
-			LOG_ERROR("Invalid pixel size for gif ");
-			return false;
-		}
-
 		ComPtr<IWICBitmapFrameEncode> bitmapFrame = nullptr;
 		ComPtr<IPropertyBag2> prop = nullptr;
 		ComPtr<IWICMetadataQueryWriter> frameMeta = nullptr;
