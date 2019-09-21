@@ -68,7 +68,7 @@ namespace prev {
 	TimeThis::~TimeThis() {
 		if (!m_LogOnDestruction) return;
 
-		float duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_Start).count();
+		float duration = (float)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_Start).count();
 
 		LOG_TIMER(
 			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "-----------------------------------");
@@ -93,9 +93,9 @@ namespace prev {
 
 #if defined(ENGINE_DIST) || defined(ENGINE_RELEASE)
 		if (isMS)
-			printf("Scope took : %f ms\n", duration.count() * 1000.0f);
+			printf("Scope took : %f ms\n", duration * 1000.0f);
 		else
-			printf("Scope took : %f s\n", duration.count());
+			printf("Scope took : %f s\n", duration);
 #endif
 	}
 
