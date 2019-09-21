@@ -87,11 +87,11 @@ namespace prev {
 	StrongHandle<Texture2D> D3DFramebuffer::GetTexture() {
 		if (m_ISMultisampled)
 			ResolveTexture();
-		return m_AntialiasedTexture;
+		return StrongHandle(dynamic_cast<Texture2D *>(m_AntialiasedTexture.Get()));
 	}
 
 	prev::StrongHandle<prev::Texture2D> D3DFramebuffer::GetDepthTexture() {
-		return m_DepthTexture;
+		return StrongHandle(dynamic_cast<Texture2D *>(m_DepthTexture.Get()));
 	}
 
 	void D3DFramebuffer::ResolveTexture() {
@@ -207,8 +207,8 @@ namespace prev {
 		D3D11_TEXTURE2D_DESC dbd;
 		ZeroMemory(&dbd, sizeof(dbd));
 
-		dbd.Width					= size.x;
-		dbd.Height					= size.y;
+		dbd.Width					= (UINT)size.x;
+		dbd.Height					= (UINT)size.y;
 		dbd.MipLevels				= 1;
 		dbd.ArraySize				= 1;
 		dbd.Format					= DXGI_FORMAT_R32_TYPELESS;

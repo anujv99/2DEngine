@@ -178,10 +178,10 @@ namespace prev {
 					x += PixelsToScreenX(kerning) * scale.x;
 				}
 
-				float x0 = x + PixelsToScreenX(glyph->offset_x) * scale.x;
-				float y0 = label.Position.y + PixelsToScreenY(glyph->offset_y) * scale.y;
-				float x1 = x0 + PixelsToScreenX(glyph->width) * scale.x;
-				float y1 = y0 - PixelsToScreenY(glyph->height) * scale.y;
+				float x0 = x + PixelsToScreenX((float)glyph->offset_x) * scale.x;
+				float y0 = label.Position.y + PixelsToScreenY((float)glyph->offset_y) * scale.y;
+				float x1 = x0 + PixelsToScreenX((float)glyph->width) * scale.x;
+				float y1 = y0 - PixelsToScreenY((float)glyph->height) * scale.y;
 
 				float u0 = glyph->s0;
 				float v0 = glyph->t0;
@@ -333,7 +333,7 @@ namespace prev {
 		group->VertexShader->UpdateMVP();
 
 		for (size_t i = 0; i < group->Textures.size(); i++) {
-			group->Textures[i]->SetTextureSlot(i);
+			group->Textures[i]->SetTextureSlot((unsigned int)i);
 			group->Textures[i]->Bind();
 		}
 		
@@ -352,7 +352,7 @@ namespace prev {
 
 		for (size_t i = 0; i < group->Textures.size(); i++) {
 			if (group->Textures[i] == texture) {
-				return i;
+				return (unsigned int)i;
 			}
 		}
 

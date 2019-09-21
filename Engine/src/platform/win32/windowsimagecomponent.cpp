@@ -208,7 +208,7 @@ namespace prev {
 		};
 
 		val.vt = VT_UI1 | VT_VECTOR;
-		val.caub.cElems = std::size(data);
+		val.caub.cElems = (ULONG)std::size(data);
 		val.caub.pElems = data;
 
 		CHECK_HR(MetaData->SetMetadataByName(L"/appext/Data", &val), "Unable to set metadata appext Data for file : " + fileName);

@@ -253,7 +253,7 @@ namespace prev {
 		wc.cbWndExtra			= 0;
 		wc.hInstance			= m_HInst;
 		wc.hIcon				= LoadIcon(NULL, IDI_WINLOGO);
-		wc.hCursor				= LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
+		wc.hCursor				= LoadCursor(NULL, IDC_ARROW);
 		wc.hbrBackground		= (HBRUSH)GetStockObject(BLACK_BRUSH);
 		wc.lpszMenuName			= NULL;
 		wc.lpszClassName		= WINDOW_CLASS_NAME;
@@ -321,7 +321,7 @@ namespace prev {
 		rid[0].dwFlags			= 0l;
 		rid[0].hwndTarget		= nullptr;
 
-		if (RegisterRawInputDevices(rid, std::size(rid), sizeof(rid[0])) == FALSE) {
+		if (RegisterRawInputDevices(rid, (UINT)std::size(rid), sizeof(rid[0])) == FALSE) {
 			ERROR_TRACE(ERR_WINDOW_INTERNAL_ERROR, "Unable to register raw input device");
 			return false;
 		}

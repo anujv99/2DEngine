@@ -24,11 +24,11 @@ namespace prev {
 	TiledTexture::~TiledTexture() {}
 
 	prev::Vec2 TiledTexture::GetTextureCoordX(unsigned int texUnitX) {
-		return Vec2(m_UnitSize.x) * Vec2(texUnitX, texUnitX + 1);
+		return Vec2(m_UnitSize.x) * Vec2((float)texUnitX, (float)texUnitX + 1.0f);
 	}
 
 	prev::Vec2 TiledTexture::GetTextureCoordY(unsigned int texUnitY) {
-		return Vec2(m_UnitSize.y) * Vec2(texUnitY, texUnitY + 1);
+		return Vec2(m_UnitSize.y) * Vec2((float)texUnitY, (float)texUnitY + 1.0f);
 	}
 
 	prev::Vec4 TiledTexture::GetTextureCorrds(Vec2i texUnit) {

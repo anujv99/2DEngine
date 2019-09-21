@@ -64,8 +64,8 @@ namespace prev {
 		float max = 0.0f;
 		for (int i = 0; i < label.GetText().size(); i++) {
 			ftgl::texture_glyph_t * glyph = ftgl::texture_font_get_glyph(m_Font, &label.GetText()[i]);
-			float height = PixelsToScreenY(glyph->height) / scale.y;
-			float offset = PixelsToScreenY(glyph->offset_y) / scale.y - height;
+			float height = PixelsToScreenY((float)glyph->height) / scale.y;
+			float offset = PixelsToScreenY((float)glyph->offset_y) / scale.y - height;
 			if (offset < min)
 				min = offset;
 			if (height > max)
