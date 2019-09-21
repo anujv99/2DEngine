@@ -3,4 +3,4 @@ engines:
  coverage:
    enabled: true
    exclude_paths:
-     - Engine/src/gm/**.*
+     - 'Engine/src/gm/**'
