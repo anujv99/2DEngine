@@ -4,10 +4,10 @@
 
 namespace prev {
 
-	enum class WindowStyle {
-		WINDOWED,
-		BORDERLESS,
-		FULLSCREEN
+	enum WindowStyle {
+		WINDOW_STYLE_WINDOWED,
+		WINDOW_STYLE_BORDERLESS,
+		WINDOW_STYLE_FULLSCREEN
 	};
 
 	struct DisplayMode {
@@ -15,7 +15,7 @@ namespace prev {
 	public:
 		Vec2i GetWindowSize() const { return WindowSize; }
 		WindowStyle GetWindowStyle() const { return Style; }
-		bool IsWindowFullscreen() const { return Style == WindowStyle::FULLSCREEN; }
+		bool IsWindowFullscreen() const { return Style == WINDOW_STYLE_FULLSCREEN; }
 
 		inline void SetWindowStyle(WindowStyle style) { Style = style; }
 		inline void SetMultisample(unsigned int numSamples) { Samples = numSamples; }
@@ -23,7 +23,7 @@ namespace prev {
 		inline bool IsMultisampled() const { return Samples != 1; }
 	private:
 		DisplayMode() :
-			WindowSize(0, 0), Style(WindowStyle::WINDOWED), Samples(1u) {}
+			WindowSize(0, 0), Style(WindowStyle::WINDOW_STYLE_WINDOWED), Samples(1u) {}
 	private:
 		Vec2i WindowSize;
 		WindowStyle Style;

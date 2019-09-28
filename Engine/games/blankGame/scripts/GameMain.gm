@@ -35,7 +35,7 @@ local MakeBlankGame = function() {
 		.Tex.Position = Vec2(0.0f);
 		.Tex.Scale = Vec2(1.0f);
 		.Tex.Rotation = 0.0f;
-		.Tex.Text = "[=]";
+		.Tex.Text = "Madarchod";
 	};
 
 	BlankGame.Update = function() {
@@ -105,7 +105,7 @@ local MakeBlankGame = function() {
 		.Ps.Draw();
 		.Box.Draw();
 		.Box2.Draw();
-		//.Fnt.Print(.Tex);
+		.Fnt.Print(.Tex);
 	};
 
 	return BlankGame;

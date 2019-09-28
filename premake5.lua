@@ -16,6 +16,7 @@ workspace "2DEngine"
 	IncludeDirs["box2d"] = "Engine/vendor/box2d"
 	IncludeDirs["freetype"] = "Engine/vendor/freetype/include"
 	IncludeDirs["freetypegl"] = "Engine/vendor/freetype-gl"
+	IncludeDirs["fmod"] = "Engine/vendor/fmod/includes"
 
     include "Engine/vendor/spdlog"
 	include "Engine/vendor/imgui"
@@ -34,14 +35,22 @@ workspace "2DEngine"
         objdir ("bin-int/" .. outputDir .. "%{prj.name}")
 
         files {
-            "%{prj.name}/src/**.*"
+            "%{prj.name}/src/**.*",
+			"%{IncludeDirs.fmod}/**.*",
         }
+		
+		libdirs {
+			"Engine/vendor/fmod/lib_x64"
+		}
 		
         links {
 			"ImGui",
 			"Box2D",
 			"freetype",
 			"freetype-gl",
+			"fmodL_vc",
+			"fmodstudioL_vc",
+			
             "d3d11.lib",
             "dxgi.lib",
             "d3dcompiler.lib",
@@ -53,6 +62,7 @@ workspace "2DEngine"
             "%{IncludeDirs.box2d}",
             "%{IncludeDirs.freetype}",
             "%{IncludeDirs.freetypegl}",
+            "%{IncludeDirs.fmod}",
 			"%{prj.name}/src",
 			"%{prj.name}"
         }
@@ -70,6 +80,12 @@ workspace "2DEngine"
 		
         pchsource "%{prj.name}/src/pch.cpp"
         pchheader "pch.h"
+		
+		filter "system:windows"
+			postbuildcommands {
+				"{COPY} vendor/fmod/bin_x64/fmodL.dll ../bin/%{outputDir}/Engine",
+				"{COPY} vendor/fmod/bin_x64/fmodstudioL.dll ../bin/%{outputDir}/Engine",
+			}
 		
 		filter "files:Engine/src/gm/**.cpp"
 			flags { "NoPCH" }

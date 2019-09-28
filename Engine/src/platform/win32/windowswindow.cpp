@@ -202,14 +202,14 @@ namespace prev {
 		m_DisplayPos.y = (m_DisplaySize.y - displayMode.GetWindowSize().y) / 2;
 
 		switch (displayMode.GetWindowStyle()) {
-			case WindowStyle::WINDOWED:
+			case WINDOW_STYLE_WINDOWED:
 				m_WindowClassStyle	= CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 				m_WindowExStyle		= WS_EX_APPWINDOW;
 				m_WindowStyle		= WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 				break;
-			case WindowStyle::FULLSCREEN:
+			case WINDOW_STYLE_FULLSCREEN:
 				m_DisplayPos = Vec2i(0u, 0u);
-			case WindowStyle::BORDERLESS:
+			case WINDOW_STYLE_BORDERLESS:
 				m_WindowClassStyle	= CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 				m_WindowExStyle		= WS_EX_APPWINDOW;
 				m_WindowStyle		= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;

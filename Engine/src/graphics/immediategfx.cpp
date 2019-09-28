@@ -36,10 +36,10 @@ namespace prev {
 	ImmediateGFX::ImmediateGFX() : VertexBatcher(IMMEDIATEGFX_MAX_VERTS), m_IsBuilding(false) {
 		LOG_TRACE("Immediate GFX initializing");
 
-		LOG_TRACE("\tinitializing Vertex Buffer");
+		LOG_TRACE("initializing Vertex Buffer");
 		InitializeVertexBuffer();
 
-		LOG_TRACE("\tinitializing Shaders");
+		LOG_TRACE("initializing Shaders");
 		m_VertexShader = ShaderManager::Ref().LoadVertexShaderFromFile(
 			"IMMGFX_DEFAULT_VERTEX_SHADER", 
 			"res/shaders/immGFXDefaultVertex.hlsl"
@@ -50,7 +50,7 @@ namespace prev {
 			"res/shaders/immGFXDefaultPixel.hlsl"
 		);
 
-		LOG_TRACE("\tCreating Verex Layout");
+		LOG_TRACE("Creating Verex Layout");
 		m_VertexLayout = CreateVertexLayout(m_VertexShader);
 
 		LOG_TRACE("Immediate GFX initialized");

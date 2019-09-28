@@ -68,7 +68,7 @@ namespace prev {
 	TimeThis::~TimeThis() {
 		if (!m_LogOnDestruction) return;
 
-		float duration = (float)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_Start).count();
+		float duration = (float)std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_Start).count();
 
 		LOG_TIMER(
 			Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "-----------------------------------");
@@ -79,11 +79,11 @@ namespace prev {
 
 		if (isMS) {
 			LOG_TIMER(
-				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}ms", duration * 1000);
+				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}ms", duration);
 			);
 		} else {
 			LOG_TIMER(
-				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}s", duration);
+				Logger::Ref().Log(User::ENGINE, LOG_LEVEL_INFO, "THIS SCOPE TOOK : {0}s", duration / 1000.0f);
 			);
 		}
 
@@ -93,9 +93,9 @@ namespace prev {
 
 #if defined(ENGINE_DIST) || defined(ENGINE_RELEASE)
 		if (isMS)
-			printf("Scope took : %f ms\n", duration * 1000.0f);
+			printf("Scope took : %f ms\n", duration);
 		else
-			printf("Scope took : %f s\n", duration);
+			printf("Scope took : %f s\n", duration / 1000.0f);
 #endif
 	}
 

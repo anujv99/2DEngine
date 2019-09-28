@@ -3,16 +3,16 @@
 
 #include "utils/input.h"
 
-#include "graphics/graphicscontext.h"
-#include "graphics/imagecomponent.h"
-#include "graphics/computebuffer.h"
-#include "graphics/shadermanager.h"
+#include "graphics/font.h"
+#include "graphics/window.h"
+#include "graphics/texture2d.h"
+#include "graphics/renderstate.h"
 #include "graphics/tiledtexture.h"
 #include "graphics/immediategfx.h"
-#include "graphics/renderstate.h"
-#include "graphics/texture2d.h"
-#include "graphics/window.h"
-#include "graphics/font.h"
+#include "graphics/computebuffer.h"
+#include "graphics/shadermanager.h"
+#include "graphics/imagecomponent.h"
+#include "graphics/graphicscontext.h"
 
 #include "math/screenspace.h"
 #include "math/mat4.h"
@@ -30,33 +30,16 @@
 
 #include "game/square.h"
 
+#include "audio/fmod/fmodaudio.h"
+
 //-----------------TEMP------------------
-#include "platform/win32/d3dhelper.h"
 //---------------------------------------
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	static constexpr const unsigned int TILE_X = 1600;
-	static constexpr const unsigned int TILE_Y = 900;
-
-	static constexpr const unsigned int THREAD_X = TILE_X / 100;
-	static constexpr const unsigned int THREAD_Y = TILE_Y / 10;
-
-	StrongHandle<ComputeShader> cs = nullptr;
-	StrongHandle<ComputeBuffer> b1 = nullptr;
-	StrongHandle<ComputeBuffer> b2 = nullptr;
-	StrongHandle<Framebuffer>	fm = nullptr;
-	StrongHandle<Framebuffer>	fb = nullptr;
-	StrongHandle<PixelShader>	ps = nullptr;
-	StrongHandle<VertexShader>	vs = nullptr;
-
-	struct {
-		unsigned int Size[2];
-		float Damping;
-		float Padding;
-	} d;
+	StrongHandle<Sound> sound;
 
 	Application::Application() {
 
@@ -65,8 +48,8 @@ namespace prev {
 
 		auto dis = GraphicsContext::GetDisplayModes();
 		unsigned int selectedDis = 0;
-		dis[selectedDis].SetWindowStyle(WindowStyle::BORDERLESS);
-		dis[selectedDis].SetMultisample(4);
+		dis[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
+		dis[selectedDis].SetMultisample(8);
 		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
 
@@ -105,54 +88,24 @@ namespace prev {
 		m_DefCamera.Begin();
 
 		ImageComponent::CreateInst();
+		FMODAudio::CreateInst();
 
-		////////////////////////////////////////TESTING////////////////////////////////////// //
+		////////////////////////////////////////TESTING////////////////////////////////////////
 
-		cs = ShaderManager::Ref().LoadComputeShaderFromFile("TEST_COMPUTE", "res/shaders/testCompute.hlsl");
-
-		b1 = ComputeBuffer::CreateComputeBuffer();
-		b1->Init(nullptr, TILE_X * TILE_Y, sizeof(float));
-		b1->SetBindSlot(1);
-
-		b2 = ComputeBuffer::CreateComputeBuffer();
-		b2->Init(nullptr, TILE_X * TILE_Y, sizeof(float));
-		b2->SetBindSlot(2);
-
-		d.Damping = 0.98f;
-		d.Size[0] = TILE_X;
-		d.Size[1] = TILE_Y;
-		d.Padding = 0.0f;
-		
-		cs->SetUniform("Data", &d, sizeof(d));
-
-		fm = Framebuffer::CreateFramebuffer();
-		fm->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_NO_FLAGS);
-
-		fb = Framebuffer::CreateFramebuffer();
-		fb->Init(winSize, PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_NO_FLAGS);
-
-		ps = ShaderManager::Ref().LoadPixelShaderFromFile("TEST_PIXEL", "res/shaders/testFboPixel.hlsl");
-		vs = ShaderManager::Ref().LoadVertexShaderFromFile("TEST_VERTEX", "res/shaders/testFboVertex.hlsl");
-
-		unsigned int size[4] = { TILE_X, TILE_Y, 0u, 0u };
-		vs->SetUniform("VData", size, sizeof(size));
-		ps->SetUniform("PData", size, sizeof(size));
+		sound = FMODAudio::Ref().LoadSound("res/audio/test.wav");
+		sound->SetLoopCount(LOOP_FOREVER);
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
 	}
 
 	Application::~Application() {
-		cs = nullptr;
-		b1 = nullptr;
-		b2 = nullptr;
-		fm = nullptr;
-		fb = nullptr;
-		ps = nullptr;
-		vs = nullptr;
+
+		sound = nullptr;
 
 		m_DefCamera.End();
 
+		FMODAudio::DestroyInst();
 		ImageComponent::DestroyInst();
 		Box2DManager::DestroyInst();
 		FramebufferPass::DestroyInst();
@@ -172,7 +125,6 @@ namespace prev {
 
 	void Application::Run() {
 		while (m_ApplicationRunning) {
-
 			PROFILER_ROOT_BEGIN;
 
 			Timer::Update();
@@ -186,73 +138,18 @@ namespace prev {
 
 			Box2DManager::Ref().Update();
 
-			fm->Bind();		//TEMP
-			fm->Clear();	//TEMP
-
 			VirtualMachine::Ref().Update();
 			VirtualMachine::Ref().Render();
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
 
-			{
-				b1->Bind();
-				b2->Bind();
-
-				cs->Bind();
-
-				cs->Dispatch(THREAD_X, THREAD_Y, 1);
-
-				b2->UnBind();
-				b1->UnBind();
-
-				StrongHandle<ComputeBuffer> temp = b1;
-				b1 = b2;
-				b2 = temp;
-
-				b1->SetBindSlot(1);
-				b2->SetBindSlot(2);
-
-				//------------------------------------------------------------------------------
-
-				if (Input::Ref().IsMouseButtonDown(0)) {
-
-					Vec2 pos = Input::Ref().GetMousePosition();
-					pos = ScreenToPixels(pos);
-					pos += ToVec2(Window::Ref().GetDisplayMode().GetWindowSize() / 2);
-					pos = Vec2(pos.x, Window::Ref().GetDisplayMode().GetWindowSize().y - pos.y);
-					pos = Clamp(pos, Vec2(0.0f), ToVec2(Window::Ref().GetDisplayMode().GetWindowSize()));
-					pos /= ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
-					pos *= Vec2((float)TILE_X, (float)TILE_Y);
-
-					float * d = (float *)b2->Map();
-					d[((int)pos.x) + ((int)pos.y) * TILE_X] = 1.0f;
-					b2->UnMap();
-				}
-				
-				//------------------------------------------------------------------------------
-
-				Renderer::Ref().Present();
-
-				fm->UnBind();
-
-				b2->BindToPixelShader(10);
-
-				fb->Bind();
-				fb->Clear(Vec4(1.0f));
-
-				FramebufferPass::Ref().Pass(fm, vs, ps);
-
-				b2->UnBindFromPixelShader();
-
-				fb->UnBind();
-
-				FramebufferPass::Ref().Pass(fb);
-
+			if (Input::Ref().IsKeyPressed(PV_KEY_P)) {
+				sound->Play();
+			} else if (Input::Ref().IsKeyPressed(PV_KEY_S)) {
+				sound->Pause();
 			}
 
-			if (Input::Ref().IsKeyPressed(PV_KEY_S)) {
-				ImageComponent::Ref().SaveAsImage(fb->GetTexture(), "test.png");
-			}
+			FMODAudio::Ref().Update();
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
 
