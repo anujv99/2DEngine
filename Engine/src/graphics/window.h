@@ -12,6 +12,7 @@ namespace prev {
 
 	struct DisplayMode {
 		friend class GraphicsContext;
+		friend class WindowsWindow;
 	public:
 		Vec2i GetWindowSize() const { return WindowSize; }
 		WindowStyle GetWindowStyle() const { return Style; }
@@ -45,9 +46,8 @@ namespace prev {
 		static Window * CreateEngineWindow(const DisplayMode & displayMode);
 
 		bool m_IsWindowReady = true;
-	private:
+	protected:
 		DisplayMode m_DisplayMode;
-
 	};
 
 	template<>

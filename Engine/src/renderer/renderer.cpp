@@ -3,7 +3,6 @@
 #include "graphics/renderstate.h"
 
 #include <freetype-gl.h>
-#include "math/screenspace.h"
 
 namespace prev {
 
@@ -175,13 +174,13 @@ namespace prev {
 			if (glyph) {
 				if (i > 0) {
 					float kerning = ftgl::texture_glyph_get_kerning(glyph, &text[i - 1]);
-					x += PixelsToScreenX(kerning) * scale.x;
+					x += kerning * scale.x;
 				}
 
-				float x0 = x + PixelsToScreenX((float)glyph->offset_x) * scale.x;
-				float y0 = label.Position.y + PixelsToScreenY((float)glyph->offset_y) * scale.y;
-				float x1 = x0 + PixelsToScreenX((float)glyph->width) * scale.x;
-				float y1 = y0 - PixelsToScreenY((float)glyph->height) * scale.y;
+				float x0 = x + (float)glyph->offset_x * scale.x;
+				float y0 = label.Position.y + (float)glyph->offset_y * scale.y;
+				float x1 = x0 + (float)glyph->width * scale.x;
+				float y1 = y0 - (float)glyph->height * scale.y;
 
 				float u0 = glyph->s0;
 				float v0 = glyph->t0;
@@ -242,7 +241,7 @@ namespace prev {
 
 				group->MappedBufferIndex += (unsigned int)std::size(drawVertices);
 
-				x += PixelsToScreenX(glyph->advance_x) * scale.x;
+				x += glyph->advance_x * scale.x;
 			}
 
 		}

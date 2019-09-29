@@ -205,7 +205,7 @@ namespace prev {
 			case WINDOW_STYLE_WINDOWED:
 				m_WindowClassStyle	= CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 				m_WindowExStyle		= WS_EX_APPWINDOW;
-				m_WindowStyle		= WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
+				m_WindowStyle		= WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_OVERLAPPEDWINDOW;
 				break;
 			case WINDOW_STYLE_FULLSCREEN:
 				m_DisplayPos = Vec2i(0u, 0u);
@@ -234,6 +234,8 @@ namespace prev {
 		}
 
 		RegisterRawInput();
+
+		EventHandler::Ref().RegisterEventFunction(BIND_EVENT_FN(WindowsWindow::OnEvent));
 
 		return;
 	}
@@ -327,6 +329,22 @@ namespace prev {
 		}
 
 		return true;
+	}
+
+	void WindowsWindow::OnEvent(Event & event) {
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(WindowsWindow::WindowResized));
+		dispatcher.Dispatch<WindowMoveEvent>(BIND_EVENT_FN(WindowsWindow::WindowMoved));
+	}
+
+	bool WindowsWindow::WindowResized(WindowResizeEvent & e) {
+		m_DisplayMode.WindowSize = e.GetWindowSize();
+		return false;
+	}
+
+	bool WindowsWindow::WindowMoved(WindowMoveEvent & e) {
+		m_DisplayPos = e.GetWindowPos();
+		return false;
 	}
 
 	void WindowsWindow::PollEvents() {

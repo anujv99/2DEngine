@@ -20,6 +20,11 @@ namespace prev {
 		bool RegisterWindowClass(const DisplayMode & displayMode);
 		bool CreateWindowsWindow(const DisplayMode & displayMode);
 		bool RegisterRawInput();
+
+		void OnEvent(Event & event);
+
+		bool WindowResized(WindowResizeEvent & e);
+		bool WindowMoved(WindowMoveEvent & e);
 	private:
 		HWND m_HWnd					= nullptr;
 		HINSTANCE m_HInst			= nullptr;

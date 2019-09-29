@@ -13,6 +13,7 @@ namespace prev {
 
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame() = 0;
+		virtual bool ChangeResolution(Vec2i newResolution) = 0;
 	protected:
 		GraphicsContext() {}
 		virtual ~GraphicsContext() {}

@@ -14,9 +14,9 @@
 #include "graphics/imagecomponent.h"
 #include "graphics/graphicscontext.h"
 
-#include "math/screenspace.h"
 #include "math/mat4.h"
 #include "math/mvp.h"
+#include "math/camera.h"
 
 #include "common/profiler.h"
 
@@ -47,11 +47,11 @@ namespace prev {
 		EventHandler::CreateInst();
 
 		auto dis = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 0;
-		dis[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
+		unsigned int selectedDis = 5;
+		dis[selectedDis].SetWindowStyle(WINDOW_STYLE_WINDOWED);
 		dis[selectedDis].SetMultisample(8);
 		Window::CreateInst(dis[selectedDis]);
-		EventHandler::Ref().RegisterEventFunction(std::bind(&Application::OnEvent, this, std::placeholders::_1));
+		EventHandler::Ref().RegisterEventFunction(BIND_EVENT_FN(Application::OnEvent));
 
 		Input::CreateInst();
 		MVP::CreateInst();
@@ -71,22 +71,7 @@ namespace prev {
 
 		Renderer::CreateInst();
 		FramebufferPass::CreateInst();
-
 		Box2DManager::CreateInst();
-
-		Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
-		float aspect = winSize.x / winSize.y;
-
-		float defCameraXScale = aspect * S_DEFCAMERA_SCALE_Y;
-
-		m_DefCamera.SetScreenSpace (
-			Vec2(-defCameraXScale / 2, -S_DEFCAMERA_SCALE_Y / 2),
-			Vec2(defCameraXScale / 2, S_DEFCAMERA_SCALE_Y / 2)
-		);
-
-		m_DefCamera.SetNearFar(S_DEFCAMERA_NEAR, S_DEFCAMERA_FAR);
-		m_DefCamera.Begin();
-
 		ImageComponent::CreateInst();
 		FMODAudio::CreateInst();
 
@@ -102,8 +87,6 @@ namespace prev {
 	Application::~Application() {
 
 		sound = nullptr;
-
-		m_DefCamera.End();
 
 		FMODAudio::DestroyInst();
 		ImageComponent::DestroyInst();
@@ -124,8 +107,78 @@ namespace prev {
 	}
 
 	void Application::Run() {
+
+		Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+		float aspect = winSize.x / winSize.y;
+		float zoom = 1.0f;
+
+		Camera cam(-aspect * zoom, aspect * zoom, zoom, -zoom);
+
 		while (m_ApplicationRunning) {
 			PROFILER_ROOT_BEGIN;
+
+			//////////////////////////////////////TESTING////////////////////////////////////////
+
+			cam.Begin();
+
+			if (m_IsWindowReiszed) {
+				winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+
+				Viewport v;
+				v.TopLeft = Vec2(0.0f);
+				v.DepthValues = Vec2(0.0f, 1.0f);
+				v.Dimension = winSize;
+
+				GraphicsContext::Ref().ChangeResolution(ToVec2i(winSize));
+				RenderState::Ref().SetViewport(v);
+				RenderState::Ref().DisableScissors();
+
+				aspect = winSize.x / winSize.y;
+
+				cam.End();
+
+				cam = Camera(-aspect * zoom, aspect * zoom, zoom, -zoom);
+
+				cam.Begin();
+
+				m_IsWindowReiszed = false;
+			}
+
+			if (Input::Ref().IsKeyDown(PV_KEY_A)) {
+				cam.SetPosition(cam.GetPosition() + Vec2(-0.1f, 0.0f));
+			}
+
+			if (Input::Ref().IsKeyDown(PV_KEY_D)) {
+				cam.SetPosition(cam.GetPosition() + Vec2(0.1f, 0.0f));
+			}
+
+			if (Input::Ref().IsKeyDown(PV_KEY_W)) {
+				cam.SetPosition(cam.GetPosition() + Vec2(0.0f, 0.1f));
+			}
+
+			if (Input::Ref().IsKeyDown(PV_KEY_S)) {
+				cam.SetPosition(cam.GetPosition() + Vec2(0.0f, -0.1f));
+			}
+
+			if (Input::Ref().IsKeyDown(PV_KEY_L)) {
+				cam.SetRotation(cam.GetRotation() + 1.0f);
+			}
+
+			if (Input::Ref().IsKeyDown(PV_KEY_K)) {
+				cam.SetRotation(cam.GetRotation() - 1.0f);
+			}
+
+			if (Input::Ref().GetMouseScrollDelta().y != 0) {
+				zoom += ((float)Input::Ref().GetMouseScrollDelta().y) / 1200.0f;
+
+				cam.End();
+
+				cam = Camera(-aspect * zoom, aspect * zoom, zoom, -zoom);
+
+				cam.Begin();
+			}
+
+			//////////////////////////////////////TESTING////////////////////////////////////////
 
 			Timer::Update();
 
@@ -175,6 +228,7 @@ namespace prev {
 			//LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
 			GLOBAL_DRAW_CALL_COUNT = 0;
 
+			cam.End(); //////////////////////////////////////TESTING////////////////////////////////////////
 		}
 	}
 
@@ -197,20 +251,7 @@ namespace prev {
 	}
 
 	bool Application::WindowResized(WindowResizeEvent & e) {
-		Vec2 winSize = ToVec2(e.GetWindowSize());
-		float aspect = winSize.x / winSize.y;
-
-		float defCameraXScale = aspect * S_DEFCAMERA_SCALE_Y;
-
-		m_DefCamera.SetScreenSpace(
-			Vec2(-defCameraXScale / 2, -S_DEFCAMERA_SCALE_Y / 2),
-			Vec2(defCameraXScale / 2, S_DEFCAMERA_SCALE_Y / 2)
-		);
-
-		m_DefCamera.SetNearFar(S_DEFCAMERA_NEAR, S_DEFCAMERA_FAR);
-		m_DefCamera.End();
-		m_DefCamera.Begin();
-
+		m_IsWindowReiszed = true;
 		return false;
 	}
 

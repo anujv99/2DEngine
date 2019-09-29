@@ -3,6 +3,14 @@
 
 namespace com = Microsoft::WRL;
 
+#if defined(ENGINE_DEBUG)
+	#define CHECK_CONTEXT_CREATION(F) m_IsContextCreated = F; if (!m_IsContextCreated) return;
+	#define CHECK_HR(F, M) if (FAILED(F)) { ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, M); return false; }
+#elif defined(ENGINE_RELEASE) || defined(ENGINE_DIST)
+	#define CHECK_CONTEXT_CREATION(F) F
+	#define CHECK_HR(F, M) F
+#endif
+
 namespace prev {
 
 	std::vector<DisplayMode> GraphicsContext::GetDisplayModes() {
@@ -60,22 +68,11 @@ namespace prev {
 		if (m_IsContextCreated == false) {
 			return;
 		}
-		m_IsContextCreated = InitializeD3D(displayModeDesc, hWnd);
-		if (m_IsContextCreated == false) {
-			return;
-		}
-		m_IsContextCreated = CreateRenderTargetView(displayModeDesc);
-		if (m_IsContextCreated == false) {
-			return;
-		}
-		m_IsContextCreated = CreateDepthBuffer(displayModeDesc);
-		if (m_IsContextCreated == false) {
-			return;
-		}
-		m_IsContextCreated = CreateRasterizerState(displayModeDesc);
-		if (m_IsContextCreated == false) {
-			return;
-		}
+
+		CHECK_CONTEXT_CREATION(InitializeD3D(displayModeDesc, hWnd));
+		CHECK_CONTEXT_CREATION(CreateRenderTargetView());
+		//CHECK_CONTEXT_CREATION(CreateDepthBuffer(displayModeDesc));
+		CHECK_CONTEXT_CREATION(CreateRasterizerState(displayModeDesc));
 
 		if (displayMode.IsWindowFullscreen()) {
 			m_SwapChain->SetFullscreenState(TRUE, nullptr);
@@ -87,11 +84,24 @@ namespace prev {
 	void D3DContext::BeginFrame() {
 		float clearColor[] = { 0, 0, 0, 0 };
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), clearColor);
-		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		//m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
 	void D3DContext::EndFrame() {
 		m_SwapChain->Present(1u, 0u);
+	}
+
+	bool D3DContext::ChangeResolution(Vec2i newResolution) {
+		com::ComPtr<ID3D11Resource> backBuffer;
+		CHECK_HR(m_SwapChain->GetBuffer(0, __uuidof(ID3D11Resource), (void **)backBuffer.GetAddressOf()), "Unable to get back buffer");
+		backBuffer = nullptr;
+		m_RenderTargetView = nullptr;
+
+		CHECK_HR(m_SwapChain->ResizeBuffers(0, newResolution.x, newResolution.y, DXGI_FORMAT_UNKNOWN, 0u), "Unable to resize D3DBuffer");
+
+		CreateRenderTargetView();
+
+		return true;
 	}
 
 	void D3DContext::BindDefaultRenderTarget() {
@@ -160,35 +170,21 @@ namespace prev {
 		flags |= D3D11_CREATE_DEVICE_DEBUG;
 		#endif
 
-		HRESULT hr = D3D11CreateDeviceAndSwapChain(
+		CHECK_HR(D3D11CreateDeviceAndSwapChain(
 			NULL, D3D_DRIVER_TYPE_HARDWARE,
 			NULL, flags,
 			featureLevels, (UINT)std::size(featureLevels),
 			D3D11_SDK_VERSION, &scd,
 			m_SwapChain.GetAddressOf(), m_Device.GetAddressOf(),
-			&selectedFeatureLevels, m_DeviceContext.GetAddressOf());
-
-		if (FAILED(hr)) {
-			ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, "Failed to create DirectX Device and Swap chain");
-			return false;
-		}
+			&selectedFeatureLevels, m_DeviceContext.GetAddressOf()), "Failed to create DirectX Device and Swap chain");
 
 		return true;
 	}
 
-	bool D3DContext::CreateRenderTargetView(const DXGI_MODE_DESC & displayMode) {
+	bool D3DContext::CreateRenderTargetView() {
 		com::ComPtr<ID3D11Resource> backBuffer;
-		HRESULT hr = m_SwapChain->GetBuffer(0, __uuidof(ID3D11Resource), (void **)backBuffer.GetAddressOf());
-		if (FAILED(hr)) {
-			ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, "Unable to get back buffer");
-			return false;
-		}
-
-		hr = m_Device->CreateRenderTargetView(backBuffer.Get(), NULL, m_RenderTargetView.GetAddressOf());
-		if (FAILED(hr)) {
-			ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, "Failed to create DirectX Render Traget View");
-			return false;
-		}
+		CHECK_HR(m_SwapChain->GetBuffer(0, __uuidof(ID3D11Resource), (void **)backBuffer.GetAddressOf()), "Unable to get back buffer");
+		CHECK_HR(m_Device->CreateRenderTargetView(backBuffer.Get(), NULL, m_RenderTargetView.GetAddressOf()), "Failed to create DirectX Render Traget View");
 
 		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), NULL);
 
@@ -208,11 +204,7 @@ namespace prev {
 		rd.MultisampleEnable		= m_NumSamples == 1 ? FALSE : TRUE;
 		rd.AntialiasedLineEnable	= FALSE;
 
-		HRESULT hr = m_Device->CreateRasterizerState(&rd, m_RasterizerState.GetAddressOf());
-		if (FAILED(hr)) {
-			ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, "Failed to create Rasterizer state");
-			return false;
-		}
+		CHECK_HR(m_Device->CreateRasterizerState(&rd, m_RasterizerState.GetAddressOf()), "Failed to create Rasterizer state");
 
 		m_DeviceContext->RSSetState(m_RasterizerState.Get());
 
@@ -228,11 +220,7 @@ namespace prev {
 		dsd.DepthFunc						= D3D11_COMPARISON_LESS_EQUAL;
 		dsd.StencilEnable					= FALSE;
 
-		HRESULT hr = m_Device->CreateDepthStencilState(&dsd, m_DepthStencilState.GetAddressOf());
-		if (FAILED(hr)) {
-			ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, "Failed to create Depth Stencil State");
-			return false;
-		}
+		CHECK_HR(m_Device->CreateDepthStencilState(&dsd, m_DepthStencilState.GetAddressOf()), "Failed to create Depth Stencil State");
 
 		m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 1u);
 
@@ -253,11 +241,7 @@ namespace prev {
 		dbd.CPUAccessFlags			= 0;
 		dbd.MiscFlags				= 0;
 
-		hr = m_Device->CreateTexture2D(&dbd, NULL, m_DepthStencilBuffer.GetAddressOf());
-		if (FAILED(hr)) {
-			ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, "Failed to create Depth Stencil Texture2D");
-			return false;
-		}
+		CHECK_HR(m_Device->CreateTexture2D(&dbd, NULL, m_DepthStencilBuffer.GetAddressOf()), "Failed to create Depth Stencil Texture2D");
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC dsvd;
 		ZeroMemory(&dsvd, sizeof(dsvd));
@@ -269,12 +253,8 @@ namespace prev {
 			dsvd.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2D;
 		dsvd.Texture2D.MipSlice		= 0;
 
-		hr = m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &dsvd, m_DepthStencilView.GetAddressOf());
-		if (FAILED(hr)) {
-			ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, "Failed to create Depth Stencil View");
-			return false;
-		}
-
+		CHECK_HR(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), &dsvd, m_DepthStencilView.GetAddressOf()), "Failed to create Depth Stencil View");
+		
 		m_DeviceContext->OMSetRenderTargets(1u, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 
 		return true;

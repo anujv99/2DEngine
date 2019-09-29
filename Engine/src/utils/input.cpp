@@ -3,7 +3,6 @@
 #include "math/vecconversion.h"
 #include "math/mvp.h"
 #include "application.h"
-#include "math/screenspace.h"
 
 namespace prev {
 
@@ -80,8 +79,6 @@ namespace prev {
 	}
 
 	bool Input::MouseMoved(MouseMovedEvent & e) {
-		const Cam2D & defCamera = Application::Ref().GetDefaultCamera();
-		m_MousePos = defCamera.MapMouseCoords(e.GetMousePos());
 		return false;
 	}
 

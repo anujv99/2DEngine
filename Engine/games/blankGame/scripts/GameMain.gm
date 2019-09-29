@@ -20,12 +20,12 @@ local MakeBlankGame = function() {
 		.Box = Sprite();
 		.Box.Color = Vec4(1.0f, 0.0f, 0.0f, 1.0f);
 		.Box.Position = Vec2(0.0f);
-		.Box.Dimension = Vec2(1.0f);
+		.Box.Dimension = Vec2(0.2f);
 
 		.Box2 = Sprite();
 		.Box2.Color = Vec4(0.0f, 0.0f, 1.0f, 1.0f);
-		.Box2.Position = Vec2(0.0f, 1.0f);
-		.Box2.Dimension = Vec2(1.0f);
+		.Box2.Position = Vec2(0.0f, 0.2f);
+		.Box2.Dimension = Vec2(0.2f);
 
 		.Ps = ParticleSystem(1024);
 
@@ -105,7 +105,7 @@ local MakeBlankGame = function() {
 		.Ps.Draw();
 		.Box.Draw();
 		.Box2.Draw();
-		.Fnt.Print(.Tex);
+		//.Fnt.Print(.Tex);
 	};
 
 	return BlankGame;

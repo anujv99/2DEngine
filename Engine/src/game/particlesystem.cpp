@@ -17,18 +17,18 @@ namespace prev {
 		m_ElapsedTime					= 0.0f;
 
 		m_LifeSpan						= 2.0f;
-		m_LifeSpanVaraince				= 0.1f;
+		m_LifeSpanVaraince				= 1.0f;
 
 		m_StartPosition					= Vec2(0.0f);
 		m_StartPositionVariance			= Vec2(0.0f);
 
-		m_StartScale					= Vec2(1.0f);
-		m_StartScaleVariance			= Vec2(0.1f);
+		m_StartScale					= Vec2(0.1f);
+		m_StartScaleVariance			= Vec2(0.0f);
 		m_EndScale						= Vec2(0.0f);
 		m_EndScaleVariance				= Vec2(0.0f);
 
 		m_Velocity						= Vec2(0.0f);
-		m_VelocityVariance				= Vec2(0.1f);
+		m_VelocityVariance				= Vec2(0.01f);
 
 		m_Accel							= Vec2(0.0f);
 

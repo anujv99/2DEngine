@@ -3,7 +3,9 @@
 #include "window.h"
 #include "viewport.h"
 #include "uniform.h"
+
 #include "math/mvp.h"
+#include "math/vecconversion.h"
 
 #include "datatypes.h"
 
@@ -29,7 +31,7 @@ namespace prev {
 			auto windowSize = Window::Ref().GetDisplayMode().GetWindowSize();
 
 			DefaultViewport.TopLeft = Vec2(0.0f, 0.0f);
-			DefaultViewport.Dimension = Vec2((float)windowSize.x, (float)windowSize.y);
+			DefaultViewport.Dimension = ToVec2(windowSize);
 			DefaultViewport.DepthValues = Vec2(0.0f, 1.0f);
 
 			Blend.SrcBlend = PV_BLEND_SRC_ALPHA;

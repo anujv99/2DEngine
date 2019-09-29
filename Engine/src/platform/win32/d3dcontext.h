@@ -13,6 +13,7 @@ namespace prev {
 
 		virtual void BeginFrame() override;
 		virtual void EndFrame() override;
+		virtual bool ChangeResolution(Vec2i newResolution) override;
 
 		inline ID3D11Device * GetDevice() { return m_Device.Get(); }
 		inline ID3D11DeviceContext * GetDeviceContext() { return m_DeviceContext.Get(); }
@@ -22,7 +23,7 @@ namespace prev {
 		DXGI_MODE_DESC GetDisplayModeDesc(const DisplayMode & displayMode);
 
 		bool InitializeD3D(const DXGI_MODE_DESC & displayMode, HWND windowHandle);
-		bool CreateRenderTargetView(const DXGI_MODE_DESC & displayMode);
+		bool CreateRenderTargetView();
 		bool CreateRasterizerState(const DXGI_MODE_DESC & displayMode);
 		bool CreateDepthBuffer(const DXGI_MODE_DESC & displayMode);
 	private:

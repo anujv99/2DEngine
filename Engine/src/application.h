@@ -3,8 +3,6 @@
 #include "utils/layerstack.h"
 #include "imgui/imguilayer.h"
 
-#include "math/cam2d.h"
-
 namespace prev {
 
 	class Application : public Singleton<Application> {
@@ -14,8 +12,6 @@ namespace prev {
 		~Application();
 	public:
 		void Run();
-
-		const Cam2D & GetDefaultCamera() const { return m_DefCamera; }
 	private:
 		void Gui();
 	private:
@@ -25,10 +21,7 @@ namespace prev {
 	private:
 		ImGuiLayer * m_ImGuiLayer = nullptr;
 		bool m_ApplicationRunning = true;
-
-		//Default Camera
-		Cam2D m_DefCamera;
-
+		bool m_IsWindowReiszed = false;
 	};
 
 }

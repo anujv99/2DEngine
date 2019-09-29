@@ -4,8 +4,6 @@
 #include <freetype-gl.h>
 #include "application.h"
 
-#include "math/screenspace.h"
-
 namespace prev {
 
 	static constexpr const unsigned int TEXTURE_SIZE = 1024;
@@ -13,7 +11,7 @@ namespace prev {
 	Font::Font(const std::string & name, const std::string & fileName, float size) :
 		m_FontName(name), m_FontFile(fileName), m_Size(size), m_Texture(nullptr), m_FontAtlas(nullptr), m_Font(nullptr) {
 
-		size = ScreenToPixels(Vec2(size)).y;
+		//size = ScreenToPixels(Vec2(size)).y;
 		m_Size = size;
 
 		m_FontAtlas = ftgl::texture_atlas_new(TEXTURE_SIZE, TEXTURE_SIZE, 1);
@@ -51,9 +49,9 @@ namespace prev {
 			ftgl::texture_glyph_t * glyph = ftgl::texture_font_get_glyph(m_Font, &label.GetText()[i]);
 			if (i > 0) {
 				float kerning = ftgl::texture_glyph_get_kerning(glyph, &label.GetText()[i - 1]);
-				width += PixelsToScreenX(kerning) / scale.x;
+				width += kerning / scale.x;
 			}
-			width += PixelsToScreenX(glyph->advance_x) / scale.x;
+			width += glyph->advance_x / scale.x;
 		}
 		return width;
 	}
@@ -64,8 +62,8 @@ namespace prev {
 		float max = 0.0f;
 		for (int i = 0; i < label.GetText().size(); i++) {
 			ftgl::texture_glyph_t * glyph = ftgl::texture_font_get_glyph(m_Font, &label.GetText()[i]);
-			float height = PixelsToScreenY((float)glyph->height) / scale.y;
-			float offset = PixelsToScreenY((float)glyph->offset_y) / scale.y - height;
+			float height = (float)glyph->height / scale.y;
+			float offset = (float)glyph->offset_y / scale.y - height;
 			if (offset < min)
 				min = offset;
 			if (height > max)
