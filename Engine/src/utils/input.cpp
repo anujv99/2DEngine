@@ -79,6 +79,7 @@ namespace prev {
 	}
 
 	bool Input::MouseMoved(MouseMovedEvent & e) {
+		m_MousePos = ToVec2(e.GetMousePos());
 		return false;
 	}
 

@@ -39,7 +39,11 @@ namespace prev {
 		inline bool IsWindowReady() const { return m_IsWindowReady; }
 	public:
 		virtual void PollEvents() = 0;
+		virtual void SetPosition(Vec2i pos) = 0;
+		virtual void SetWindowSize(Vec2i size) = 0;
 		virtual uintptr_t GetWindowRawPointer() = 0;
+
+		virtual Vec2i GetPosition() = 0;
 	protected:
 		Window(const DisplayMode & displayMode) : m_DisplayMode(displayMode) { }
 		virtual ~Window() {}

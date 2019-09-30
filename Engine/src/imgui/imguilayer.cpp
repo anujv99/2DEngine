@@ -4,12 +4,20 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include "graphics/window.h"
+
 namespace prev {
 
 	ImGuiLayer::ImGuiLayer() : Layer(IMGUI_LAYER_NAME) {
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+
 		ImGuiIO & io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+		ImGuiStyle & style = ImGui::GetStyle();
+		style.WindowRounding = 0.0f;
+
 		ImGui::StyleColorsDark();
 		InitImGui();
 
@@ -29,8 +37,31 @@ namespace prev {
 	}
 
 	void ImGuiLayer::StartFrame() {
+
+		static bool windowMoved = false;
+
 		Start();
 		ImGui::NewFrame();
+
+		if (ImGui::BeginMainMenuBar()) {
+
+			if (ImGui::IsWindowHovered() || windowMoved) {
+				if (ImGui::IsMouseDragging()) {
+					windowMoved = true;
+					ImVec2 delta = ImGui::GetMouseDragDelta();
+					Window::Ref().SetPosition(Window::Ref().GetPosition() + Vec2i(delta.x, delta.y));
+				} else {
+					windowMoved = false;
+				}
+			}
+
+			if (ImGui::BeginMenu("File")) {
+				if (ImGui::MenuItem("Open File")) {}
+				if (ImGui::MenuItem("Close Engine")) { WindowCloseEvent e; REGISTER_EVENT(e); }
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
 	}
 
 	void ImGuiLayer::EndFrame() {

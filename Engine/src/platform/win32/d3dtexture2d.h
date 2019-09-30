@@ -26,6 +26,8 @@ namespace prev {
 
 		virtual void Bind() override;
 		virtual void UnBind() override;
+
+		virtual void * GetNativeTexture() override;
 	public:
 		D3DTexture2D(D3D11_TEXTURE2D_DESC desc);
 		D3DTexture2D(D3D11_TEXTURE2D_DESC desc, D3D11_SHADER_RESOURCE_VIEW_DESC vDesc);

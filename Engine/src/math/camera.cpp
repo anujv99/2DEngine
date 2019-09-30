@@ -13,9 +13,10 @@ namespace prev {
 		m_OrthoMatrix = Ortho(left, right, bottom, top, NEAR_PLANE, FAR_PLANE);
 	}
 
-	Camera::Camera(float left, float right, float top, float bottom, float nearPlane, float farPlane) :
-		m_OrthoMatrix(Identity()), m_ViewMatrix(Identity()), m_Position(0.0f), m_Rotation(0.0f) {
-		m_OrthoMatrix = Ortho(left, right, bottom, top, nearPlane, farPlane);
+	Camera::~Camera() {}
+
+	void Camera::SetProjection(float left, float right, float top, float bottom) {
+		m_OrthoMatrix = Ortho(left, right, bottom, top, NEAR_PLANE, FAR_PLANE);
 	}
 
 	void Camera::Begin() {

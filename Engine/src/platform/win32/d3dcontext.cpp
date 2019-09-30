@@ -71,7 +71,7 @@ namespace prev {
 
 		CHECK_CONTEXT_CREATION(InitializeD3D(displayModeDesc, hWnd));
 		CHECK_CONTEXT_CREATION(CreateRenderTargetView());
-		//CHECK_CONTEXT_CREATION(CreateDepthBuffer(displayModeDesc));
+		CHECK_CONTEXT_CREATION(CreateDepthBuffer(displayModeDesc));
 		CHECK_CONTEXT_CREATION(CreateRasterizerState(displayModeDesc));
 
 		if (displayMode.IsWindowFullscreen()) {
@@ -84,7 +84,7 @@ namespace prev {
 	void D3DContext::BeginFrame() {
 		float clearColor[] = { 0, 0, 0, 0 };
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), clearColor);
-		//m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
 	void D3DContext::EndFrame() {
@@ -100,6 +100,16 @@ namespace prev {
 		CHECK_HR(m_SwapChain->ResizeBuffers(0, newResolution.x, newResolution.y, DXGI_FORMAT_UNKNOWN, 0u), "Unable to resize D3DBuffer");
 
 		CreateRenderTargetView();
+
+		DXGI_MODE_DESC desc;
+		desc.Width = newResolution.x;
+		desc.Height = newResolution.y;
+
+		m_DepthStencilBuffer = nullptr;
+		m_DepthStencilView = nullptr;
+		m_DepthStencilState = nullptr;
+
+		CreateDepthBuffer(desc);
 
 		return true;
 	}

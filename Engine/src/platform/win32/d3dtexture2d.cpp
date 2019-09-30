@@ -139,6 +139,10 @@ namespace prev {
 		GetDeviceContext()->PSSetShaderResources(m_BindSlot, 1, temp);
 	}
 
+	void * D3DTexture2D::GetNativeTexture() {
+		return (void *)m_TextureView.Get();
+	}
+
 	D3DTexture2D::D3DTexture2D(D3D11_TEXTURE2D_DESC desc) : m_IsCreated(false), m_BindSlot(0u), m_TextureSampler(nullptr) {
 
 		desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;

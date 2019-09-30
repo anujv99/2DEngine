@@ -39,6 +39,8 @@ namespace prev {
 		virtual void Bind() override = 0;
 		virtual void UnBind() override = 0;
 
+		virtual void * GetNativeTexture() = 0;
+
 		virtual BindableType GetType() const override {
 			return BindableType::TEXTURE_2D;
 		}

@@ -29,10 +29,12 @@
 #include "physics/box2dmanager.h"
 
 #include "game/square.h"
+#include "game/cameracontroller.h"
 
 #include "audio/fmod/fmodaudio.h"
 
 //-----------------TEMP------------------
+#include "imgui.h"
 //---------------------------------------
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
@@ -48,7 +50,7 @@ namespace prev {
 
 		auto dis = GraphicsContext::GetDisplayModes();
 		unsigned int selectedDis = 5;
-		dis[selectedDis].SetWindowStyle(WINDOW_STYLE_WINDOWED);
+		dis[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
 		dis[selectedDis].SetMultisample(8);
 		Window::CreateInst(dis[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(BIND_EVENT_FN(Application::OnEvent));
@@ -74,6 +76,7 @@ namespace prev {
 		Box2DManager::CreateInst();
 		ImageComponent::CreateInst();
 		FMODAudio::CreateInst();
+		CameraController::CreateInst();
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -88,6 +91,7 @@ namespace prev {
 
 		sound = nullptr;
 
+		CameraController::DestroyInst();
 		FMODAudio::DestroyInst();
 		ImageComponent::DestroyInst();
 		Box2DManager::DestroyInst();
@@ -108,21 +112,15 @@ namespace prev {
 
 	void Application::Run() {
 
-		Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
-		float aspect = winSize.x / winSize.y;
-		float zoom = 1.0f;
-
-		Camera cam(-aspect * zoom, aspect * zoom, zoom, -zoom);
-
 		while (m_ApplicationRunning) {
 			PROFILER_ROOT_BEGIN;
 
+			CameraController::Ref().Begin();
+
 			//////////////////////////////////////TESTING////////////////////////////////////////
 
-			cam.Begin();
-
 			if (m_IsWindowReiszed) {
-				winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+				Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
 
 				Viewport v;
 				v.TopLeft = Vec2(0.0f);
@@ -133,49 +131,7 @@ namespace prev {
 				RenderState::Ref().SetViewport(v);
 				RenderState::Ref().DisableScissors();
 
-				aspect = winSize.x / winSize.y;
-
-				cam.End();
-
-				cam = Camera(-aspect * zoom, aspect * zoom, zoom, -zoom);
-
-				cam.Begin();
-
 				m_IsWindowReiszed = false;
-			}
-
-			if (Input::Ref().IsKeyDown(PV_KEY_A)) {
-				cam.SetPosition(cam.GetPosition() + Vec2(-0.1f, 0.0f));
-			}
-
-			if (Input::Ref().IsKeyDown(PV_KEY_D)) {
-				cam.SetPosition(cam.GetPosition() + Vec2(0.1f, 0.0f));
-			}
-
-			if (Input::Ref().IsKeyDown(PV_KEY_W)) {
-				cam.SetPosition(cam.GetPosition() + Vec2(0.0f, 0.1f));
-			}
-
-			if (Input::Ref().IsKeyDown(PV_KEY_S)) {
-				cam.SetPosition(cam.GetPosition() + Vec2(0.0f, -0.1f));
-			}
-
-			if (Input::Ref().IsKeyDown(PV_KEY_L)) {
-				cam.SetRotation(cam.GetRotation() + 1.0f);
-			}
-
-			if (Input::Ref().IsKeyDown(PV_KEY_K)) {
-				cam.SetRotation(cam.GetRotation() - 1.0f);
-			}
-
-			if (Input::Ref().GetMouseScrollDelta().y != 0) {
-				zoom += ((float)Input::Ref().GetMouseScrollDelta().y) / 1200.0f;
-
-				cam.End();
-
-				cam = Camera(-aspect * zoom, aspect * zoom, zoom, -zoom);
-
-				cam.Begin();
 			}
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
@@ -196,13 +152,8 @@ namespace prev {
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
 
-			if (Input::Ref().IsKeyPressed(PV_KEY_P)) {
-				sound->Play();
-			} else if (Input::Ref().IsKeyPressed(PV_KEY_S)) {
-				sound->Pause();
-			}
-
 			FMODAudio::Ref().Update();
+			CameraController::Ref().Update();
 
 			//////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -223,12 +174,12 @@ namespace prev {
 			Input::Ref().Update();
 			EventHandler::Ref().FlushEventQueue();
 
+			CameraController::Ref().End();
+
 			PROFILER_ROOT_END;
 
 			//LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
 			GLOBAL_DRAW_CALL_COUNT = 0;
-
-			cam.End(); //////////////////////////////////////TESTING////////////////////////////////////////
 		}
 	}
 

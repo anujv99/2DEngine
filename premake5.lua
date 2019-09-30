@@ -75,7 +75,8 @@ workspace "2DEngine"
 		}
 		
 		undefines {
-			"UNICODE"
+			"UNICODE",
+			"_UNICODE",
 		}
 		
         pchsource "%{prj.name}/src/pch.cpp"

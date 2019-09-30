@@ -10,7 +10,9 @@ namespace prev {
 	class Camera : public HandledObject<Camera> {
 	public:
 		Camera(float left, float right, float top, float bottom);
-		Camera(float left, float right, float top, float bottom, float nearPlane, float farPlane);
+		~Camera();
+
+		void SetProjection(float left, float right, float top, float bottom);
 
 		void Begin();
 		void End();

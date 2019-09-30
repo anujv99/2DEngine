@@ -354,4 +354,31 @@ namespace prev {
 		}
 	}
 
+	void WindowsWindow::SetPosition(Vec2i pos) {
+		RECT rc;
+		GetWindowRect(m_HWnd, &rc);
+		BOOL result = MoveWindow(m_HWnd, pos.x, pos.y, std::abs(rc.right - rc.left), std::abs(rc.top - rc.bottom), FALSE);
+		if (result == FALSE) {
+			LOG_ERROR("Unable to set new window pos {}", pos);
+		}
+	}
+
+	void WindowsWindow::SetWindowSize(Vec2i size) {
+		RECT rc;
+		GetWindowRect(m_HWnd, &rc);
+
+		RECT newRc;
+		newRc.left = 0;
+		newRc.top = 0;
+		newRc.right = size.x;
+		newRc.bottom = size.y;
+
+		AdjustWindowRectEx(&newRc, m_WindowStyle, FALSE, m_WindowExStyle);
+
+		BOOL result = MoveWindow(m_HWnd, rc.left, rc.top, std::abs(newRc.right - newRc.left), std::abs(newRc.top - newRc.bottom), FALSE);
+		if (result == FALSE) {
+			LOG_ERROR("Unable to set new window size {}", size);
+		}
+	}
+
 }

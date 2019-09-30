@@ -6,6 +6,8 @@
 
 #include "graphics/window.h"
 
+#include "math/vecconversion.h"
+
 namespace prev {
 
 	class WindowsWindow : public Window {
@@ -15,7 +17,10 @@ namespace prev {
 
 		// Inherited via Window
 		virtual void PollEvents() override;
+		virtual void SetPosition(Vec2i pos) override;
+		virtual void SetWindowSize(Vec2i size) override;
 		virtual uintptr_t GetWindowRawPointer() { return (uintptr_t)(void *)m_HWnd; }
+		virtual Vec2i GetPosition() override { return m_DisplayPos; }
 	private:
 		bool RegisterWindowClass(const DisplayMode & displayMode);
 		bool CreateWindowsWindow(const DisplayMode & displayMode);
