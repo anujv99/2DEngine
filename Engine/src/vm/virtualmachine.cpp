@@ -6,7 +6,6 @@
 
 #include "virtualmachinelibs.h"
 #include "utils/layerstack.h"
-#include "imgui/imguilayer.h"
 #include "graphics/window.h"
 
 #include <imgui.h>
@@ -30,13 +29,14 @@ namespace prev {
 		InitGuiSettings();
 		InitGuiThreadAllocations();
 
-		ImGuiLayer * imlayer = LayerStack::Ref().GetImGuiLayer();
-		if (imlayer == nullptr) return;
-		imlayer->AddGuiFunction(std::bind(&VirtualMachine::GuiSettings, this));
+		IMGUI_CALL(ImGuiLayer * imlayer = LayerStack::Ref().GetImGuiLayer());
+		IMGUI_CALL(if (imlayer == nullptr) return);
+		IMGUI_CALL(imlayer->AddGuiFunction(std::bind(&VirtualMachine::GuiSettings, this)));
+		IMGUI_CALL(imlayer->SetSettingBoolean("VM Settings", &m_ShowSettingsGui));
 	}
 
 	VirtualMachine::~VirtualMachine() {
-		m_de.Close();
+		IMGUI_CALL(m_de.Close());
 
 		delete m_VM;
 		m_VM = nullptr;
@@ -52,20 +52,29 @@ namespace prev {
 		m_UpdateMs = Timer::GetTimeMs() - m_UpdateMs;
 		m_LastCallTime = (int)Timer::GetTimeMs();
 
-		m_de.Update();
+		IMGUI_CALL(m_de.Update());
 	}
 
 	void VirtualMachine::Render() {
 		if (!m_DrawManager.IsNull()) {
-			if (!m_de.IsDebugging()) {
+			IMGUI_CALL(
+				if (!m_de.IsDebugging()) {
+					m_DrawMs = Timer::GetTimeMs();
+					m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(1));
+					m_VM->ExecuteFunction(m_DrawFunction, 0, true, &m_DrawManager);
+					m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(0));
+					m_DrawMs = Timer::GetTimeMs() - m_DrawMs;
+				} else {
+					m_VM->ExecuteFunction(m_ClearFunction, 0, true, &m_DrawManager);
+				}
+			);
+			#ifndef IMGUI_ENABLED
 				m_DrawMs = Timer::GetTimeMs();
 				m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(1));
 				m_VM->ExecuteFunction(m_DrawFunction, 0, true, &m_DrawManager);
 				m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(0));
 				m_DrawMs = Timer::GetTimeMs() - m_DrawMs;
-			} else {
-				m_VM->ExecuteFunction(m_ClearFunction, 0, true, &m_DrawManager);
-			}
+			#endif // !IMGUI_ENABLED
 		}
 	}
 
@@ -101,7 +110,7 @@ namespace prev {
 
 		m_VM->SetDebugMode(true);
 
-		m_de.Open(m_VM);
+		IMGUI_CALL(m_de.Open(m_VM));
 
 		RegisterLibs(m_VM);
 		InitGlobals();
@@ -149,10 +158,13 @@ namespace prev {
 
 	void VirtualMachine::InitGlobals() {
 		m_VM->GetGlobals()->Set(m_VM, "g_Rendering", gmVariable(0));
-		if (ImGuiLayer::IsImGuiInitialized())
-			m_VM->GetGlobals()->Set(m_VM, "g_ImGui", gmVariable(1));
-		else
-			m_VM->GetGlobals()->Set(m_VM, "g_ImGui", gmVariable(0));
+
+		IMGUI_CALL(
+			if (ImGuiLayer::IsImGuiInitialized())
+				m_VM->GetGlobals()->Set(m_VM, "g_ImGui", gmVariable(1));
+			else
+				m_VM->GetGlobals()->Set(m_VM, "g_ImGui", gmVariable(0));
+		);
 	}
 
 	void VirtualMachine::InitGuiSettings() {
@@ -172,13 +184,11 @@ namespace prev {
 
 	void VirtualMachine::GuiSettings() {
 
-		static bool showGuiSettings = false;
-
 		if (Input::Ref().IsKeyPressed(PV_KEY_F1)) {
-			showGuiSettings = !showGuiSettings;
+			m_ShowSettingsGui = !m_ShowSettingsGui;
 		}
 
-		if (!showGuiSettings) return;
+		if (!m_ShowSettingsGui) return;
 
 		m_LineGraphUpdate->PushValue(m_UpdateMs);
 		m_LineGraphDraw->PushValue(m_DrawMs);
@@ -191,7 +201,7 @@ namespace prev {
 		int memUsageHard = m_VM->GetDesiredByteMemoryUsageHard();
 
 		ImGui::SetNextWindowSize(Vec2(232, 800));
-		ImGui::Begin("GameMonkey Settings", &showGuiSettings, ImGuiWindowFlags_NoResize);
+		ImGui::Begin("GameMonkey Settings", &m_ShowSettingsGui, ImGuiWindowFlags_NoResize);
 		ImGui::Text("Update");
 		ImGui::ProgressBar(m_UpdateMs / 100.0f, Vec2(-1, 0), std::to_string(m_UpdateMs).c_str());
 		m_LineGraphUpdate->DrawImGui();
@@ -244,7 +254,7 @@ namespace prev {
 		m_VM->GetGC()->SetWorkPerIncrement(workPerIncrement);
 		m_VM->GetGC()->SetDestructPerIncrement(destructPerIncrement);
 
-		m_de.Gui();
+		IMGUI_CALL(m_de.Gui());
 	}
 
 	void VirtualMachine::InitGuiThreadAllocations() {

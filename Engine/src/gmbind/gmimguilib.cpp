@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "gmimguilib.h"
 
+#ifdef IMGUI_ENABLED
+
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -343,3 +345,5 @@ namespace prev {
 	}
 
 }
+
+#endif

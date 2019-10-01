@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#ifdef IMGUI_ENABLED
+
 #include "d3dhelper.h"
 
 #include "imgui/imguilayer.h"
@@ -64,3 +66,5 @@ namespace prev {
 	}
 
 }
+
+#endif

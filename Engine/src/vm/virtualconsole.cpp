@@ -31,9 +31,10 @@ namespace prev {
 		m_CmdIndex = 0;
 		m_Text.reserve(1024 * 1024);
 
-		ImGuiLayer * imlayer = LayerStack::Ref().GetImGuiLayer();
-		if (imlayer != nullptr)
-			imlayer->AddGuiFunction(std::bind(&VirtualConsole::Gui, this));
+		IMGUI_CALL(ImGuiLayer * imlayer = LayerStack::Ref().GetImGuiLayer());
+		IMGUI_CALL(if (imlayer != nullptr))
+		IMGUI_CALL(imlayer->AddGuiFunction(std::bind(&VirtualConsole::Gui, this)));
+		IMGUI_CALL(imlayer->SetSettingBoolean("VM Console", &m_Enabled));
 
 		vmConsole.CommandCallbackFunction = [this](const char * command) -> void {
 			this->RunCommand(command);

@@ -6,17 +6,21 @@
 #include "math/vecconversion.h"
 #include "utils/input.h"
 
+#include <imgui.h>
+#include "utils/layerstack.h"
+
 #define CHECK_MOVEMENT(K, P) if (Input::Ref().IsKeyDown(K)) { m_Position += P; m_Camera->SetPosition(m_Position); }
 
 namespace prev {
 
-	CameraController::CameraController() : 
-		m_Camera(nullptr), 
+	CameraController::CameraController() :
+		m_Camera(nullptr),
 		m_AspectRatio(0.0f),
 		m_ZoomLevel(1.0f),
 		m_Rotation(0.0f),
 		m_Position(0.0f),
-		m_CameraTranslationSpeed(2.0f), m_CameraRotationSpeed(3.0f), m_CameraZoomStep(0.1f) {
+		m_CameraTranslationSpeed(2.0f), m_CameraRotationSpeed(3.0f), m_CameraZoomStep(0.1f), 
+		m_IsGuiOpen(false) {
 
 
 		Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
@@ -25,6 +29,11 @@ namespace prev {
 		m_Camera = new Camera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, m_ZoomLevel, -m_ZoomLevel);
 
 		EventHandler::Ref().RegisterEventFunction(BIND_EVENT_FN(CameraController::OnEvent));
+
+		IMGUI_CALL(ImGuiLayer * imlayer = LayerStack::Ref().GetImGuiLayer());
+		IMGUI_CALL(if (imlayer != nullptr))
+		IMGUI_CALL(imlayer->AddGuiFunction(std::bind(&CameraController::GuiFunction, this)));
+		IMGUI_CALL(imlayer->SetSettingBoolean("Canera Settings", &m_IsGuiOpen));
 	}
 
 	CameraController::~CameraController() {}
@@ -48,6 +57,29 @@ namespace prev {
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(CameraController::WindowResized));
 		dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(CameraController::MouseScrolled));
+	}
+
+	void CameraController::GuiFunction() {
+
+		if (!m_IsGuiOpen)
+			return;
+
+		Vec2 pos = m_Camera->GetPosition();
+		float rot = ToRadians(m_Camera->GetRotation());
+
+		IMGUI_CALL(
+			ImGui::Begin("Camera Settings", &m_IsGuiOpen);
+			if (ImGui::DragFloat2("Position", (float *)& pos, 0.04f)) {
+				m_Camera->SetPosition(pos);
+			}
+			if (ImGui::DragFloat("Zoom", &m_ZoomLevel, 0.04f)) {
+				m_Camera->SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, m_ZoomLevel, -m_ZoomLevel);
+			}
+			if (ImGui::SliderAngle("Rotatin", &rot)) {
+				m_Camera->SetRotation(ToDegrees(rot));
+			}
+			ImGui::End();
+		);
 	}
 
 	bool CameraController::WindowResized(WindowResizeEvent & e) {

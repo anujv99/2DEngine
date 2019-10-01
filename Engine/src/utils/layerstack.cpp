@@ -3,7 +3,11 @@
 
 namespace prev {
 
+#ifdef IMGUI_ENABLED
 	LayerStack::LayerStack() : m_ImGuiLayer(nullptr) {}
+#else
+	LayerStack::LayerStack() {}
+#endif
 
 	LayerStack::~LayerStack() {
 		m_Layers.clear();
@@ -16,13 +20,15 @@ namespace prev {
 		m_Layers.push_back(layer);
 		layer->OnAttach();
 
-		if (m_ImGuiLayer != nullptr) {
-			m_ImGuiLayer->AddGuiFunction(std::bind(&Layer::OnImGuiUpdate, layer));
-		}
+		IMGUI_CALL(
+			if (m_ImGuiLayer != nullptr) {
+				m_ImGuiLayer->AddGuiFunction(std::bind(&Layer::OnImGuiUpdate, layer));
+			}
 
-		if (layer->GetName() == IMGUI_LAYER_NAME && m_ImGuiLayer == nullptr) {
-			m_ImGuiLayer = dynamic_cast<ImGuiLayer *>(layer);
-		}
+			if (layer->GetName() == IMGUI_LAYER_NAME && m_ImGuiLayer == nullptr) {
+				m_ImGuiLayer = dynamic_cast<ImGuiLayer *>(layer);
+			}
+		);
 	}
 
 	void LayerStack::PushOverlay(Layer * layer) {
@@ -31,13 +37,15 @@ namespace prev {
 		m_Overlays.push_back(layer);
 		layer->OnAttach();
 
-		if (m_ImGuiLayer != nullptr) {
-			m_ImGuiLayer->AddGuiFunction(std::bind(&Layer::OnImGuiUpdate, layer));
-		}
+		IMGUI_CALL(
+			if (m_ImGuiLayer != nullptr) {
+				m_ImGuiLayer->AddGuiFunction(std::bind(&Layer::OnImGuiUpdate, layer));
+			}
 
-		if (layer->GetName() == IMGUI_LAYER_NAME && m_ImGuiLayer == nullptr) {
-			m_ImGuiLayer = dynamic_cast<ImGuiLayer *>(layer);
-		}
+			if (layer->GetName() == IMGUI_LAYER_NAME && m_ImGuiLayer == nullptr) {
+				m_ImGuiLayer = dynamic_cast<ImGuiLayer *>(layer);
+			}
+		);
 	}
 
 	void LayerStack::PopLayer(Layer * layer) {
@@ -68,10 +76,12 @@ namespace prev {
 		}
 	}
 
+#ifdef IMGUI_ENABLED
 	void LayerStack::OnImGuiUpdate() {
 		if (m_ImGuiLayer != nullptr)
 			m_ImGuiLayer->OnImGuiUpdate();
 	}
+#endif
 
 	void LayerStack::OnEvent(Event & e) {
 		for (auto layer : m_Layers) {

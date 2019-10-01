@@ -17,6 +17,7 @@ namespace prev {
 		void Update();
 	private:
 		void OnEvent(Event & event);
+		void GuiFunction();
 
 		bool WindowResized(WindowResizeEvent & e);
 		bool MouseScrolled(MouseScrolledEvent & e);
@@ -29,6 +30,8 @@ namespace prev {
 		float m_Rotation;
 		Vec2 m_Position;
 		float m_CameraTranslationSpeed, m_CameraRotationSpeed, m_CameraZoomStep;
+
+		bool m_IsGuiOpen;
 	};
 
 }

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "imguilayer.h" 
 
+#ifdef IMGUI_ENABLED
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -49,7 +51,7 @@ namespace prev {
 				if (ImGui::IsMouseDragging()) {
 					windowMoved = true;
 					ImVec2 delta = ImGui::GetMouseDragDelta();
-					Window::Ref().SetPosition(Window::Ref().GetPosition() + Vec2i(delta.x, delta.y));
+					Window::Ref().SetPosition(Window::Ref().GetPosition() + Vec2i((int)delta.x, (int)delta.y));
 				} else {
 					windowMoved = false;
 				}
@@ -60,8 +62,17 @@ namespace prev {
 				if (ImGui::MenuItem("Close Engine")) { WindowCloseEvent e; REGISTER_EVENT(e); }
 				ImGui::EndMenu();
 			}
+
+			if (ImGui::BeginMenu("Settings")) {
+				for (auto & setting : m_Settings) {
+					if (ImGui::MenuItem(setting.first.c_str(), nullptr, setting.second)) {}
+				}
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMainMenuBar();
 		}
+
 	}
 
 	void ImGuiLayer::EndFrame() {
@@ -165,3 +176,5 @@ namespace prev {
 	}
 
 }
+
+#endif

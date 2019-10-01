@@ -14,10 +14,11 @@ namespace prev {
 	static const char PROFILER_GRAPHS_IMGUI_WINDOW_NAME[] = "Profiler Graphs";
 
 	Profiler::Profiler() : m_ActiveEntry(nullptr), m_RootEntry(PROFILER_ROOT_NAME, nullptr), m_IsPaused(false), m_PlotGraph(false), m_DrawGui(false) {
-		auto imguilayer = LayerStack::Ref().GetImGuiLayer();
-		if (imguilayer == nullptr) return;
-		imguilayer->AddGuiFunction(std::bind(&Profiler::Gui, this));
-		imguilayer->AddGuiFunction(std::bind(&Profiler::GuiGraphs, this));
+		IMGUI_CALL(auto imguilayer = LayerStack::Ref().GetImGuiLayer());
+		IMGUI_CALL(if (imguilayer == nullptr) return);
+		IMGUI_CALL(imguilayer->AddGuiFunction(std::bind(&Profiler::Gui, this)));
+		IMGUI_CALL(imguilayer->AddGuiFunction(std::bind(&Profiler::GuiGraphs, this)));
+		IMGUI_CALL(imguilayer->SetSettingBoolean("Profiler", &m_DrawGui));
 	}
 
 	Profiler::~Profiler() {

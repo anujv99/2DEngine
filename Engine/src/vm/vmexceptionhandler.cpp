@@ -13,8 +13,10 @@ namespace prev {
 	void OnGmException() {
 		if (ImGui::GetCurrentContext()->CurrentWindowStack.size() != 1 && ImGui::GetCurrentContext()->CurrentWindow) {
 			gmThread * thr = VirtualMachine::Ref().GetVM().GetThread(VirtualMachine::Ref().GetConsole().GetLastCmdThread());
-			if (thr == nullptr)
-				ImGuiSafeEnd();
+			#ifdef IMGUI_ENABLED
+				if (thr == nullptr)
+					ImGuiSafeEnd();
+			#endif
 		}
 	}
 

@@ -3,6 +3,7 @@
 #include "gm/gmVariable.h"
 #include "virtualconsole.h"
 #include "graphics/linegraph.h"
+#include "imgui/imguilayer.h"
 
 #include "virtualmachinedebugger.h"
 
@@ -63,7 +64,7 @@ namespace prev {
 		StrongHandle<LineGraph> m_LineGraphMemory;
 
 		//
-		gmDebuggerFunk m_de;
+		IMGUI_CALL(gmDebuggerFunk m_de);
 	};
 
 }

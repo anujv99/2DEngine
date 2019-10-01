@@ -48,11 +48,11 @@ namespace prev {
 		Timer::FPSCounter(false);
 		EventHandler::CreateInst();
 
-		auto dis = GraphicsContext::GetDisplayModes();
+		m_DisplayModes = GraphicsContext::GetDisplayModes();
 		unsigned int selectedDis = 5;
-		dis[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
-		dis[selectedDis].SetMultisample(8);
-		Window::CreateInst(dis[selectedDis]);
+		m_DisplayModes[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
+		m_DisplayModes[selectedDis].SetMultisample(8);
+		Window::CreateInst(m_DisplayModes[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(BIND_EVENT_FN(Application::OnEvent));
 
 		Input::CreateInst();
@@ -64,8 +64,10 @@ namespace prev {
 		LayerStack::CreateInst();
 		//ImGui Layer
 
-		m_ImGuiLayer = new ImGuiLayer();
-		LayerStack::Ref().PushLayer(m_ImGuiLayer);
+		IMGUI_CALL(m_ImGuiLayer = new ImGuiLayer());
+		IMGUI_CALL(LayerStack::Ref().PushLayer(m_ImGuiLayer));
+		IMGUI_CALL(m_ImGuiLayer->AddGuiFunction(std::bind(&Application::Gui, this)));
+		IMGUI_CALL(m_ImGuiLayer->SetSettingBoolean("App Settings", &m_IsGuiOpen));
 		Profiler::CreateInst(); // Because profiler use imgui layer
 
 		VirtualMachine::CreateInst();
@@ -140,8 +142,8 @@ namespace prev {
 
 			GraphicsContext::Ref().BeginFrame();
 			
-			if (LayerStack::Ref().GetImGuiLayer())
-				LayerStack::Ref().GetImGuiLayer()->StartFrame();
+			IMGUI_CALL(if (LayerStack::Ref().GetImGuiLayer())
+				LayerStack::Ref().GetImGuiLayer()->StartFrame();)
 
 			LayerStack::Ref().OnUpdate();
 
@@ -162,11 +164,11 @@ namespace prev {
 			PROFILER_END("App::Present");
 
 			PROFILER_BEGIN("App::Gui");
-			Gui();
+			GuiUpdate();
 			PROFILER_END("App::Gui");
 
-			if (LayerStack::Ref().GetImGuiLayer())
-				LayerStack::Ref().GetImGuiLayer()->EndFrame();
+			IMGUI_CALL(if (LayerStack::Ref().GetImGuiLayer())
+				LayerStack::Ref().GetImGuiLayer()->EndFrame());
  
 			GraphicsContext::Ref().EndFrame();
 
@@ -183,9 +185,25 @@ namespace prev {
 		}
 	}
 
-	void Application::Gui() {
+	void Application::GuiUpdate() {
 		VirtualMachine::Ref().Gui();
-		LayerStack::Ref().OnImGuiUpdate();
+		IMGUI_CALL(LayerStack::Ref().OnImGuiUpdate());
+	}
+
+	void Application::Gui() {
+		if (m_IsGuiOpen) {
+			ImGui::Begin("Application Settings", &m_IsGuiOpen);
+			if (ImGui::CollapsingHeader("Window Size")) {
+				ImGui::Indent();
+				for (const auto & disMode : m_DisplayModes) {
+					if (ImGui::Selectable((std::to_string(disMode.GetWindowSize().x) + ", " + std::to_string(disMode.GetWindowSize().y)).c_str())) {
+						Window::Ref().SetWindowSize(disMode.GetWindowSize());
+					}
+				}
+				ImGui::Unindent();
+			}
+			ImGui::End();
+		}
 	}
 
 	void Application::OnEvent(Event & e) {

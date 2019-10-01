@@ -72,6 +72,7 @@ workspace "2DEngine"
 			"LOG_DETAILED",
 			--"LOG_DISABLED",
 			"PREVMATH",
+			"IMGUI_ENABLED",
 		}
 		
 		undefines {

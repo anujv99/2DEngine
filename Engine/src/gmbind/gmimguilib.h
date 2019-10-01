@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IMGUI_ENABLED
+
 class gmMachine;
 class gmTableObject;
 class gmUserArray;
@@ -12,3 +14,5 @@ namespace prev {
 	void ImGuiSafeEnd();
 
 }
+
+#endif

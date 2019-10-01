@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "virtualmachinedebugger.h"
 
+#ifdef IMGUI_ENABLED
+
 #include <cstring>
 
 #include <gm/gmMachine.h>
@@ -627,3 +629,5 @@ void gmDebuggerFunk::DebugState::ResetTableSelector() {
 		tableTraverse.SetAt(i, gmVariable(-1));
 	}
 }
+
+#endif

@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef IMGUI_ENABLED
+
 #include <queue>
 
 #include <gm/gmDebug.h>
@@ -64,3 +66,5 @@ private:
 
 	gmDebugSession m_debugSesh;
 };
+
+#endif

@@ -29,7 +29,9 @@ namespace prev {
 		gmBindArrayLib(vm);
 
 		//Custom Libs
+#ifdef IMGUI_ENABLED
 		gmBindImGuiLib(vm);
+#endif
 		gmBindImmediateGFXLib(vm);
 		gmBindInputLib(vm);
 		gmBindShaderManagerLib(vm);

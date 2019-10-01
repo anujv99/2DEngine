@@ -18,16 +18,20 @@
 #define X1BUTTONCODE	3
 #define X2BUTTONCODE	4
 
+#ifdef IMGUI_ENABLED
 extern LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
 
 namespace prev {
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		
+#ifdef IMGUI_ENABLED
 		if (GImGui) {
 			if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 				return 0;
 		}
+#endif
 
 		switch (msg) {
 			
