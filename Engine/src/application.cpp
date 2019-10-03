@@ -25,8 +25,8 @@
 #include "renderer/renderer.h"
 #include "renderer/fbopass.h"
 
-#include "physics/box2ddebugdraw.h"
 #include "physics/box2dmanager.h"
+#include "physics/box2ddebugdraw.h"
 
 #include "game/square.h"
 #include "game/cameracontroller.h"
@@ -34,7 +34,9 @@
 #include "audio/fmod/fmodaudio.h"
 
 //-----------------TEMP------------------
+#ifdef IMGUI_ENABLED
 #include "imgui.h"
+#endif
 //---------------------------------------
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
@@ -42,6 +44,9 @@ extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 namespace prev {
 
 	StrongHandle<Sound> sound;
+	StrongHandle<Texture2D> fmodLogo;
+
+	Sprite square;
 
 	Application::Application() {
 
@@ -49,7 +54,7 @@ namespace prev {
 		EventHandler::CreateInst();
 
 		m_DisplayModes = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 5;
+		unsigned int selectedDis = 0;
 		m_DisplayModes[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
 		m_DisplayModes[selectedDis].SetMultisample(8);
 		Window::CreateInst(m_DisplayModes[selectedDis]);
@@ -72,7 +77,7 @@ namespace prev {
 
 		VirtualMachine::CreateInst();
 		VirtualMachine::Ref().RunMain();
-
+		
 		Renderer::CreateInst();
 		FramebufferPass::CreateInst();
 		Box2DManager::CreateInst();
@@ -84,6 +89,16 @@ namespace prev {
 
 		sound = FMODAudio::Ref().LoadSound("res/audio/test.wav");
 		sound->SetLoopCount(LOOP_FOREVER);
+
+		fmodLogo = Texture2D::CreateTexture2D();
+		fmodLogo->Init("res/textures/fmodWhite.png");
+
+		Vec2 texSize = ToVec2(fmodLogo->GetDesc().TextureSize) / Vec2(Window::Ref().GetDisplayMode().GetWindowSize().x);
+		float aspect = texSize.x / texSize.y;
+		float scale = 3.0f;
+
+		//square.Dimension = Vec2(1.0f * scale, 1.0f * scale);
+		square.Dimension = texSize * scale;
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
@@ -191,19 +206,21 @@ namespace prev {
 	}
 
 	void Application::Gui() {
-		if (m_IsGuiOpen) {
-			ImGui::Begin("Application Settings", &m_IsGuiOpen);
-			if (ImGui::CollapsingHeader("Window Size")) {
-				ImGui::Indent();
-				for (const auto & disMode : m_DisplayModes) {
-					if (ImGui::Selectable((std::to_string(disMode.GetWindowSize().x) + ", " + std::to_string(disMode.GetWindowSize().y)).c_str())) {
-						Window::Ref().SetWindowSize(disMode.GetWindowSize());
+		IMGUI_CALL(
+			if (m_IsGuiOpen) {
+				ImGui::Begin("Application Settings", &m_IsGuiOpen);
+				if (ImGui::CollapsingHeader("Window Size")) {
+					ImGui::Indent();
+					for (const auto & disMode : m_DisplayModes) {
+						if (ImGui::Selectable((std::to_string(disMode.GetWindowSize().x) + ", " + std::to_string(disMode.GetWindowSize().y)).c_str())) {
+							Window::Ref().SetWindowSize(disMode.GetWindowSize());
+						}
 					}
+					ImGui::Unindent();
 				}
-				ImGui::Unindent();
+				ImGui::End();
 			}
-			ImGui::End();
-		}
+		);
 	}
 
 	void Application::OnEvent(Event & e) {

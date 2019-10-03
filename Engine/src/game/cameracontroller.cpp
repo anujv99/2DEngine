@@ -20,7 +20,7 @@ namespace prev {
 		m_Rotation(0.0f),
 		m_Position(0.0f),
 		m_CameraTranslationSpeed(2.0f), m_CameraRotationSpeed(3.0f), m_CameraZoomStep(0.1f), 
-		m_IsGuiOpen(false) {
+		m_IsGuiOpen(false), m_IsFreeroam(false) {
 
 
 		Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
@@ -47,6 +47,9 @@ namespace prev {
 	}
 
 	void CameraController::Update() {
+		if (!m_IsFreeroam)
+			return;
+
 		CHECK_MOVEMENT(PV_KEY_A, Vec2(-m_CameraTranslationSpeed * Timer::GetDeltaTime(), 0.0f));
 		CHECK_MOVEMENT(PV_KEY_D, Vec2( m_CameraTranslationSpeed * Timer::GetDeltaTime(), 0.0f));
 		CHECK_MOVEMENT(PV_KEY_S, Vec2( 0.0f,-m_CameraTranslationSpeed * Timer::GetDeltaTime()));
@@ -78,6 +81,7 @@ namespace prev {
 			if (ImGui::SliderAngle("Rotatin", &rot)) {
 				m_Camera->SetRotation(ToDegrees(rot));
 			}
+			ImGui::Checkbox("Freeroam", &m_IsFreeroam);
 			ImGui::End();
 		);
 	}
@@ -90,6 +94,9 @@ namespace prev {
 	}
 
 	bool CameraController::MouseScrolled(MouseScrolledEvent & e) {
+		if (!m_IsFreeroam)
+			return false;
+
 		int sign = e.GetScrollOffset().y / std::abs(e.GetScrollOffset().y);
 		m_ZoomLevel += sign * m_CameraZoomStep;
 

@@ -8,3 +8,6 @@ system.DoFile("res/scripts/Constants.gm");
 //Helper Libs
 system.DoFile("res/scripts/utils/ImGuiHelper.gm");
 system.DoFile("res/scripts/utils/ParticleHelper.gm");
+
+//Splash Screen
+system.DoFile("res/scripts/SplashScreen.gm");

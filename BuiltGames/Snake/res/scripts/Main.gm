@@ -1,0 +1,77 @@
+//script used by engine. Do not change this.
+
+local MakeMain = function() {
+
+	main = {};
+
+	main.Init = function() {
+		system.DoFile("res/scripts/Includes.gm");
+
+		g_SplashScreen.Show();
+
+		global DebugSettings = table();
+
+		DebugSettings.Game = "snake";
+
+		if (!DebugSettings.Game) {
+			._SelectGame();
+		}
+
+		assert(DebugSettings.Game);
+
+		local game = DebugSettings.Game;
+		local gameMain = format("games/%s/scripts/GameMain.gm", game);
+
+		system.DoFile(gameMain);
+		assert(g_Game);
+
+		g_DrawManager.Clear();
+		g_ImGuiManager.Clear();
+
+		sysCollectGarbage(true);
+
+		g_Game.Init();
+	};
+
+	main._SelectGame = function() {
+		local dirs = system.GetDirectoryList("games/*");
+		local stripped = table();
+
+		foreach (dir in dirs) {
+			if (dir == "." || dir == "..") {
+				continue;
+			}
+			stripped[dir] = dir;
+		}
+
+		while (!DebugSettings.Game) {
+			local drawGui = function(games) {
+				Gui.Begin("Select Game");
+
+				Gui.Text("Select a game");
+				Gui.Text("To add a new game :- ");
+				Gui.Text("1 : Create a new folder in the 'games' folder");
+				Gui.Text("2 : Create a new 'scripts' folder in your game folder");
+				Gui.Text("3 : Create a 'GameMain.gm' script in the scripts folder and create a new g_Game");
+				Gui.Separator();
+				foreach(game in games) {
+					if (Gui.Button(game)) {
+						DebugSettings.Game = game;
+					}
+				}
+
+				Gui.End();
+			};
+
+			RegisterGui(drawGui, this, stripped);
+			yield();
+		}
+
+		return stripped;
+	};
+
+	return main;
+};
+
+global g_Main = MakeMain();
+g_Main.Init();

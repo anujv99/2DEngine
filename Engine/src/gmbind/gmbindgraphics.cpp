@@ -14,6 +14,8 @@
 
 #include "game/label.h"
 
+#include "graphics/texture2d.h"
+
 #undef CreateFont
 
 using namespace prev;
@@ -47,3 +49,33 @@ GM_REG_HANDLED_DESTRUCTOR(Font)
 GM_REG_MEMFUNC(Font, Print)
 GM_REG_MEM_END(Font)
 GM_BIND_DEFINE(Font)
+
+// TEXTURE ----------------------------------------------------------------
+
+using Texture = Texture2D;
+
+GM_REG_NAMESPACE(Texture) {
+
+	GM_MEMFUNC_DECL(CreateTexture) {
+		GM_CHECK_NUM_PARAMS(1);
+		GM_CHECK_STRING_PARAM(fileName, 0);
+		StrongHandle<Texture2D> texture = Texture2D::CreateTexture2D();
+		texture->Init(fileName);
+		GM_PUSH_USER_HANDLED(Texture, texture);
+		return GM_OK;
+	}
+
+	GM_MEMFUNC_DECL(GetSize) {
+		GM_CHECK_NUM_PARAMS(0);
+		GM_GET_THIS_PTR(Texture, tex);
+		a_thread->PushVec2(ToVec2(tex->GetDesc().TextureSize));
+		return GM_OK;
+	}
+
+}
+
+GM_REG_MEM_BEGIN(Texture)
+GM_REG_HANDLED_DESTRUCTOR(Texture)
+GM_REG_MEMFUNC(Texture, GetSize)
+GM_REG_MEM_END(Texture)
+GM_BIND_DEFINE(Texture)

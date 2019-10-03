@@ -1,0 +1,13 @@
+//Include all important stuff
+
+//Important stuff
+system.DoFile("res/scripts/graphics/DrawManager.gm");
+system.DoFile("res/scripts/Utils/ImGui.gm");
+system.DoFile("res/scripts/Constants.gm");
+
+//Helper Libs
+system.DoFile("res/scripts/utils/ImGuiHelper.gm");
+system.DoFile("res/scripts/utils/ParticleHelper.gm");
+
+//Splash Screen
+system.DoFile("res/scripts/SplashScreen.gm");

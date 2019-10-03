@@ -1,0 +1,10 @@
+
+global CheckCollision = function(a, b) {
+	if ((a.Position.x > b.Position.x - b.Dimension.x) &&
+		(a.Position.x < b.Position.x + b.Dimension.x) &&
+		(a.Position.y > b.Position.y - b.Dimension.y) &&
+		(a.Position.y < b.Position.y + b.Dimension.y)) {
+		return 1; 
+	}
+	return 0;
+};

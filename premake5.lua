@@ -87,6 +87,8 @@ workspace "2DEngine"
 			postbuildcommands {
 				"{COPY} vendor/fmod/bin_x64/fmodL.dll ../bin/%{outputDir}/Engine",
 				"{COPY} vendor/fmod/bin_x64/fmodstudioL.dll ../bin/%{outputDir}/Engine",
+				"{COPY} ./res ../bin/%{outputDir}/Engine/res/",
+				"{COPY} ./games ../bin/%{outputDir}/Engine/games/",
 			}
 		
 		filter "files:Engine/src/gm/**.cpp"

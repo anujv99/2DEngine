@@ -15,6 +15,9 @@ namespace prev {
 		void Begin();
 		void End();
 		void Update();
+
+		Vec2 GetScreenCoordsX() const { return Vec2(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel); }
+		Vec2 GetScreenCoordsY() const { return Vec2(-m_ZoomLevel, m_ZoomLevel); }
 	private:
 		void OnEvent(Event & event);
 		void GuiFunction();
@@ -32,6 +35,7 @@ namespace prev {
 		float m_CameraTranslationSpeed, m_CameraRotationSpeed, m_CameraZoomStep;
 
 		bool m_IsGuiOpen;
+		bool m_IsFreeroam;
 	};
 
 }

@@ -1,0 +1,63 @@
+
+local MakeSplashScreen = function() {
+	
+	splashScreen = {
+		SPLASH_SCREEN_DURATION = 5.0f,
+		FMOD_LOGO_PATH = "res/textures/fmodWhite.png",
+
+		FmodLogo,
+		FmodTexture,
+
+		TimePassed = 0.0f,
+	};
+
+	splashScreen.Init = function() {
+		.FmodTexture = Texture(.FMOD_LOGO_PATH);
+		.FmodLogo = Sprite();
+
+		local texSize = .FmodTexture.GetSize();
+		local scale = 0.5f;
+
+		.FmodLogo.Dimension = Vec2(texSize.x / texSize.y, 1.0f) * scale;
+	};
+
+	splashScreen.Show = function() {
+		
+		while(.TimePassed <= .SPLASH_SCREEN_DURATION) {
+			.TimePassed += Timer.GetDeltaTime();
+
+			local factor = (.TimePassed / .SPLASH_SCREEN_DURATION) - 0.5f;
+			if (factor > 0.0f) {
+				factor = -factor;
+			}
+
+			factor += 0.5f;
+			factor *= 4.0f;
+
+			if (factor >= 1.0f) {
+				factor = 1.0f;
+			}
+
+			if (factor <= 0.0f) {
+				factor = 0.0f;
+			}
+
+			.FmodLogo.Color = Vec4(factor);
+
+			RegisterDraw(.Draw, this);
+
+			yield();
+		}
+
+	};
+
+	splashScreen.Draw = function() {
+		.FmodLogo.Draw(.FmodTexture);
+	};
+
+	return splashScreen;
+
+};
+
+global g_SplashScreen = MakeSplashScreen();
+g_SplashScreen.Init();

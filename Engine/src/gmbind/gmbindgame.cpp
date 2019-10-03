@@ -24,9 +24,16 @@ GM_REG_NAMESPACE(Sprite) {
 	}
 
 	GM_MEMFUNC_DECL(Draw) {
-		GM_CHECK_NUM_PARAMS(0);
+		StrongHandle<Texture2D> tex = nullptr;
+		GM_CHECK_NUM_PARAMS_RANGE(0, 1);
 		GM_GET_THIS_PTR(Sprite, ptr);
-		Renderer::Ref().Submit(*ptr);
+		if (GM_NUM_PARAMS > 0) {
+			if (a_thread->Param(0).m_type == GM_TYPEID(Texture)) {
+				GM_USER_PARAM(Texture2D *, var, 0);
+				tex = var;
+			}
+		}
+		Renderer::Ref().Submit(*ptr, tex);
 		return GM_OK;
 	}
 

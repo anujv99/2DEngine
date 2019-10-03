@@ -15,8 +15,8 @@ namespace prev {
 	};
 
 	struct TextureParams {
-		TextureWrapType Wrapping = PV_TEXTURE_WRAP_DEFAULT;
-		TextureFilterType Filtering = PV_TEXTURE_FILTER_DEFAULT;
+		TextureWrapType Wrapping = PV_TEXTURE_WRAP_CLAMP;
+		TextureFilterType Filtering = PV_TEXTURE_FILTER_LINEAR;
 	};
 
 	class Texture2D : public HandledObject<Texture2D>, public Bindable {

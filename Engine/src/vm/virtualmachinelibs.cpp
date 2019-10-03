@@ -11,12 +11,14 @@
 #include "gmbind/gmimguilib.h"
 #include "gmbind/gminputlib.h"
 #include "gmbind/gmcommonlib.h"
+#include "gmbind/gmbindcameracontrollerlib.h"
 
 #include "gmbind/gmbindshader.h"
 #include "gmbind/gmbindparticle.h"
 #include "gmbind/gmbindgame.h"
 #include "gmbind/gmbind.h"
 #include "gmbind/gmbindgraphics.h"
+#include "gmbind/gmbinddata.h"
 
 namespace prev {
 
@@ -36,6 +38,7 @@ namespace prev {
 		gmBindInputLib(vm);
 		gmBindShaderManagerLib(vm);
 		gmBindCommonLib(vm);
+		gmBindCameraControllerLib(vm);
 
 		//Custom Types
 		GM_BIND_INIT(VertexShader, vm);
@@ -44,6 +47,9 @@ namespace prev {
 		GM_BIND_INIT(Sprite, vm);
 		GM_BIND_INIT(Label, vm);
 		GM_BIND_INIT(Font, vm);
+		GM_BIND_INIT(Texture, vm);
+		GM_BIND_INIT(queue, vm);
+		GM_BIND_INIT(linkedlist, vm);
 	}
 
 }

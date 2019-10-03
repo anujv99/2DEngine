@@ -1,0 +1,111 @@
+local MakeBlankGame = function() {
+	
+	local Snake = {
+		ThreadId,
+		Temp,
+
+		SNAKE_DIMENSION,
+		SNAKE_DIRECTION,
+		SNAKE_HEAD_POSITION,
+		SNAKE_MOVEMENT_COOLDOWN,
+		COOLDOWN_TIME,
+	};
+
+	Snake.Init = function() {
+		.SNAKE_DIMENSION				= Vec2(0.03f);
+		.SNAKE_DIRECTION				= Vec2i(1, 0);
+		.SNAKE_MOVEMENT_COOLDOWN		= 0.0f;
+		.COOLDOWN_TIME					= 0.0f;
+
+		.ThreadId = this:thread(.Update);
+
+		.Temp = linkedlist();
+
+		for (i = 0; i < 100; i += 1) {
+			local Body = Sprite();
+			Body.Color = Vec4(1.0f, 0.0f, 0.0f, 1.0f);
+			Body.Position = Vec2(0.0f) - (.SNAKE_DIMENSION * Vec2(i, 0.0f));
+			Body.Dimension = .SNAKE_DIMENSION;
+			.Temp.PushBack(Body);
+		}
+
+		system.DoFile("games/snake/scripts/Collision.gm");
+	};
+
+	Snake.Update = function() {
+		while (true) {
+			RegisterDraw(.Draw, this);
+
+			.COOLDOWN_TIME += Timer.GetDeltaTime();
+			if (.COOLDOWN_TIME > .SNAKE_MOVEMENT_COOLDOWN) {
+				.Move();
+				.COOLDOWN_TIME = 0.0f;
+			}
+
+			//Check Direction---------
+			.CheckDirection();
+			
+			//Check Collision---------
+			head = .Temp.PopFront();
+
+			for (i = 0; i < .Temp.Size(); i += 1) {
+				node = .Temp.PopFront();
+				if (CheckCollision(head, node)) {
+					print("Collided");
+				}
+				.Temp.PushBack(node);
+			}
+
+			.Temp.PushFront(head);
+
+			yield();
+		}
+	};
+
+	Snake.Move = function() {
+		b = .Temp.Front();
+		a = .Temp.PopBack();
+
+		newPos = b.Position + (.SNAKE_DIMENSION * Vec2(.SNAKE_DIRECTION.x, .SNAKE_DIRECTION.y));
+
+		local boundX = CameraController.GetXCoords();
+		local boundY = CameraController.GetYCoords();
+
+		if (newPos.x >= boundX.y) {
+			newPos = Vec2(boundX.x, newPos.y);
+		} else if (newPos.x <= boundX.x) {
+			newPos = Vec2(boundX.y, newPos.y);
+		}
+
+		if (newPos.y >= boundY.y) {
+			newPos = Vec2(newPos.x, boundY.x);
+		} else if (newPos.y <= boundY.x) {
+			newPos = Vec2(newPos.x, boundY.y);
+		}
+
+		a.Position = newPos;
+
+		.Temp.PushFront(a);
+	};
+
+	Snake.CheckDirection = function() {
+		if (Input.IsKeyPressed(Input.KEY_UPARROW)	 && .SNAKE_DIRECTION.y != -1)	{ .SNAKE_DIRECTION = Vec2( 0,  1); }
+		if (Input.IsKeyPressed(Input.KEY_DOWNARROW)	 && .SNAKE_DIRECTION.y !=  1)	{ .SNAKE_DIRECTION = Vec2( 0, -1); }
+		if (Input.IsKeyPressed(Input.KEY_LEFTARROW)	 && .SNAKE_DIRECTION.x !=  1)	{ .SNAKE_DIRECTION = Vec2(-1,  0); }
+		if (Input.IsKeyPressed(Input.KEY_RIGHTARROW) && .SNAKE_DIRECTION.x != -1)	{ .SNAKE_DIRECTION = Vec2( 1,  0); }
+	};
+
+	Snake.Gui = function() {};
+
+	Snake.Draw = function() {
+		for (i = 0; i < .Temp.Size(); i += 1) {
+			unit = .Temp.PopFront();
+			unit.Draw();
+			.Temp.PushBack(unit);
+		}
+	};
+
+	return Snake;
+};
+
+global g_Game = MakeBlankGame();
