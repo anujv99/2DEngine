@@ -298,7 +298,7 @@ static void GM_CDECL gmArraySetInd(gmThread * a_thread, gmVariable * a_operands)
 #if GM_USE_INCGC
 static void GM_CDECL gmGCDestructArrayUserType(gmMachine * a_machine, gmUserObject* a_object)
 {
-  if(a_object->m_user) 
+  if(a_object->m_user)
   {
     gmUserArray * array = (gmUserArray *) a_object->m_user;
     array->Destruct(a_machine);

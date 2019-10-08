@@ -7,6 +7,40 @@
 
 using namespace prev;
 
+class gmLinkedList : public LinkedList<gmVariable> {
+public:
+	gmLinkedList(gmMachine * a_machine) : m_Machine(a_machine) {
+		ASSERT(a_machine);
+	}
+
+	bool Trace(gmMachine * a_machine, gmGarbageCollector * a_gc, const int a_workLeftToGo, int & a_workDone) {
+		int i;
+		Node * node = m_Tail;
+		while (node != nullptr) {
+			if (node->Data->IsReference()) {
+				gmObject * object = GM_MOBJECT(a_machine, node->Data->m_value.m_ref);
+				a_gc->GetNextObject(object);
+				++a_workDone;
+			}
+			node = node->Next;
+		}
+
+		++a_workDone;
+		return true;
+	}
+protected:
+	virtual gmVariable * Allocate() override {
+		return (gmVariable *)m_Machine->Sys_Alloc((int)sizeof(gmVariable));
+	}
+
+	virtual void Free(gmVariable * elem) override {
+		ASSERT(elem);
+		m_Machine->Sys_Free(elem);
+	}
+private:
+	gmMachine * m_Machine;
+};
+
 GM_REG_NAMESPACE(queue) {
 
 	using queue = std::queue<gmVariable>;
@@ -53,11 +87,11 @@ GM_REG_NAMESPACE(queue) {
 
 GM_REG_NAMESPACE(linkedlist) {
 
-	using linkedlist = LinkedList<gmVariable>;
+	using linkedlist = gmLinkedList;
 
 	GM_MEMFUNC_DECL(Createlinkedlist) {
 		GM_CHECK_NUM_PARAMS(0);
-		GM_PUSH_USER(linkedlist, new linkedlist);
+		GM_PUSH_USER(linkedlist, new linkedlist(a_thread->GetMachine()));
 		return GM_OK;
 	}
 
@@ -118,8 +152,26 @@ GM_REG_NAMESPACE(linkedlist) {
 		return GM_OK;
 	}
 
+
+	static bool GM_CDECL gmGCTraceLinkedListUserType(gmMachine * a_machine, gmUserObject * a_object, gmGarbageCollector * a_gc, const int a_workLeftToGo, int & a_workDone) {
+		if (a_object->m_user) {
+			linkedlist * list = (linkedlist *)a_object->m_user;
+			return list->Trace(a_machine, a_gc, a_workLeftToGo, a_workDone);
+		}
+		return true;
+	}
+
+	static void GM_CDECL gmGCDestructLinkedListUserType(gmMachine * a_machine, gmUserObject * a_object) {
+		if (a_object->m_user) {
+			linkedlist * list = (linkedlist *)a_object->m_user;
+			list->Destruct();
+			delete list;
+		}
+		a_object->m_user = NULL;
+	}
+
 	GM_REG_MEM_BEGIN(linkedlist)
-		GM_REG_DESTRUCTOR(linkedlist)
+		a_machine->RegisterUserCallbacks(GM_TYPEID(linkedlist), gmGCTraceLinkedListUserType, gmGCDestructLinkedListUserType);
 		GM_REG_MEMFUNC(linkedlist, PushFront)
 		GM_REG_MEMFUNC(linkedlist, PushBack)
 		GM_REG_MEMFUNC(linkedlist, PopFront)

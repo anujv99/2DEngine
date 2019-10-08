@@ -7,7 +7,7 @@ local MakeMain = function() {
 	main.Init = function() {
 		system.DoFile("res/scripts/Includes.gm");
 
-		g_SplashScreen.Show();
+		//g_SplashScreen.Show();
 
 		global DebugSettings = table();
 

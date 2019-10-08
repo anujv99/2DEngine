@@ -108,7 +108,7 @@ namespace prev {
 	void Renderer::Submit(const ParticleSystem & system, StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {
 		if (vShader == nullptr) vShader = m_ParticleVertexShaderDefault;
 		if (pShader == nullptr) pShader = m_ParticlePixelShaderDefault;
-		auto drawGroup = GetDrawGroup(vShader, pShader);
+		auto drawGroup = GetDrawGroup(vShader, pShader, "PARTICLE_SYSTEM_RENDER_STATE");
 
 		TextureCoordinates defaultUvs(Vec2(0, 1), Vec2(0, 1));
 
@@ -145,12 +145,7 @@ namespace prev {
 		bf.DestBlend = PV_BLEND_ONE;
 		bf.Operation = PV_BLEND_OP_ADD;
 
-		BlendFunction pbf = RenderState::Ref().GetBlendFunction();
-		RenderState::Ref().SetBlendFunction(bf);
-
-		DrawGroup(drawGroup);
-
-		RenderState::Ref().SetBlendFunction(pbf);
+		drawGroup->NewRenderState->SetNewBlendFunction(bf);
 	}
 
 	void Renderer::Submit(const Label & label, StrongHandle<Font> font, StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {
@@ -335,8 +330,16 @@ namespace prev {
 			group->Textures[i]->SetTextureSlot((unsigned int)i);
 			group->Textures[i]->Bind();
 		}
+
+		if (group->NewRenderState != nullptr) {
+			group->NewRenderState->Bind();
+		}
 		
 		drawBuffer->Draw(numVertices, 0);
+
+		if (group->NewRenderState != nullptr) {
+			group->NewRenderState->UnBind();
+		}
 
 		group->Textures.clear();
 		group->Textures.reserve(MAX_NUM_TEXTURES);
@@ -388,11 +391,18 @@ namespace prev {
 		}
 	}
 
-	prev::Renderer::SpriteGroup * Renderer::GetDrawGroup(StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {
+	prev::Renderer::SpriteGroup * Renderer::GetDrawGroup(StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader, const std::string & renderState) {
 		if (vShader == nullptr) vShader = m_SpriteVertexShaderDefault;
 		if (pShader == nullptr) pShader = m_SpritePixelShaderDefault;
 
-		uint64_t key = HashStringPair(vShader->GetShaderName(), pShader->GetShaderName());
+		uint64_t key = 0ull;
+
+		if (renderState != DEFAULT_RENDER_STATE_NAME) {
+			key = HashStringPair(vShader->GetShaderName() + pShader->GetShaderName(), renderState);
+		} else {
+			key = HashStringPair(vShader->GetShaderName(), pShader->GetShaderName());
+		}
+
 		auto it = m_DrawGroups.find(key);
 
 		if (it != m_DrawGroups.end()) {
@@ -411,6 +421,10 @@ namespace prev {
 		group.VertexLayout = m_VertexLayoutDefault;
 
 		group.Textures.reserve(MAX_NUM_TEXTURES);
+
+		if (renderState != DEFAULT_RENDER_STATE_NAME) {
+			group.NewRenderState = new RenderStateChanges();
+		}
 
 		auto val = m_DrawGroups.insert(std::make_pair(key, group));
 		return &val.first->second;

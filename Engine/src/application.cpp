@@ -43,11 +43,6 @@ extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
 namespace prev {
 
-	StrongHandle<Sound> sound;
-	StrongHandle<Texture2D> fmodLogo;
-
-	Sprite square;
-
 	Application::Application() {
 
 		Timer::FPSCounter(false);
@@ -87,26 +82,11 @@ namespace prev {
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
-		sound = FMODAudio::Ref().LoadSound("res/audio/test.wav");
-		sound->SetLoopCount(LOOP_FOREVER);
-
-		fmodLogo = Texture2D::CreateTexture2D();
-		fmodLogo->Init("res/textures/fmodWhite.png");
-
-		Vec2 texSize = ToVec2(fmodLogo->GetDesc().TextureSize) / Vec2(Window::Ref().GetDisplayMode().GetWindowSize().x);
-		float aspect = texSize.x / texSize.y;
-		float scale = 3.0f;
-
-		//square.Dimension = Vec2(1.0f * scale, 1.0f * scale);
-		square.Dimension = texSize * scale;
-
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
 	}
 
 	Application::~Application() {
-
-		sound = nullptr;
 
 		CameraController::DestroyInst();
 		FMODAudio::DestroyInst();

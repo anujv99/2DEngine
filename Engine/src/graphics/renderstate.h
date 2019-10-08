@@ -63,11 +63,13 @@ namespace prev {
 		//Viewport
 		virtual void SetViewport(const Viewport & viewport) = 0;
 		virtual Viewport GetViewport() const = 0;
-
+		
+		//Scissors
 		virtual void SetScissorBox(const ScissorBox & sBox) = 0;
 		virtual ScissorBox GetScissorBox() = 0;
 		virtual void DisableScissors() = 0;
 
+		//Blending
 		virtual void SetBlendFunction(const BlendFunction & blendFunc) = 0;
 		virtual void DisableBlend() = 0;
 		virtual BlendFunction GetBlendFunction() = 0;
