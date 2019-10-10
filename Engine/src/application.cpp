@@ -175,7 +175,7 @@ namespace prev {
 
 			PROFILER_ROOT_END;
 
-			LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
+			//LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
 			GLOBAL_DRAW_CALL_COUNT = 0;
 		}
 	}

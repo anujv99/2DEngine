@@ -1,0 +1,46 @@
+local MakeTetris = function() {
+	
+	local Tetris = {
+		ThreadID,
+		Grid,
+	};
+
+	Tetris.Init = function() {
+		print("Init");
+		.ThreadID = this:thread(.Update);
+
+		system.DoFile("games/tetris/scripts/TetrisGrid.gm");
+
+		.Grid = MakeTetrisGrid(10, 24);
+		//.Grid.InsertBox(5, 5);
+	};
+
+	Tetris.Update = function() {
+		while(true) {
+			RegisterDraw(.Draw, this);
+			RegisterGui(.Gui, this);
+			yield();
+		}
+	};
+
+	Tetris.Draw = function() {
+		.Grid.Draw();
+	};
+
+	Tetris.Gui = function() {
+		Gui.Begin("Tetris Props");
+
+		Gui.Text("Grid Props");
+		.Grid.Size = Gui.SliderVec2i("Size", .Grid.Size, 1, 100);
+		.Grid.Scale = Gui.DragVec2("Scale", .Grid.Scale, 0.001f);
+		.Grid.Thickness = Gui.DragFloat("Thickness", .Grid.Thickness, 0.0001f);
+		.Grid.Position = Gui.DragVec2("Position", .Grid.Position, 0.01f);
+
+		Gui.End();
+	};
+
+	return Tetris;
+
+};
+
+global g_Game = MakeTetris();
