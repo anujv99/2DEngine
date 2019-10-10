@@ -3,15 +3,17 @@
 
 #include <freetype-gl.h>
 #include "application.h"
+#include "game/cameracontroller.h"
 
 namespace prev {
 
 	static constexpr const unsigned int TEXTURE_SIZE = 1024;
+	static constexpr float FONT_TEXTURE_PADDING = 0.001f;
 
 	Font::Font(const std::string & name, const std::string & fileName, float size) :
 		m_FontName(name), m_FontFile(fileName), m_Size(size), m_Texture(nullptr), m_FontAtlas(nullptr), m_Font(nullptr) {
 
-		//size = ScreenToPixels(Vec2(size)).y;
+		size = CameraController::Ref().ScreenToPixels(Vec2(size)).y;
 		m_Size = size;
 
 		m_FontAtlas = ftgl::texture_atlas_new(TEXTURE_SIZE, TEXTURE_SIZE, 1);
@@ -29,15 +31,26 @@ namespace prev {
 		m_Texture->Init(desc, params, 0);
 		m_Texture->SetData(m_FontAtlas->data);
 
+		ftgl::texture_glyph_t * glyph;
+
 		for (unsigned int i = 0; i < 128; i++) {
-			char c = (char)i;
-			ftgl::texture_font_get_glyph(m_Font, &c);
+			char ch = (char)i;
+			glyph = ftgl::texture_font_get_glyph(m_Font, &ch);
+
+			ASSERT(glyph);
+
+			FontCharacter * c = new FontCharacter(ch, glyph);
+
+			m_Characters.insert(std::make_pair(ch, c));
 		}
 		m_Texture->SetData(m_FontAtlas->data);
-
 	}
 
 	Font::~Font() {
+		for (auto & c : m_Characters) {
+			delete (c.second);
+		}
+
 		ftgl::texture_atlas_delete(m_FontAtlas);
 		ftgl::texture_font_delete(m_Font);
 	}
@@ -76,8 +89,37 @@ namespace prev {
 		return Vec2(GetWidth(label), GetHeight(label));
 	}
 
-	void Font::UpdateAtlas() {
-		//m_Texture->SetData(m_FontAtlas->data);
+	const prev::FontCharacter * Font::GetCharacter(char c) {
+		auto it = m_Characters.find(c);
+		if (it == m_Characters.end()) {
+			return nullptr;
+		} else {
+			return it->second;
+		}
+	}
+
+	prev::Vec2 FontCharacter::GetTexCoordsX() const {
+		return Vec2(m_Glyph->s0, m_Glyph->s1 - FONT_TEXTURE_PADDING);
+	}
+
+	prev::Vec2 FontCharacter::GetTexCoordsY() const {
+		return Vec2(m_Glyph->t0, m_Glyph->t1 - FONT_TEXTURE_PADDING);
+	}
+
+	prev::Vec2 FontCharacter::GetSize() const {
+		return CameraController::Ref().PixelsToScreen(Vec2((float)m_Glyph->width, (float)m_Glyph->height));
+	}
+
+	prev::Vec2 FontCharacter::GetOffset() const {
+		return CameraController::Ref().PixelsToScreen(Vec2((float)m_Glyph->offset_x, (float)m_Glyph->offset_y));
+	}
+
+	float FontCharacter::GetKerning(const FontCharacter * previousCharacter) const {
+		return CameraController::Ref().PixelsToScreen(Vec2(ftgl::texture_glyph_get_kerning(m_Glyph, &previousCharacter->m_C))).x;
+	}
+
+	float FontCharacter::GetXAdvance() const {
+		return CameraController::Ref().PixelsToScreen(Vec2(m_Glyph->advance_x)).x;
 	}
 
 }

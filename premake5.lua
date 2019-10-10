@@ -18,11 +18,15 @@ workspace "2DEngine"
 	IncludeDirs["freetypegl"] = "Engine/vendor/freetype-gl"
 	IncludeDirs["fmod"] = "Engine/vendor/fmod/includes"
 
+	group "Dependencies"
+
     include "Engine/vendor/spdlog"
 	include "Engine/vendor/imgui"
 	include "Engine/vendor/box2d"
 	include "Engine/vendor/freetype"
 	include "Engine/vendor/freetype-gl"
+	
+	group ""
 
     project "Engine"
         location "Engine"

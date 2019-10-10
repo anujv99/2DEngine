@@ -49,7 +49,7 @@ namespace prev {
 		EventHandler::CreateInst();
 
 		m_DisplayModes = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 0;
+		unsigned int selectedDis = 9;
 		m_DisplayModes[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
 		m_DisplayModes[selectedDis].SetMultisample(8);
 		Window::CreateInst(m_DisplayModes[selectedDis]);
@@ -175,7 +175,7 @@ namespace prev {
 
 			PROFILER_ROOT_END;
 
-			//LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
+			LOG_INFO("Draw Calls This Frame : {}", GLOBAL_DRAW_CALL_COUNT);
 			GLOBAL_DRAW_CALL_COUNT = 0;
 		}
 	}

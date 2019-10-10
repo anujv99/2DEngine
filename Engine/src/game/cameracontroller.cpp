@@ -56,6 +56,23 @@ namespace prev {
 		CHECK_MOVEMENT(PV_KEY_W, Vec2( 0.0f, m_CameraTranslationSpeed * Timer::GetDeltaTime()));
 	}
 
+	prev::Vec2 CameraController::ScreenToPixels(Vec2 coords) const {
+		Vec2 screenSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+
+		float x = std::abs(GetScreenCoordsX().y - GetScreenCoordsX().x);
+		float y = std::abs(GetScreenCoordsY().y - GetScreenCoordsY().x);
+
+		return Vec2(screenSize.x / x, screenSize.y / y) * coords;
+	}
+
+	prev::Vec2 CameraController::PixelsToScreen(Vec2 coords) const {
+		Vec2 screenSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+		float x = GetScreenCoordsX().y - GetScreenCoordsX().x;
+		float y = GetScreenCoordsY().y - GetScreenCoordsY().x;
+
+		return Vec2(x / screenSize.x, y / screenSize.y) * coords;
+	}
+
 	void CameraController::OnEvent(Event & event) {
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(CameraController::WindowResized));

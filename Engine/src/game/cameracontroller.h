@@ -18,6 +18,9 @@ namespace prev {
 
 		Vec2 GetScreenCoordsX() const { return Vec2(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel); }
 		Vec2 GetScreenCoordsY() const { return Vec2(-m_ZoomLevel, m_ZoomLevel); }
+
+		Vec2 ScreenToPixels(Vec2 coords) const;
+		Vec2 PixelsToScreen(Vec2 coords) const;
 	private:
 		void OnEvent(Event & event);
 		void GuiFunction();

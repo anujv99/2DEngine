@@ -29,13 +29,13 @@ local MakeBlankGame = function() {
 
 		.Ps = ParticleSystem(1024);
 
-		.Fnt = Font("testFont", "res/fonts/Minecraftia.ttf", 0.5f);
+		.Fnt = Font("testFont", "res/fonts/Minecraftia.ttf", 0.1f);
 
 		.Tex = Label();
 		.Tex.Position = Vec2(0.0f);
 		.Tex.Scale = Vec2(1.0f);
 		.Tex.Rotation = 0.0f;
-		.Tex.Text = "Madarchod";
+		.Tex.Text = "Hello";
 	};
 
 	BlankGame.Update = function() {
@@ -102,10 +102,10 @@ local MakeBlankGame = function() {
 	};
 
 	BlankGame.Draw = function() {
-		.Ps.Draw();
 		.Box.Draw();
 		.Box2.Draw();
-		//.Fnt.Print(.Tex);
+		.Fnt.Print(.Tex);
+		.Ps.Draw();
 	};
 
 	return BlankGame;

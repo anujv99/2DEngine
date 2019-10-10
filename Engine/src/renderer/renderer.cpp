@@ -2,16 +2,12 @@
 #include "renderer.h"
 #include "graphics/renderstate.h"
 
-#include <freetype-gl.h>
-
 namespace prev {
 
 	static constexpr unsigned int MAX_NUM_SPRITES					= 1024 * 16;
 	static constexpr unsigned int MAX_NUM_VERTICES_PER_SPRTIE		= 6;
 	static constexpr unsigned int MAX_NUM_VERTICES					= MAX_NUM_SPRITES * MAX_NUM_VERTICES_PER_SPRTIE;
 	static constexpr unsigned int MAX_NUM_TEXTURES					= 16;
-
-	static constexpr float FONT_TEXTURE_PADDING						= 0.001f;
 
 	Renderer::SpriteVertices::SpriteVertices(Vec2 center, Vec2 dimension, float rotation) {
 		static const Vec2 squareVertices[] = {
@@ -156,31 +152,29 @@ namespace prev {
 		const Vec2 & scale = label.Dimension;
 		float x = label.Position.x;
 
-		ftgl::texture_font_t * ftFont = font->m_Font;
-
 		std::string & text = label.GetText();
 
 		float xSize = font->GetWidth(label);
 
 		for (unsigned int i = 0; i < text.length(); i++) {
 			char c = text[i];
-			ftgl::texture_glyph_t * glyph = ftgl::texture_font_get_glyph(ftFont, &c);
+			const FontCharacter * character = font->GetCharacter(c);
 
-			if (glyph) {
+			if (character) {
 				if (i > 0) {
-					float kerning = ftgl::texture_glyph_get_kerning(glyph, &text[i - 1]);
+					float kerning = character->GetKerning(font->GetCharacter(text[i - 1]));
 					x += kerning * scale.x;
 				}
 
-				float x0 = x + (float)glyph->offset_x * scale.x;
-				float y0 = label.Position.y + (float)glyph->offset_y * scale.y;
-				float x1 = x0 + (float)glyph->width * scale.x;
-				float y1 = y0 - (float)glyph->height * scale.y;
+				float x0 = x + character->GetOffset().x * scale.x;
+				float y0 = label.Position.y + character->GetOffset().y * scale.y;
+				float x1 = x0 + character->GetSize().x * scale.x;
+				float y1 = y0 - character->GetSize().y * scale.y;
 
-				float u0 = glyph->s0;
-				float v0 = glyph->t0;
-				float u1 = glyph->s1 - FONT_TEXTURE_PADDING;
-				float v1 = glyph->t1 - FONT_TEXTURE_PADDING;
+				float u0 = character->GetTexCoordsX().x;
+				float u1 = character->GetTexCoordsX().y;
+				float v0 = character->GetTexCoordsY().x;
+				float v1 = character->GetTexCoordsY().y;
 
 				switch (label.Alignment) {
 				case PV_LABEL_ALIGNMENT_LEFT:
@@ -236,13 +230,12 @@ namespace prev {
 
 				group->MappedBufferIndex += (unsigned int)std::size(drawVertices);
 
-				x += glyph->advance_x * scale.x;
+				x += character->GetXAdvance() * scale.x;
 			}
 
 		}
 
 		if (label.GetDirty()) {
-			font->UpdateAtlas();
 			label.SetDirty(false);
 		}
 
