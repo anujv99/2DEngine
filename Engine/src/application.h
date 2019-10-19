@@ -16,8 +16,13 @@ namespace prev {
 		void Run();
 	private:
 		void GuiUpdate();
-
 		void Gui();
+
+		void Render();
+		void PreRender();
+		void PostRender();
+
+		void TestRender();
 	private:
 		void OnEvent(Event & e);
 		bool WindowClosed(WindowCloseEvent & e);

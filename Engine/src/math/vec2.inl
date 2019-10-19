@@ -185,12 +185,21 @@ inline Vec2 Hermite(const Vec2 & _v1, const Vec2 & _tan1, const Vec2 & _v2, cons
 	float val_cubed = _val * _val * _val;
 	float val_sqr = _val * _val;
 
-	float h1 = 2.0f * val_cubed - 3.0f * val_sqr + 1.0f;   // calculate basis function 1
+	float h1 = 2.0f * val_cubed - 3.0f * val_sqr + 1.0f;	// calculate basis function 1
 	float h2 = -2.0f * val_cubed + 3.0f * val_sqr;          // calculate basis function 2
 	float h3 = val_cubed - 2.0f * val_sqr + _val;			// calculate basis function 3
-	float h4 = val_cubed - val_sqr;					// calculate basis function 4
+	float h4 = val_cubed - val_sqr;							// calculate basis function 4
 
 	return h1 * _v1 + h2 * _v2 + h3 * _tan1 + h4 * _tan2;
+}
+
+inline Vec2 Bezier(const Vec2 & _anchor1, const Vec2 & _anchor2, const Vec2 & _control1, const Vec2 & _control2, float _factor) {
+	Clamp(_factor, 0.0f, 1.0f);
+	float a = std::pow(1 - _factor, 3);
+	float b = 3 * std::pow(1 - _factor, 2) * _factor;
+	float c = 3 * (1 - _factor) * std::pow(_factor, 2);
+	float d = std::pow(_factor, 3);
+	return (a * _anchor1) + (b * _control1) + (c * _control2) + (d * _anchor2);
 }
 
 inline Vec2 Rotate(const Vec2 & _dir, float _angle) {

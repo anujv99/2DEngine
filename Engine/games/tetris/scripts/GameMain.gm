@@ -3,22 +3,45 @@ local MakeTetris = function() {
 	local Tetris = {
 		ThreadID,
 		Grid,
+		GRID_SIZE_X,
+		GRID_SIZE_Y,
 	};
 
 	Tetris.Init = function() {
 		print("Init");
-		.ThreadID = this:thread(.Update);
+
+		.GRID_SIZE_X = 10;
+		.GRID_SIZE_Y = 24;
 
 		system.DoFile("games/tetris/scripts/TetrisGrid.gm");
+		system.DoFile("games/tetris/scripts/TetrisShapes.gm");
+		system.DoFile("games/tetris/scripts/TetrisLogic.gm");
 
-		.Grid = MakeTetrisGrid(10, 24);
-		//.Grid.InsertBox(5, 5);
+		.Grid = MakeTetrisGrid(.GRID_SIZE_X, .GRID_SIZE_Y);
+
+		.PositionArray = array();
+		.PositionArray.Resize(.GRID_SIZE_X);
+		for (i = 0; i < .GRID_SIZE_X; i += 1) {
+			.PositionArray[i] = array();
+			.PositionArray[i].Resize(.GRID_SIZE_Y);
+			for (j = 0; j < .GRID_SIZE_Y; j += 1) {
+				.PositionArray[i][j] = false;
+			}
+		}
+
+		.ActiveShape = MakeTetrisLine();
+		.ActiveShape.Position = Vec2i(.GRID_SIZE_X / 2, 0);
+
+		.ThreadID = this:thread(.Update);
 	};
 
 	Tetris.Update = function() {
 		while(true) {
 			RegisterDraw(.Draw, this);
 			RegisterGui(.Gui, this);
+
+			.AddShape();
+
 			yield();
 		}
 	};
@@ -36,7 +59,18 @@ local MakeTetris = function() {
 		.Grid.Thickness = Gui.DragFloat("Thickness", .Grid.Thickness, 0.0001f);
 		.Grid.Position = Gui.DragVec2("Position", .Grid.Position, 0.01f);
 
+		.Grid.Recalculate();
+
 		Gui.End();
+	};
+
+	Tetris.AddShape = function() {
+		for (i = 0; i < .ActiveShape.SHAPE_SIZE; i += 1) {
+			.Grid.InsertBox(.ActiveShape.Position.x + .ActiveShape.PositionOffset[i].x,
+							.ActiveShape.Position.y + .ActiveShape.PositionOffset[i].y, 
+							.ActiveShape.ShapeList[i]
+			);
+		}
 	};
 
 	return Tetris;

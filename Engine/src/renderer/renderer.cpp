@@ -8,6 +8,12 @@ namespace prev {
 	static constexpr unsigned int MAX_NUM_VERTICES_PER_SPRTIE		= 6;
 	static constexpr unsigned int MAX_NUM_VERTICES					= MAX_NUM_SPRITES * MAX_NUM_VERTICES_PER_SPRTIE;
 	static constexpr unsigned int MAX_NUM_TEXTURES					= 16;
+	
+	static float ALL_SUBMIT_CALL_TIME								= 0.0f;
+
+#define ADD_SUBMIT_CALL_TIME_BEGIN float submitCallTime = Timer::GetTimeMs();
+#define ADD_SUBMIT_CALL_TIME_END ALL_SUBMIT_CALL_TIME += (Timer::GetTimeMs() - submitCallTime);
+#define LOG_SUBMIT_CALL_TIME printf("Submit Calls Took : %fms\n", ALL_SUBMIT_CALL_TIME); ALL_SUBMIT_CALL_TIME = 0.0f;
 
 	Renderer::SpriteVertices::SpriteVertices(Vec2 center, Vec2 dimension, float rotation) {
 		static const Vec2 squareVertices[] = {

@@ -21,6 +21,7 @@ namespace prev {
 
 		Vec2 ScreenToPixels(Vec2 coords) const;
 		Vec2 PixelsToScreen(Vec2 coords) const;
+		Vec2 MapPixelsToScreen(Vec2 coords) const;
 	private:
 		void OnEvent(Event & event);
 		void GuiFunction();

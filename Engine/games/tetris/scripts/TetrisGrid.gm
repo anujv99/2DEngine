@@ -7,24 +7,26 @@ global MakeTetrisGrid = function(x, y) {
 		Scale,
 		Thickness,
 		BoxList,
-		GridList,
+		GridListX,
+		GridListY,
 		Overlay,
 	};
 
 	TetrisGrid.Init = function(sizeX, sizeY) {
 		.Size = Vec2i(sizeX, sizeY);
-		.Scale = Vec2(0.98f, 1.8f);
+		.Scale = Vec2(0.9f, 1.8f);
 		.Position = Vec2(0.0f);
 		.Thickness = 0.001f;
 		.BoxList = linkedlist();
-		.GridList = linkedlist();
+		.GridListX = linkedlist();
+		.GridListY = linkedlist();
 
 		for (i = 0; i < .Size.x + 1; i += 1) {
 			local box = Sprite();
 			box.Position = (Vec2((.Scale.x / (.Size.x)) * i, 0.0f) - Vec2(.Scale.x / 2.0f, 0.0f)) + .Position;
 			box.Dimension = Vec2(.Thickness, .Scale.y);
 			
-			.GridList.PushFront(box);
+			.GridListX.PushFront(box);
 		}
 
 		for (i = 0; i < .Size.y + 1; i += 1) {
@@ -32,29 +34,31 @@ global MakeTetrisGrid = function(x, y) {
 			box.Position = (Vec2(0.0f, (.Scale.y / (.Size.y)) * i) - Vec2(0.0f, .Scale.y / 2.0f)) + .Position;
 			box.Dimension = Vec2(.Scale.x, .Thickness);
 			
-			.GridList.PushFront(box);
+			.GridListY.PushFront(box);
 		}
 		
-		local te = Sprite();
-		te.Color = Vec4(1.0f, 0.0f, 0.0f, 0.4f);
-		te.Position = .Position;
-		te.Dimension = .Scale;
-		te.Draw();
-
-		.Overlay = te;
+		.Overlay = Sprite();
+		.Overlay.Color = Vec4(1.0f, 0.0f, 0.0f, 0.4f);
+		.Overlay.Position = .Position;
+		.Overlay.Dimension = .Scale;
 	};
 
 	TetrisGrid.Draw = function() {
-		for (i = 0; i < .GridList.Size(); i += 1) {
-			local box = .GridList.PopFront();
+		for (i = 0; i < .GridListX.Size(); i += 1) {
+			local box = .GridListX.PopFront();
 			box.Draw();
-			.GridList.PushBack(box);
+			.GridListX.PushBack(box);
+		};
+
+		for (i = 0; i < .GridListY.Size(); i += 1) {
+			local box = .GridListY.PopFront();
+			box.Draw();
+			.GridListY.PushBack(box);
 		};
 
 		for (i = 0; i < .BoxList.Size(); i += 1) {
 			local box = .BoxList.PopFront();
 			box.Draw();
-			.BoxList.PushBack(box);
 		};
 
 		.Overlay.Draw();
@@ -73,12 +77,58 @@ global MakeTetrisGrid = function(x, y) {
 		return pos;
 	};
 
-	TetrisGrid.InsertBox = function(x, y) {
-		local box = Sprite();
-		box.Position = .GetBoxPosition(x, y);
-		box.Dimension = .GetBoxSize();
+	TetrisGrid.InsertBox = function(x, y, sprite) {
+		if (x >= .Size.x) { return; }
+		if (y >= .Size.y) { return; }
+		ny = .Size.y - y - 1;
 
-		.BoxList.PushFront(box);
+		sprite.Position = .GetBoxPosition(x, ny);
+		sprite.Dimension = .GetBoxSize();
+
+		.BoxList.PushFront(sprite);
+	};
+
+	TetrisGrid.Recalculate = function() {
+
+		if (.Size.x + 1 < .GridListX.Size()) {
+			for (i = 0; i < .GridListX.Size() - (.Size.x + 1); i += 1) {
+				.GridListX.PopFront();
+			}
+		} else {
+			for (i = 0; i < (.Size.x + 1) - .GridListX.Size(); i += 1) {
+				.GridListX.PushFront(Sprite());
+			}
+		}
+
+		if (.Size.y + 1 < .GridListY.Size()) {
+			for (i = 0; i < .GridListY.Size() - (.Size.y + 1); i += 1) {
+				.GridListY.PopFront();
+			}
+		} else {
+			for (i = 0; i < (.Size.y + 1) - .GridListY.Size(); i += 1) {
+				.GridListY.PushFront(Sprite());
+			}
+		}
+
+		for (i = 0; i < .Size.x + 1; i += 1) {
+			local box = .GridListX.PopFront();
+			box.Position = (Vec2((.Scale.x / (.Size.x)) * i, 0.0f) - Vec2(.Scale.x / 2.0f, 0.0f)) + .Position;
+			box.Dimension = Vec2(.Thickness, .Scale.y);
+			
+			.GridListX.PushBack(box);
+		}
+
+		for (i = 0; i < .Size.y + 1; i += 1) {
+			local box = .GridListY.PopFront();
+			box.Position = (Vec2(0.0f, (.Scale.y / (.Size.y)) * i) - Vec2(0.0f, .Scale.y / 2.0f)) + .Position;
+			box.Dimension = Vec2(.Scale.x, .Thickness);
+			
+			.GridListY.PushBack(box);
+		}
+
+		.Overlay.Position = .Position;
+		.Overlay.Dimension = .Scale;
+
 	};
 
 	TetrisGrid.Init(x, y);

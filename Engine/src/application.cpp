@@ -17,6 +17,7 @@
 #include "math/mat4.h"
 #include "math/mvp.h"
 #include "math/camera.h"
+#include "math/spline.h"
 
 #include "common/profiler.h"
 
@@ -41,70 +42,199 @@
 
 extern unsigned int GLOBAL_DRAW_CALL_COUNT;
 
+#define INITIALIZE_MODULE(M, ...) M::CreateInst(__VA_ARGS__); LOG_INFO("Module " #M " successfully initialized");
+#define DESTROY_MODULE(M) M::DestroyInst(); LOG_INFO("Module " #M " successfully destroyed");
+
 namespace prev {
+
+	static Spline s(Vec2(0.0f));
 
 	Application::Application() {
 
 		Timer::FPSCounter(false);
-		EventHandler::CreateInst();
+		INITIALIZE_MODULE(EventHandler);
 
 		m_DisplayModes = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 9;
+		unsigned int selectedDis = 5;
 		m_DisplayModes[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
 		m_DisplayModes[selectedDis].SetMultisample(8);
 		Window::CreateInst(m_DisplayModes[selectedDis]);
 		EventHandler::Ref().RegisterEventFunction(BIND_EVENT_FN(Application::OnEvent));
 
-		Input::CreateInst();
-		MVP::CreateInst();
-		GraphicsContext::CreateInst(Window::Ref().GetWindowRawPointer(), Window::Ref().GetDisplayMode());
-		RenderState::CreateInst();
-		ShaderManager::CreateInst();
-		ImmediateGFX::CreateInst();
-		LayerStack::CreateInst();
+		INITIALIZE_MODULE(Input);
+		INITIALIZE_MODULE(MVP);
+		INITIALIZE_MODULE(GraphicsContext, Window::Ref().GetWindowRawPointer(), Window::Ref().GetDisplayMode());
+		INITIALIZE_MODULE(RenderState);
+		INITIALIZE_MODULE(ShaderManager);
+		INITIALIZE_MODULE(ImmediateGFX);
+		INITIALIZE_MODULE(LayerStack);
 		//ImGui Layer
 
 		IMGUI_CALL(m_ImGuiLayer = new ImGuiLayer());
 		IMGUI_CALL(LayerStack::Ref().PushLayer(m_ImGuiLayer));
 		IMGUI_CALL(m_ImGuiLayer->AddGuiFunction(std::bind(&Application::Gui, this)));
 		IMGUI_CALL(m_ImGuiLayer->SetSettingBoolean("App Settings", &m_IsGuiOpen));
-		Profiler::CreateInst(); // Because profiler use imgui layer
+		INITIALIZE_MODULE(Profiler); // Because profiler use imgui layer
 
-		VirtualMachine::CreateInst();
+		INITIALIZE_MODULE(VirtualMachine);
 		VirtualMachine::Ref().RunMain();
 		
-		Renderer::CreateInst();
-		FramebufferPass::CreateInst();
-		Box2DManager::CreateInst();
-		ImageComponent::CreateInst();
-		FMODAudio::CreateInst();
-		CameraController::CreateInst();
+		INITIALIZE_MODULE(Renderer);
+		INITIALIZE_MODULE(FramebufferPass);
+		INITIALIZE_MODULE(Box2DManager);
+		INITIALIZE_MODULE(ImageComponent);
+		INITIALIZE_MODULE(FMODAudio);
+		INITIALIZE_MODULE(CameraController);
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
-
+		s.AddSegment(Vec2(0.5f, 0.0f));
+		s.AddSegment(Vec2(1.5f, 0.0f));
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
 	}
 
 	Application::~Application() {
+		DESTROY_MODULE(CameraController);
+		DESTROY_MODULE(FMODAudio);
+		DESTROY_MODULE(ImageComponent);
+		DESTROY_MODULE(Box2DManager);
+		DESTROY_MODULE(FramebufferPass);
+		DESTROY_MODULE(Renderer);
+		DESTROY_MODULE(VirtualMachine);
+		DESTROY_MODULE(Profiler);
+		DESTROY_MODULE(LayerStack);
+		DESTROY_MODULE(ImmediateGFX);
+		DESTROY_MODULE(ShaderManager); 
+		DESTROY_MODULE(RenderState);
+		DESTROY_MODULE(GraphicsContext);
+		DESTROY_MODULE(MVP);
+		DESTROY_MODULE(Input);
+		DESTROY_MODULE(Window);
+		DESTROY_MODULE(EventHandler);
+	}
 
-		CameraController::DestroyInst();
-		FMODAudio::DestroyInst();
-		ImageComponent::DestroyInst();
-		Box2DManager::DestroyInst();
-		FramebufferPass::DestroyInst();
-		Renderer::DestroyInst();
-		VirtualMachine::DestroyInst();
-		Profiler::DestroyInst();
-		LayerStack::DestroyInst();
-		ImmediateGFX::DestroyInst();
-		ShaderManager::DestroyInst(); 
-		RenderState::DestroyInst();
-		GraphicsContext::DestroyInst();
-		MVP::DestroyInst();
-		Input::DestroyInst();
-		Window::DestroyInst();
-		EventHandler::DestroyInst();
+	void Application::Render() {
+		PROFILER_BEGIN("App::Render");
+		Renderer::Ref().Present();
+		PROFILER_END("App::Render");
+	}
+
+	void Application::PreRender() {
+		CameraController::Ref().Begin();
+
+		//////////////////////////////////////TESTING////////////////////////////////////////
+
+		if (m_IsWindowReiszed) {
+			Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+
+			Viewport v;
+			v.TopLeft = Vec2(0.0f);
+			v.DepthValues = Vec2(0.0f, 1.0f);
+			v.Dimension = winSize;
+
+			GraphicsContext::Ref().ChangeResolution(ToVec2i(winSize));
+			RenderState::Ref().SetViewport(v);
+			RenderState::Ref().DisableScissors();
+
+			m_IsWindowReiszed = false;
+		}
+
+		//////////////////////////////////////TESTING////////////////////////////////////////
+
+		GraphicsContext::Ref().BeginFrame();
+
+		IMGUI_CALL(if (LayerStack::Ref().GetImGuiLayer())
+			LayerStack::Ref().GetImGuiLayer()->StartFrame());
+
+			LayerStack::Ref().OnUpdate();
+
+		Box2DManager::Ref().Update();
+
+		VirtualMachine::Ref().Update();
+		VirtualMachine::Ref().Render();
+	}
+
+	void Application::PostRender() {
+		PROFILER_BEGIN("App::Gui");
+		GuiUpdate();
+		PROFILER_END("App::Gui");
+
+		IMGUI_CALL(if (LayerStack::Ref().GetImGuiLayer())
+			LayerStack::Ref().GetImGuiLayer()->EndFrame());
+
+		GraphicsContext::Ref().EndFrame();
+
+		Window::Ref().PollEvents();
+		Input::Ref().Update();
+		EventHandler::Ref().FlushEventQueue();
+
+		CameraController::Ref().End();
+	}
+
+	void Application::TestRender() {
+		//////////////////////////////////////TESTING////////////////////////////////////////
+
+		FMODAudio::Ref().Update();
+		CameraController::Ref().Update();
+
+		Vec2 mousePos = CameraController::Ref().MapPixelsToScreen(Input::Ref().GetMousePosition());
+		bool isHovered = false;
+		static bool isDown = false;
+		static unsigned int index = 0;
+
+		static float CIRCLE_RADIUS = 0.02f;
+
+		for (unsigned int i = 0; i < s.GetNumPoints(); i++) {
+			ImmediateGFX::Ref().Color(Vec4(1.0f, 0.0f, 1.0f, 1.0f));
+			if (!isDown && Length(mousePos - s[i]) < CIRCLE_RADIUS) {
+				ImmediateGFX::Ref().Color(Vec4(0.0f, 1.0f, 1.0f, 1.0f));
+				isHovered = true;
+				index = i;
+			}
+			if (isDown && index == i) {
+				ImmediateGFX::Ref().Color(Vec4(0.0f, 1.0f, 1.0f, 1.0f));
+			}
+			ImmediateGFX::Ref().DrawCircle(s[i], CIRCLE_RADIUS);
+		}
+
+		if (isHovered && Input::Ref().IsMouseButtonDown(0)) {
+			isDown = true;
+		}
+
+		if (isDown && Input::Ref().IsMouseButtonReleased(0)) {
+			isDown = false;
+		}
+
+		if (isDown) {
+			s.MovePoint(index, mousePos);
+		}
+
+		Vec2 prevPos(0.0f);
+
+		static unsigned int NUM_LINE_SEGMENTS = 128;
+
+		ImmediateGFX::Ref().Color(Vec4(1.0f));
+		for (unsigned int i = 0; i <= NUM_LINE_SEGMENTS; i++) {
+			if (i == 0) prevPos = s.GetValue((float)i / (float)NUM_LINE_SEGMENTS);
+			else {
+				Vec2 newPos = s.GetValue((float)i / (float)NUM_LINE_SEGMENTS);
+				ImmediateGFX::Ref().DrawLine(prevPos, newPos);
+				prevPos = newPos;
+			}
+		}
+
+		ImmediateGFX::Ref().Color(Vec4(1.0f, 1.0f, 0.0f, 1.0f));
+		for (unsigned int i = 0; i < s.GetNumSegments(); i++) {
+			auto c = s.GetControlPointsOfSegment(i);
+			auto a = s.GetAnchorPointsOfSegment(i);
+			ImmediateGFX::Ref().DrawLine(c[0], a[0]);
+			ImmediateGFX::Ref().DrawLine(c[1], a[1]);
+		}
+
+		ImmediateGFX::Ref().Color(0.0f, 1.0f, 0.0f, 1.0f);
+		ImmediateGFX::Ref().DrawCircle(Vec2(-0.5f), s.GetValue(Timer::GetTime() - (unsigned int)Timer::GetTime()).y, 128);
+
+		//////////////////////////////////////TESTING////////////////////////////////////////
 	}
 
 	void Application::Run() {
@@ -112,66 +242,12 @@ namespace prev {
 		while (m_ApplicationRunning) {
 			PROFILER_ROOT_BEGIN;
 
-			CameraController::Ref().Begin();
-
-			//////////////////////////////////////TESTING////////////////////////////////////////
-
-			if (m_IsWindowReiszed) {
-				Vec2 winSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
-
-				Viewport v;
-				v.TopLeft = Vec2(0.0f);
-				v.DepthValues = Vec2(0.0f, 1.0f);
-				v.Dimension = winSize;
-
-				GraphicsContext::Ref().ChangeResolution(ToVec2i(winSize));
-				RenderState::Ref().SetViewport(v);
-				RenderState::Ref().DisableScissors();
-
-				m_IsWindowReiszed = false;
-			}
-
-			//////////////////////////////////////TESTING////////////////////////////////////////
-
 			Timer::Update();
 
-			GraphicsContext::Ref().BeginFrame();
-			
-			IMGUI_CALL(if (LayerStack::Ref().GetImGuiLayer())
-				LayerStack::Ref().GetImGuiLayer()->StartFrame();)
-
-			LayerStack::Ref().OnUpdate();
-
-			Box2DManager::Ref().Update();
-
-			VirtualMachine::Ref().Update();
-			VirtualMachine::Ref().Render();
-
-			//////////////////////////////////////TESTING////////////////////////////////////////
-
-			FMODAudio::Ref().Update();
-			CameraController::Ref().Update();
-
-			//////////////////////////////////////TESTING////////////////////////////////////////
-
-			PROFILER_BEGIN("App::Present");
-			Renderer::Ref().Present();
-			PROFILER_END("App::Present");
-
-			PROFILER_BEGIN("App::Gui");
-			GuiUpdate();
-			PROFILER_END("App::Gui");
-
-			IMGUI_CALL(if (LayerStack::Ref().GetImGuiLayer())
-				LayerStack::Ref().GetImGuiLayer()->EndFrame());
- 
-			GraphicsContext::Ref().EndFrame();
-
-			Window::Ref().PollEvents();
-			Input::Ref().Update();
-			EventHandler::Ref().FlushEventQueue();
-
-			CameraController::Ref().End();
+			PreRender();
+			//TestRender();
+			Render();
+			PostRender();
 
 			PROFILER_ROOT_END;
 

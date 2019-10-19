@@ -1,0 +1,21 @@
+
+global MakeTetrisLogic = function(tetrisGrid) {
+
+	TetrisLogic = {
+		TetrisGrid,
+		PositionArray,
+		ActiveShape,
+	};
+
+	TetrisLogic.Init = function(tetrisGrid) {
+		.TetrisGrid = tetrisGrid;
+	};
+
+	TetrisLogic.Update = function() {
+		
+	};
+
+	TetrisLogic.Init(tetrisGrid);
+
+	return TetrisLogic;
+};

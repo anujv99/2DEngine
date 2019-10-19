@@ -70,6 +70,7 @@ namespace prev {
 	Vec2 Perpendicular(const Vec2 & _vec);
 	Vec2 UnitCircle(float _angle);
 	Vec2 Hermite(const Vec2 & _v1, const Vec2 & _tan1, const Vec2 & _v2, const Vec2 & _tan2, float _val);
+	Vec2 Bezier(const Vec2 & _anchor1, const Vec2 & _anchor2, const Vec2 & _control1, const Vec2 & _control2, float _factor);
 
 	Vec2 Rotate(const Vec2 & _dir, float _angle);
 

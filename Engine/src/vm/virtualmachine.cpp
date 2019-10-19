@@ -172,13 +172,13 @@ namespace prev {
 
 		const float minVal = 0.0f;
 		const float maxVal = 16.0f;
-		const int width = 200;
-		const int height = 150;
+		const int width = 1.0f;
+		const int height = 1.0f;
 		const int numVals = 128;
 
-		m_LineGraphUpdate	= new LineGraph(minVal, maxVal, Vec2i(width, height), numVals);
-		m_LineGraphDraw		= new LineGraph(minVal, maxVal, Vec2i(width, height), numVals);
-		m_LineGraphMemory	= new LineGraph(minVal, maxVal, Vec2i(width, height), numVals);
+		m_LineGraphUpdate	= new LineGraph(minVal, maxVal, Vec2(width, height), numVals);
+		m_LineGraphDraw		= new LineGraph(minVal, maxVal, Vec2(width, height), numVals);
+		m_LineGraphMemory	= new LineGraph(minVal, maxVal, Vec2(width, height), numVals);
 
 	}
 

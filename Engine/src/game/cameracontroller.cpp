@@ -73,6 +73,17 @@ namespace prev {
 		return Vec2(x / screenSize.x, y / screenSize.y) * coords;
 	}
 
+	prev::Vec2 CameraController::MapPixelsToScreen(Vec2 coords) const {
+		Vec2 screenSize = ToVec2(Window::Ref().GetDisplayMode().GetWindowSize());
+		Vec2 factor = coords / screenSize;
+		factor.y = 1.0f - factor.y;
+
+		float x = GetScreenCoordsX().x + (GetScreenCoordsX().y - GetScreenCoordsX().x) * factor.x;
+		float y = GetScreenCoordsY().x + (GetScreenCoordsY().y - GetScreenCoordsY().x) * factor.y;
+
+		return Vec2(x, y);
+	}
+
 	void CameraController::OnEvent(Event & event) {
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(CameraController::WindowResized));

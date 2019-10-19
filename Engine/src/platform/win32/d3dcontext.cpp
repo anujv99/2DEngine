@@ -88,7 +88,7 @@ namespace prev {
 	}
 
 	void D3DContext::EndFrame() {
-		m_SwapChain->Present(1u, 0u);
+		m_SwapChain->Present(0u, 0u);
 	}
 
 	bool D3DContext::ChangeResolution(Vec2i newResolution) {

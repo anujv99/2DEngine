@@ -7,10 +7,8 @@ namespace prev {
 
 	class LineGraph : public HandledObject<LineGraph> {
 	public:
-		LineGraph(float minValue = 0.0f, float maxValue = 1.0f, Vec2i dimen = Vec2i(200), int numValuesMax = 128);
+		LineGraph(float minValue = 0.0f, float maxValue = 1.0f, Vec2 dimen = Vec2(1.0f), int numValuesMax = 128);
 
-		void Draw(Vec2 pos);
-		void DrawBackground(Vec2 pos);
 		void PushValue(float val);
 		void PopValue();
 		void Clear();
@@ -21,7 +19,7 @@ namespace prev {
 
 		int GetMaxNumValues() const { return m_NumMaxValue; }
 
-		Vec2i GetDimension() const { return m_Dimension; }
+		Vec2 GetDimension() const { return m_Dimension; }
 
 		//Use this to get imgui PlotLine function
 		float GetData(int index);
@@ -30,7 +28,7 @@ namespace prev {
 	private:
 		float m_MinValue;
 		float m_MaxValue;
-		Vec2i m_Dimension;
+		Vec2 m_Dimension;
 		int m_NumMaxValue;
 		int m_IndexFront;
 		std::vector<float> m_Vaues;

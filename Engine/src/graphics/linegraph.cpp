@@ -13,7 +13,7 @@ namespace prev {
 		return (reinterpret_cast<LineGraph *>(data)->GetData(index));
 	}
 
-	LineGraph::LineGraph(float minValue /*= 0.0f*/, float maxValue /*= 1.0f*/, Vec2i dimen /*= Vec2i(200)*/, int numValuesMax /*= 128*/) {
+	LineGraph::LineGraph(float minValue /*= 0.0f*/, float maxValue /*= 1.0f*/, Vec2 dimen /*= Vec2(1.0f)*/, int numValuesMax /*= 128*/) {
 		m_IndexFront = 0;
 		m_NumMaxValue = numValuesMax;
 		m_MinValue = minValue;
@@ -22,93 +22,6 @@ namespace prev {
 
 		ASSERT(numValuesMax > 0);
 		m_Vaues.reserve(numValuesMax);
-	}
-
-	void LineGraph::Draw(Vec2 pos) {
-		if (m_Vaues.empty()) return;
-
-		const Vec2 minPos = pos + Vec2(0.0f, (float)-m_Dimension.y);
-		const Vec2 maxPos = minPos + ToVec2(m_Dimension);
-		const float deltaX = 1.0f / m_NumMaxValue;
-		const float denom = (m_MaxValue - m_MinValue);
-
-		ImmediateGFX & imm = ImmediateGFX::Ref();
-		imm.Color(1.0f, 1.0f, 0.0f);
-
-		ScissorBox sb;
-		sb.Left = (int)minPos.x;
-		sb.Right = (int)maxPos.x;
-		sb.Bottom = (int)minPos.y;
-		sb.Top = (int)maxPos.y;
-
-		RenderState::Ref().SetScissorBox(sb);
-
-		imm.BeginDefaultShaders();
-		imm.BeginDraw();
-		imm.PolygonBegin(PV_PRIM_LINESTRIP);
-
-		for (int i = m_IndexFront; i < (int)m_Vaues.size(); ++i) {
-			float u = (i - m_IndexFront) * deltaX;
-			float v = (m_Vaues[i] - m_MinValue) / denom;
-
-			float x = Lerp(minPos.x, maxPos.x, u);
-			float y = Lerp(minPos.y, maxPos.y, v);
-
-			imm.Vertex(x, y);
-		}
-
-		if (m_IndexFront > 0) {
-			const int offset = (int)m_Vaues.size() - m_IndexFront;
-
-			for (int i = 0; i < m_IndexFront; ++i) {
-				float u = (i + offset) * deltaX;
-				float v = (m_Vaues[i] - m_MinValue) / denom;
-
-				float x = Lerp(minPos.x, maxPos.x, u);
-				float y = Lerp(minPos.y, maxPos.y, v);
-
-				imm.Vertex(x, y);
-			}
-		}
-
-		imm.PolygonEnd();
-
-		RenderState::Ref().DisableScissors();
-	}
-
-	void LineGraph::DrawBackground(Vec2 pos) {
-
-		const Vec2 minPos = pos + Vec2(0.0f, (float)-m_Dimension.y);
-		const Vec2 dimen = ToVec2(m_Dimension);;
-		const Vec2 maxPos = minPos + dimen;
-
-		ImmediateGFX & imm = ImmediateGFX::Ref();
-
-		imm.BeginDefaultShaders();
-		imm.BeginDraw();
-
-		imm.Color(Vec3(0.2f, 0.2f, 0.2f), 0.8f);
-		imm.DrawRect(minPos, dimen);
-
-		imm.Color(Vec3(1.0f), 0.1f);
-		imm.PolygonBegin(PV_PRIM_LINELIST);
-
-		int numLines = 3;
-		for (int i = 0; i <= numLines + 1; ++i) {
-			float alpha = (float)i / (numLines + 1);
-
-			float x = Lerp(minPos.x, maxPos.x, alpha);
-			float y = Lerp(minPos.y, maxPos.y, alpha);
-
-			imm.Vertex(Vec2(x, minPos.y));
-			imm.Vertex(Vec2(x, maxPos.y));
-			imm.Vertex(Vec2(minPos.x, y));
-			imm.Vertex(Vec2(maxPos.x, y));
-		}
-
-		imm.PolygonEnd();
-
-		imm.EndDraw();
 	}
 
 	void LineGraph::PushValue(float val) {
