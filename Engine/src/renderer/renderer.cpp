@@ -4,7 +4,7 @@
 
 namespace prev {
 
-	static constexpr unsigned int MAX_NUM_SPRITES					= 1024 * 16;
+	static constexpr unsigned int MAX_NUM_SPRITES					= 1024 * 128;
 	static constexpr unsigned int MAX_NUM_VERTICES_PER_SPRTIE		= 6;
 	static constexpr unsigned int MAX_NUM_VERTICES					= MAX_NUM_SPRITES * MAX_NUM_VERTICES_PER_SPRTIE;
 	static constexpr unsigned int MAX_NUM_TEXTURES					= 16;

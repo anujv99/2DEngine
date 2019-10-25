@@ -32,7 +32,7 @@ namespace prev {
 
 		//By default MSAA is determined by the window,
 		//And no depth buffer is created
-		virtual void Init(Vec2 size, TextureFormat format, FramebufferFlags flags) = 0;
+		virtual void Init(Vec2 size, TextureFormat format, int flags) = 0;
 		virtual void Clear() = 0;
 		virtual void Clear(Vec4 color) = 0;
 		virtual Vec2 GetSize() = 0;

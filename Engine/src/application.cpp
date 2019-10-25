@@ -13,6 +13,7 @@
 #include "graphics/shadermanager.h"
 #include "graphics/imagecomponent.h"
 #include "graphics/graphicscontext.h"
+#include "graphics/framebufferstack.h"
 
 #include "math/mat4.h"
 #include "math/mvp.h"
@@ -54,16 +55,18 @@ namespace prev {
 		Timer::FPSCounter(false);
 		INITIALIZE_MODULE(EventHandler);
 
-		m_DisplayModes = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 5;
-		m_DisplayModes[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
-		m_DisplayModes[selectedDis].SetMultisample(8);
-		Window::CreateInst(m_DisplayModes[selectedDis]);
+		auto adapters = GraphicsContext::GetDisplayModes();
+
+		const DisplayMode & mode = *adapters[0]->GetMonitors()[0]->GetDisplayModes()[0];
+
+		Window::CreateInst(adapters[1]->GetMonitors()[0]);
 		EventHandler::Ref().RegisterEventFunction(BIND_EVENT_FN(Application::OnEvent));
+
+		StrongHandle<DisplayMode> disMode = Window::Ref().GetDisplayModePointer();
 
 		INITIALIZE_MODULE(Input);
 		INITIALIZE_MODULE(MVP);
-		INITIALIZE_MODULE(GraphicsContext, Window::Ref().GetWindowRawPointer(), Window::Ref().GetDisplayMode());
+		INITIALIZE_MODULE(GraphicsContext, Window::Ref().GetWindowRawPointer(), disMode, adapters[1]);
 		INITIALIZE_MODULE(RenderState);
 		INITIALIZE_MODULE(ShaderManager);
 		INITIALIZE_MODULE(ImmediateGFX);
@@ -85,6 +88,7 @@ namespace prev {
 		INITIALIZE_MODULE(ImageComponent);
 		INITIALIZE_MODULE(FMODAudio);
 		INITIALIZE_MODULE(CameraController);
+		INITIALIZE_MODULE(FramebufferStack);
 
 		////////////////////////////////////////TESTING////////////////////////////////////////
 		s.AddSegment(Vec2(0.5f, 0.0f));
@@ -94,6 +98,7 @@ namespace prev {
 	}
 
 	Application::~Application() {
+		DESTROY_MODULE(FramebufferStack);
 		DESTROY_MODULE(CameraController);
 		DESTROY_MODULE(FMODAudio);
 		DESTROY_MODULE(ImageComponent);
@@ -114,9 +119,14 @@ namespace prev {
 	}
 
 	void Application::Render() {
+		PROFILER_BEGIN("App::VirtualMachine::Render");
+		VirtualMachine::Ref().Render();
+		PROFILER_END("App::VirtualMachine::Render");
+
 		PROFILER_BEGIN("App::Render");
 		Renderer::Ref().Present();
 		PROFILER_END("App::Render");
+
 	}
 
 	void Application::PreRender() {
@@ -146,12 +156,7 @@ namespace prev {
 		IMGUI_CALL(if (LayerStack::Ref().GetImGuiLayer())
 			LayerStack::Ref().GetImGuiLayer()->StartFrame());
 
-			LayerStack::Ref().OnUpdate();
-
-		Box2DManager::Ref().Update();
-
-		VirtualMachine::Ref().Update();
-		VirtualMachine::Ref().Render();
+		LayerStack::Ref().OnUpdate();
 	}
 
 	void Application::PostRender() {
@@ -169,6 +174,11 @@ namespace prev {
 		EventHandler::Ref().FlushEventQueue();
 
 		CameraController::Ref().End();
+	}
+
+	void Application::Update() {
+		Box2DManager::Ref().Update();
+		VirtualMachine::Ref().Update();
 	}
 
 	void Application::TestRender() {
@@ -244,9 +254,39 @@ namespace prev {
 
 			Timer::Update();
 
+			//Pre Render
 			PreRender();
-			//TestRender();
-			Render();
+
+			static bool pause = false;
+			if (Input::Ref().IsKeyDown(PV_KEY_P)) {
+				pause = true;
+			} else if (Input::Ref().IsKeyReleased(PV_KEY_P)) {
+				pause = false;
+			}
+
+			//Update
+			PROFILER_BEGIN("App::ALLUpdate");
+			if (!pause)
+			Update();
+			PROFILER_END("App::ALLUpdate");
+			
+			//All Rendering
+			PROFILER_BEGIN("App::ALLRendering");
+
+			if (!pause) {
+				FramebufferStack::Ref().Start();
+				{
+					//TestRender();
+					Render();
+				}
+				FramebufferStack::Ref().End();
+			}
+
+			FramebufferStack::Ref().Present();
+
+			PROFILER_END("App::ALLRendering");
+
+			//Post Render
 			PostRender();
 
 			PROFILER_ROOT_END;
@@ -262,21 +302,21 @@ namespace prev {
 	}
 
 	void Application::Gui() {
-		IMGUI_CALL(
-			if (m_IsGuiOpen) {
-				ImGui::Begin("Application Settings", &m_IsGuiOpen);
-				if (ImGui::CollapsingHeader("Window Size")) {
-					ImGui::Indent();
-					for (const auto & disMode : m_DisplayModes) {
-						if (ImGui::Selectable((std::to_string(disMode.GetWindowSize().x) + ", " + std::to_string(disMode.GetWindowSize().y)).c_str())) {
-							Window::Ref().SetWindowSize(disMode.GetWindowSize());
-						}
-					}
-					ImGui::Unindent();
-				}
-				ImGui::End();
-			}
-		);
+		//IMGUI_CALL(
+		//	if (m_IsGuiOpen) {
+		//		ImGui::Begin("Application Settings", &m_IsGuiOpen);
+		//		if (ImGui::CollapsingHeader("Window Size")) {
+		//			ImGui::Indent();
+		//			for (const auto & disMode : m_DisplayModes) {
+		//				if (ImGui::Selectable((std::to_string(disMode.GetWindowSize().x) + ", " + std::to_string(disMode.GetWindowSize().y)).c_str())) {
+		//					Window::Ref().SetWindowSize(disMode.GetWindowSize());
+		//				}
+		//			}
+		//			ImGui::Unindent();
+		//		}
+		//		ImGui::End();
+		//	}
+		//);
 	}
 
 	void Application::OnEvent(Event & e) {

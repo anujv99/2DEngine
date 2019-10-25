@@ -23,7 +23,7 @@ namespace prev {
 		d3dContext->BindDefaultRenderTarget();
 	}
 
-	void D3DFramebuffer::Init(Vec2 size, TextureFormat format, FramebufferFlags flags) {
+	void D3DFramebuffer::Init(Vec2 size, TextureFormat format, int flags) {
 		LOG_ON_CONDITION(!m_IsCreated, LOG_ERROR, "Framebuffer already created", return);
 
 		m_TextureSize = size;

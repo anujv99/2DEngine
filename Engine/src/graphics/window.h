@@ -10,32 +10,62 @@ namespace prev {
 		WINDOW_STYLE_FULLSCREEN
 	};
 
-	struct DisplayMode {
+	struct DisplayMode : public HandledObject<DisplayMode> {
 		friend class GraphicsContext;
-		friend class WindowsWindow;
 	public:
 		Vec2i GetWindowSize() const { return WindowSize; }
 		WindowStyle GetWindowStyle() const { return Style; }
 		bool IsWindowFullscreen() const { return Style == WINDOW_STYLE_FULLSCREEN; }
 
-		inline void SetWindowStyle(WindowStyle style) { Style = style; }
-		inline void SetMultisample(unsigned int numSamples) { Samples = numSamples; }
+		inline void SetWindowStyle(WindowStyle style) const { Style = style; }
+		inline void SetMultisample(unsigned int numSamples) const { Samples = numSamples; }
 		inline unsigned int GetSamples() const {return Samples; }
 		inline bool IsMultisampled() const { return Samples != 1; }
-	private:
+	protected:
 		DisplayMode() :
-			WindowSize(0, 0), Style(WindowStyle::WINDOW_STYLE_WINDOWED), Samples(1u) {}
+			WindowSize(0, 0), Style(WINDOW_STYLE_BORDERLESS), Samples(4u) {}
 	private:
 		Vec2i WindowSize;
-		WindowStyle Style;
-		unsigned int Samples;
+		mutable WindowStyle Style;
+		mutable unsigned int Samples;
+	};
+
+	struct Monitor : public HandledObject<Monitor> {
+		friend class GraphicsContext;
+		friend class WindowsWindow;
+	public:
+		Vec2i GetResolution() const {
+			return Vec2i(std::abs(TopLeft.x - BottomRight.x), std::abs(TopLeft.y - BottomRight.y));
+		}
+		const std::vector<StrongHandle<DisplayMode>> GetDisplayModes() const { return DisplayModes; }
+	private:
+		Monitor() : TopLeft(0), BottomRight(0) {}
+	private:
+		Vec2i TopLeft;
+		Vec2i BottomRight;
+		std::string MonitorDescription;
+		std::vector<StrongHandle<DisplayMode>> DisplayModes;
+	};
+
+	struct GraphicsAdapter : public HandledObject<GraphicsAdapter> {
+		friend class GraphicsContext;
+	public:
+		const std::vector<StrongHandle<Monitor>> GetMonitors() const { return Monitors; }
+	protected:
+		GraphicsAdapter() : DedicatedVideoMemory(0) {}
+	private:
+		std::string AdapterDescription;
+		unsigned int DedicatedVideoMemory;
+		std::vector<StrongHandle<Monitor>> Monitors;
 	};
 
 	class Window : public Singleton<Window> {
 		friend class Application;
 		friend class Singleton<Window>;
 	public:
-		DisplayMode GetDisplayMode() const { return m_DisplayMode; }
+		const DisplayMode GetDisplayMode() const { return *(m_Monitor->GetDisplayModes()[m_DisplayMode]); }
+		StrongHandle<DisplayMode> GetDisplayModePointer() {	return m_Monitor->GetDisplayModes()[m_DisplayMode];	}
+
 		inline bool IsWindowReady() const { return m_IsWindowReady; }
 	public:
 		virtual void PollEvents() = 0;
@@ -45,19 +75,26 @@ namespace prev {
 
 		virtual Vec2i GetPosition() = 0;
 	protected:
-		Window(const DisplayMode & displayMode) : m_DisplayMode(displayMode) { }
+		Window(const StrongHandle<Monitor> & monitor, unsigned int displayMode) : m_Monitor(monitor), m_DisplayMode(displayMode) { }
 		virtual ~Window() {}
-		static Window * CreateEngineWindow(const DisplayMode & displayMode);
+		static Window * CreateEngineWindow(const StrongHandle<Monitor> & monitor, unsigned int displayMode = 0);
 
 		bool m_IsWindowReady = true;
 	protected:
-		DisplayMode m_DisplayMode;
+		StrongHandle<Monitor> m_Monitor;
+		unsigned int m_DisplayMode;
 	};
 
 	template<>
 	template<>
-	inline void Singleton<Window>::CreateInst(const DisplayMode & displayMode) {
-		if (!s_Instance) s_Instance = Window::CreateEngineWindow(displayMode);
+	inline void Singleton<Window>::CreateInst(const StrongHandle<Monitor> & monitor) {
+		if (!s_Instance) s_Instance = Window::CreateEngineWindow(monitor);
+	}
+
+	template<>
+	template<>
+	inline void Singleton<Window>::CreateInst(const StrongHandle<Monitor> & monitor, const unsigned int & displayMode) {
+		if (!s_Instance) s_Instance = Window::CreateEngineWindow(monitor, displayMode);
 	}
 
 }

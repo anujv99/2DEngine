@@ -15,7 +15,7 @@ namespace prev {
 		// Inherited via Framebuffer
 		virtual void Bind() override;
 		virtual void UnBind() override;
-		virtual void Init(Vec2 size, TextureFormat format, FramebufferFlags flags) override;
+		virtual void Init(Vec2 size, TextureFormat format, int flags) override;
 		virtual void Clear() override;
 		virtual void Clear(Vec4 color) override;
 		virtual Vec2 GetSize() override;

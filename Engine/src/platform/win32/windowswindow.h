@@ -12,7 +12,7 @@ namespace prev {
 
 	class WindowsWindow : public Window {
 	public:
-		WindowsWindow(const DisplayMode & displayMode);
+		WindowsWindow(const StrongHandle<Monitor> & monitor, unsigned int displayMode);
 		~WindowsWindow();
 
 		// Inherited via Window

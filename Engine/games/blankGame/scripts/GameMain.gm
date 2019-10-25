@@ -27,7 +27,7 @@ local MakeBlankGame = function() {
 		.Box2.Position = Vec2(0.0f, 0.2f);
 		.Box2.Dimension = Vec2(0.2f);
 
-		.Ps = ParticleSystem(1024);
+		.Ps = ParticleSystem(100000);
 
 		.Fnt = Font("testFont", "res/fonts/Minecraftia.ttf", 0.1f);
 
@@ -36,6 +36,7 @@ local MakeBlankGame = function() {
 		.Tex.Scale = Vec2(1.0f);
 		.Tex.Rotation = 0.0f;
 		.Tex.Text = "Hello";
+
 	};
 
 	BlankGame.Update = function() {

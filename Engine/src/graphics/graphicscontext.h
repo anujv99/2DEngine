@@ -7,7 +7,7 @@ namespace prev {
 	class GraphicsContext : public Singleton<GraphicsContext> {
 		friend class Singleton<GraphicsContext>;
 	public:
-		static std::vector<DisplayMode> GetDisplayModes();
+		static std::vector<StrongHandle<GraphicsAdapter>> GetDisplayModes();
 
 		inline bool IsGraphicsContextReady() const { return m_IsContextCreated; }
 
@@ -20,13 +20,14 @@ namespace prev {
 
 		bool m_IsContextCreated = true;
 	private:
-		static GraphicsContext * CreateContext(const uintptr_t & windowRawPointer, const DisplayMode & displayMode);
+		static GraphicsContext * CreateContext(const uintptr_t & windowRawPointer, 
+			const StrongHandle<DisplayMode> & displayMode, const StrongHandle <GraphicsAdapter> & adapter);
 	};
 
 	template<>
 	template<>
-	inline void Singleton<GraphicsContext>::CreateInst(const uintptr_t & windowRawPointer, const DisplayMode & displayMode) {
-		if (!s_Instance) s_Instance = GraphicsContext::CreateContext(windowRawPointer, displayMode);
+	inline void Singleton<GraphicsContext>::CreateInst(const uintptr_t & windowRawPointer, const StrongHandle<DisplayMode> & displayMode, const StrongHandle <GraphicsAdapter> & adapter) {
+		if (!s_Instance) s_Instance = GraphicsContext::CreateContext(windowRawPointer, displayMode, adapter);
 	}
 
 }

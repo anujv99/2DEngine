@@ -192,20 +192,20 @@ namespace prev {
 		return DefWindowProcA(hWnd, msg, wParam, lParam);
 	}
 
-	Window * Window::CreateEngineWindow(const DisplayMode & displayMode) {
-		WindowsWindow * window = new WindowsWindow(displayMode);
+	Window * Window::CreateEngineWindow(const StrongHandle<Monitor> & monitor, unsigned int displayMode) {
+		WindowsWindow * window = new WindowsWindow(monitor, displayMode);
 		return (Window *)window;
 	}
 
-	WindowsWindow::WindowsWindow(const DisplayMode & displayMode) : Window(displayMode) {
+	WindowsWindow::WindowsWindow(const StrongHandle<Monitor> & monitor, unsigned int displayMode) : Window(monitor, displayMode) {
 		m_HInst = GetModuleHandle(nullptr);
-		SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
-		m_DisplaySize = Vec2i(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 
-		m_DisplayPos.x = (m_DisplaySize.x - displayMode.GetWindowSize().x) / 2;
-		m_DisplayPos.y = (m_DisplaySize.y - displayMode.GetWindowSize().y) / 2;
+		StrongHandle<DisplayMode> disMode = m_Monitor->GetDisplayModes()[displayMode];
 
-		switch (displayMode.GetWindowStyle()) {
+		Vec2i diff = monitor->GetResolution() - monitor->GetDisplayModes()[displayMode]->GetWindowSize();
+		m_DisplayPos = monitor->TopLeft + diff / 2;
+
+		switch (disMode->GetWindowStyle()) {
 			case WINDOW_STYLE_WINDOWED:
 				m_WindowClassStyle	= CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 				m_WindowExStyle		= WS_EX_APPWINDOW;
@@ -225,13 +225,13 @@ namespace prev {
 				break;
 		}
 
-		bool result = RegisterWindowClass(displayMode);
+		bool result = RegisterWindowClass(*disMode);
 		if (!result) {
 			m_IsWindowReady = false;
 			return;
 		}
 
-		result = CreateWindowsWindow(displayMode);
+		result = CreateWindowsWindow(*disMode);
 		if (!result) {
 			m_IsWindowReady = false;
 			return;
@@ -342,7 +342,7 @@ namespace prev {
 	}
 
 	bool WindowsWindow::WindowResized(WindowResizeEvent & e) {
-		m_DisplayMode.WindowSize = e.GetWindowSize();
+		//m_DisplayMode.WindowSize = e.GetWindowSize();
 		return false;
 	}
 

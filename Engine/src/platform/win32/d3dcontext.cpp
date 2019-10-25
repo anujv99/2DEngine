@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "d3dcontext.h"
 
+#include <dxgi1_6.h>
+#include <comutil.h>
+
 namespace com = Microsoft::WRL;
 
 #if defined(ENGINE_DEBUG)
@@ -13,57 +16,99 @@ namespace com = Microsoft::WRL;
 
 namespace prev {
 
-	std::vector<DisplayMode> GraphicsContext::GetDisplayModes() {
-		com::ComPtr<IDXGIFactory> factory;
-		com::ComPtr<IDXGIAdapter> adaptor;
-		com::ComPtr<IDXGIOutput> output;
-		UINT numDisplayModes = 0;
-		DXGI_MODE_DESC * displayModes;
+	struct D3DGraphicsAdapter : public GraphicsAdapter {
+		D3DGraphicsAdapter() : GraphicsAdapter() {}
+		com::ComPtr<IDXGIAdapter1> Adapter;
+	};
 
-		CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)factory.GetAddressOf());
+	struct D3DDisplayMode : public DisplayMode {
+		D3DDisplayMode() {}
+		DXGI_MODE_DESC DisplayMode;
+	};
 
-		factory->EnumAdapters(0, adaptor.GetAddressOf());
+	std::vector<StrongHandle<GraphicsAdapter>> GraphicsContext::GetDisplayModes() {
 
-		adaptor->EnumOutputs(0, output.GetAddressOf());
+		SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
+		SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+		SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
-		auto hr = output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, NULL);
+		com::ComPtr<IDXGIFactory1> factory;
+		CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void **)factory.GetAddressOf());
 
-		displayModes = new DXGI_MODE_DESC[numDisplayModes];
+		com::ComPtr<IDXGIAdapter1> adapter;
 
-		output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, displayModes);
+		std::vector<StrongHandle<GraphicsAdapter>> graphicsadapters;
+		
+		for (UINT i = 0; !FAILED(factory->EnumAdapters1(i, adapter.GetAddressOf())); i++) {
+			StrongHandle<D3DGraphicsAdapter> adap = new D3DGraphicsAdapter();
+			adap->Adapter = adapter;
 
-		std::vector<DisplayMode> displayModeList;
+			DXGI_ADAPTER_DESC1 adapterDesc;
+			adapter->GetDesc1(&adapterDesc);
 
-		for (UINT i = 0; i < numDisplayModes; i++) {
+			adap->AdapterDescription = _bstr_t(adapterDesc.Description);
+			adap->DedicatedVideoMemory = adapterDesc.DedicatedVideoMemory;
+			
+			com::ComPtr<IDXGIOutput> output;
 
-			if (i == 0) { 
-				displayModeList.push_back(DisplayMode());
-				displayModeList[displayModeList.size() - 1].WindowSize = Vec2i(displayModes[i].Width, displayModes[i].Height);
-				continue;
+			for (UINT j = 0; !FAILED(adapter->EnumOutputs(j, output.GetAddressOf())); j++) {
+				DXGI_OUTPUT_DESC outputDesc;
+				output->GetDesc(&outputDesc);
+
+				StrongHandle<Monitor> mon = new Monitor();
+				mon->TopLeft = Vec2i(outputDesc.DesktopCoordinates.left, outputDesc.DesktopCoordinates.top);
+				mon->BottomRight = Vec2i(outputDesc.DesktopCoordinates.right, outputDesc.DesktopCoordinates.bottom);
+				mon->MonitorDescription = _bstr_t(outputDesc.DeviceName);
+
+				UINT numDisplayModes = 0u;
+
+				output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, NULL);
+
+				DXGI_MODE_DESC * displayModes = new DXGI_MODE_DESC[numDisplayModes];
+
+				output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, displayModes);
+
+				for (UINT k = 0; k < numDisplayModes; k++) {
+					
+					if (k == 0) {
+						StrongHandle<D3DDisplayMode> mode = new D3DDisplayMode();
+						mode->WindowSize = Vec2i(displayModes[i].Width, displayModes[i].Height);
+						mode->DisplayMode = displayModes[k];
+						mon->DisplayModes.push_back((DisplayMode *)mode);
+						continue;
+					}
+
+					if (displayModes[k].Width != displayModes[k - 1].Width || displayModes[k].Height != displayModes[k - 1].Height) {
+						StrongHandle<D3DDisplayMode> mode = new D3DDisplayMode();
+						mode->WindowSize = Vec2i(displayModes[k].Width, displayModes[k].Height);
+						mode->DisplayMode = displayModes[k];
+						mon->DisplayModes.push_back((DisplayMode *)mode);
+					}
+
+				}
+
+				delete[] displayModes;
+
+				std::reverse(mon->DisplayModes.begin(), mon->DisplayModes.end());
+
+				adap->Monitors.push_back(mon);
 			}
 
-			if (displayModes[i].Width != displayModeList[displayModeList.size() - 1].GetWindowSize().x ||
-				displayModes[i].Height != displayModeList[displayModeList.size() - 1].GetWindowSize().y) {
-				displayModeList.push_back(DisplayMode());
-				displayModeList[displayModeList.size() - 1].WindowSize = Vec2i(displayModes[i].Width, displayModes[i].Height);
-			}
-
+			graphicsadapters.push_back((GraphicsAdapter *)adap);
 		}
 
-		delete[] displayModes;
+		return graphicsadapters;
 
-		std::reverse(displayModeList.begin(), displayModeList.end());
-
-		return displayModeList;
 	}
 	
-	GraphicsContext * GraphicsContext::CreateContext(const uintptr_t & windowRawPointer, const DisplayMode & displayMode) {
-		return new D3DContext((HWND)(void *)windowRawPointer, displayMode);
+	GraphicsContext * GraphicsContext::CreateContext(const uintptr_t & windowRawPointer, const StrongHandle<DisplayMode> & displayMode, const StrongHandle <GraphicsAdapter> & adapter) {
+		return new D3DContext((HWND)(void *)windowRawPointer, displayMode, adapter);
 	}
 
-	D3DContext::D3DContext(HWND hWnd, const DisplayMode & displayMode) {
-		DXGI_MODE_DESC displayModeDesc = GetDisplayModeDesc(displayMode);
-		m_NumSamples = displayMode.GetSamples();
+	D3DContext::D3DContext(HWND hWnd, const StrongHandle<DisplayMode> & displayMode, const StrongHandle <GraphicsAdapter> & adapter) {
+		D3DDisplayMode * disMode = (D3DDisplayMode *)displayMode.Get();
+		DXGI_MODE_DESC displayModeDesc = disMode->DisplayMode;
+		m_NumSamples = displayMode->GetSamples();
 
 		if (m_IsContextCreated == false) {
 			return;
@@ -74,11 +119,22 @@ namespace prev {
 		CHECK_CONTEXT_CREATION(CreateDepthBuffer(displayModeDesc));
 		CHECK_CONTEXT_CREATION(CreateRasterizerState(displayModeDesc));
 
-		if (displayMode.IsWindowFullscreen()) {
+		if (displayMode->IsWindowFullscreen()) {
 			m_SwapChain->SetFullscreenState(TRUE, nullptr);
 		}
 
 		LOG_TRACE("D3D11 Successfully Initialized");
+	}
+
+	D3DContext::~D3DContext() {
+		m_DepthStencilBuffer = nullptr;
+		m_DepthStencilView = nullptr;
+		m_DepthStencilState = nullptr;
+		m_RasterizerState = nullptr;
+		m_RenderTargetView = nullptr;
+		m_DeviceContext = nullptr;
+		m_Device = nullptr;
+		m_SwapChain = nullptr;
 	}
 
 	void D3DContext::BeginFrame() {
@@ -88,7 +144,7 @@ namespace prev {
 	}
 
 	void D3DContext::EndFrame() {
-		m_SwapChain->Present(0u, 0u);
+		m_SwapChain->Present(1u, 0u);
 	}
 
 	bool D3DContext::ChangeResolution(Vec2i newResolution) {
@@ -116,40 +172,6 @@ namespace prev {
 
 	void D3DContext::BindDefaultRenderTarget() {
 		m_DeviceContext->OMSetRenderTargets(1u, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
-	}
-
-	DXGI_MODE_DESC D3DContext::GetDisplayModeDesc(const DisplayMode & displayMode) {
-		com::ComPtr<IDXGIFactory> factory;
-		com::ComPtr<IDXGIAdapter> adaptor;
-		com::ComPtr<IDXGIOutput> output;
-		UINT numDisplayModes = 0;
-		DXGI_MODE_DESC * displayModes;
-
-		CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)factory.GetAddressOf());
-
-		factory->EnumAdapters(0, adaptor.GetAddressOf());
-
-		adaptor->EnumOutputs(0, output.GetAddressOf());
-
-		auto hr = output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, NULL);
-
-		displayModes = new DXGI_MODE_DESC[numDisplayModes];
-
-		output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numDisplayModes, displayModes);
-
-		for (UINT i = 0; i < numDisplayModes; i++) {
-			if (displayModes[i].Width == displayMode.GetWindowSize().x && displayModes[i].Height == displayMode.GetWindowSize().y) {
-				auto disMode = displayModes[i];
-				delete[] displayModes;
-				return disMode;
-			}
-		}
-
-		delete[] displayModes;
-
-		ERROR_TRACE(ERR_GRAPHICS_CONTEXT_CREATION_FAILED, "Inavlid display resolution");
-		m_IsContextCreated = false;
-		return DXGI_MODE_DESC();
 	}
 
 	bool D3DContext::InitializeD3D(const DXGI_MODE_DESC & displayMode, HWND windowHandle) {

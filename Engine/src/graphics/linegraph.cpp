@@ -52,7 +52,7 @@ namespace prev {
 	}
 
 	void LineGraph::DrawImGui() {
-		ImGui::PlotLines("", ImGuiGetData, this, m_NumMaxValue, 0, (const char *)0, m_MinValue, m_MaxValue, m_Dimension);
+		ImGui::PlotLines("", ImGuiGetData, this, m_NumMaxValue, 0, (const char *)0, m_MinValue, m_MaxValue, m_Dimension * Vec2(200.0f));
 	}
 
 }

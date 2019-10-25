@@ -5,7 +5,7 @@
 
 namespace prev {
 	
-	struct DisplayMode;
+	struct GraphicsAdapter;
 
 	class Application : public Singleton<Application> {
 		friend class Singleton<Application>;
@@ -21,6 +21,7 @@ namespace prev {
 		void Render();
 		void PreRender();
 		void PostRender();
+		void Update();
 
 		void TestRender();
 	private:
@@ -32,7 +33,6 @@ namespace prev {
 		bool m_ApplicationRunning = true;
 		bool m_IsWindowReiszed = false;
 		bool m_IsGuiOpen = false;
-		std::vector<DisplayMode> m_DisplayModes;
 	};
 
 }

@@ -9,7 +9,8 @@ namespace prev {
 
 	class D3DContext : public GraphicsContext {
 	public:
-		D3DContext(HWND hWnd, const DisplayMode & displayMode);
+		D3DContext(HWND hWnd, const StrongHandle<DisplayMode> & displayMode, const StrongHandle <GraphicsAdapter> & adapter);
+		~D3DContext();
 
 		virtual void BeginFrame() override;
 		virtual void EndFrame() override;
@@ -20,8 +21,6 @@ namespace prev {
 
 		void BindDefaultRenderTarget();
 	private:
-		DXGI_MODE_DESC GetDisplayModeDesc(const DisplayMode & displayMode);
-
 		bool InitializeD3D(const DXGI_MODE_DESC & displayMode, HWND windowHandle);
 		bool CreateRenderTargetView();
 		bool CreateRasterizerState(const DXGI_MODE_DESC & displayMode);
