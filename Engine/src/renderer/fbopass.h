@@ -18,6 +18,7 @@ namespace prev {
 		void CreateVertexLayout();
 	public:
 		void Pass(StrongHandle<Framebuffer> fbo, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
+		void Pass(StrongHandle<Framebuffer> fbo, BlendFunction blendFunc, StrongHandle<VertexShader> vShader = nullptr, StrongHandle<PixelShader> pShader = nullptr);
 	public:
 		StrongHandle<VertexShader> m_DefaultFBOVertexShader;
 		StrongHandle<PixelShader> m_DefaultFBOPixelShader;

@@ -68,6 +68,26 @@ namespace prev {
 			return GM_OK;
 		}
 
+		GM_MEMFUNC_DECL(DrawCircleWire) {
+			GM_CHECK_NUM_PARAMS_RANGE(2, 3);
+			GM_CHECK_VEC2_PARAM(center, 0);
+			GM_CHECK_FLOAT_OR_INT_PARAM(radius, 1);
+			GM_INT_PARAM(numSegs, 2, 32);
+
+			ImmediateGFX::Ref().DrawCircleWire(center, radius, numSegs);
+			return GM_OK;
+		}
+
+		GM_MEMFUNC_DECL(DrawEllipseWire) {
+			GM_CHECK_NUM_PARAMS_RANGE(2, 3);
+			GM_CHECK_VEC2_PARAM(center, 0);
+			GM_CHECK_VEC2_PARAM(radius, 1);
+			GM_INT_PARAM(numSegs, 2, 32);
+
+			ImmediateGFX::Ref().DrawEllipseWire(center, radius, numSegs);
+			return GM_OK;
+		}
+
 	};
 
 	static gmFunctionEntry s_ImmediateGFXLib[] = {
@@ -79,6 +99,8 @@ namespace prev {
 		GM_LIBFUNC_ENTRY(PolygonEnd, ImmediateGFX)
 		GM_LIBFUNC_ENTRY(Color, ImmediateGFX)
 		GM_LIBFUNC_ENTRY(DrawCircle, ImmediateGFX)
+		GM_LIBFUNC_ENTRY(DrawCircleWire, ImmediateGFX)
+		GM_LIBFUNC_ENTRY(DrawEllipseWire, ImmediateGFX)
 	};
 
 	void gmBindImmediateGFXLib(gmMachine * a_machine) {

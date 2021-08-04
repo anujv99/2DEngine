@@ -1,0 +1,142 @@
+
+global MAX_VEL  = 1.5f;
+
+global Vec2LengthSq = function(v) {
+	return (v.x * v.x) + (v.y * v.y);
+};
+
+global Vec2Length = function(v) {
+	return sqrt((v.x * v.x) + (v.y * v.y));
+};
+
+global MakeBoid = function() {
+	
+	Boid = {
+		Pos,
+		Vel,
+		Acc
+	};
+
+	Boid.Init = function() {
+		.Pos = Vec2(Random.Rand(-1, 1), Random.Rand(-1, 1));
+		.Vel = Vec2(Random.Rand(-1, 1), Random.Rand(-1, 1));
+		.Acc = Vec2(0.0f);
+	};
+
+	Boid.Update = function(dt) {
+		vel_mag = Vec2LengthSq(.Vel);
+		if (vel_mag > MAX_VEL * MAX_VEL) {
+			.Vel /= sqrt(vel_mag);
+			.Vel *= MAX_VEL;
+		}
+
+		.Pos += .Vel * dt;
+		.Vel += .Acc * dt;
+		.Acc = Vec2(0.0f);
+		
+		limit_x = CameraController.GetXCoords() * 0.9f;
+		limit_y = CameraController.GetYCoords() * 0.9f;
+
+		if (.Pos.x < limit_x.x or .Pos.x > limit_x.y) {
+			// .Vel = Vec2(-.Vel.x, .Vel.y);
+
+			center = -.Pos;
+			.Acc += Vec2(center.x, 0.0f);
+		}
+
+		if (.Pos.y < limit_y.x or .Pos.y > limit_y.y) {
+			// .Vel = Vec2(.Vel.x, -.Vel.y);
+			center = -.Pos;
+			.Acc += Vec2(0.0f, center.y);
+		}
+	};
+
+	Boid.Separate = function(boidsList, currentIndex, perceptionRadius) {
+		separationForce = Vec2(0.0f);
+		totalForce = 0.0f;
+
+		for (i = 0; i < boidsList.Size(); i += 1) {
+			if (i == currentIndex) { continue; }
+
+			dist = .Pos - boidsList[i].Pos;
+			dist_sq = Vec2LengthSq(dist);
+
+			if (dist_sq < perceptionRadius * perceptionRadius) {
+				separationForce += dist / dist_sq;
+				totalForce += 1.0f;
+			}
+		}
+
+		if (totalForce > 0) {
+			separationForce /= totalForce;
+			separationForce /= Vec2Length(separationForce);
+			separationForce *= MAX_VEL;
+			separationForce -= .Vel;
+		}
+
+		return separationForce;
+	};
+
+	Boid.Align = function(boidsList, currentIndex, perceptionRadius) {
+		alignmentForce = Vec2(0.0f);
+		totalForce = 0.0f;
+
+		for (i = 0; i < boidsList.Size(); i += 1) {
+			if (i == currentIndex) { continue; }
+
+			dist = .Pos - boidsList[i].Pos;
+			dist_sq = Vec2LengthSq(dist);
+
+			if (dist_sq < perceptionRadius * perceptionRadius) {
+				alignmentForce += boidsList[i].Vel;
+				totalForce += 1.0f;
+			}
+		}
+
+		if (totalForce > 0) {
+			alignmentForce /= totalForce;
+			alignmentForce /= Vec2Length(alignmentForce);
+			alignmentForce *= MAX_VEL;
+			alignmentForce -= .Vel;
+		}
+
+		return alignmentForce;
+	};
+
+	Boid.Cohesion = function(boidsList, currentIndex, perceptionRadius) {
+		cohesiontForce = Vec2(0.0f);
+		totalForce = 0.0f;
+
+		for (i = 0; i < boidsList.Size(); i += 1) {
+			if (i == currentIndex) { continue; }
+
+			dist = .Pos - boidsList[i].Pos;
+			dist_sq = Vec2LengthSq(dist);
+
+			if (dist_sq < perceptionRadius * perceptionRadius) {
+				cohesiontForce += boidsList[i].Pos;
+				totalForce += 1.0f;
+			}
+		}
+
+		if (totalForce > 0) {
+			cohesiontForce /= totalForce;
+			cohesiontForce -= .Pos;
+			cohesiontForce /= Vec2Length(cohesiontForce);
+			cohesiontForce *= MAX_VEL;
+			cohesiontForce -= .Vel;
+		}
+
+		return cohesiontForce;
+	};
+
+	Boid.Render = function() {
+		Imm.BeginDraw();
+		Imm.Color(Vec4(1.0f, 0.0f, 1.0f, 1.0f));
+		Imm.DrawCircle(.Pos, 0.01f);
+		Imm.EndDraw();
+	};
+
+	Boid.Init();
+	return Boid;
+};

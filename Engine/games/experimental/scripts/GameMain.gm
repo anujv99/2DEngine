@@ -1,0 +1,50 @@
+local MakeSunGame = function() {
+	
+	local SunGame = {
+		ThreadId = -1,
+
+
+		Ps,
+		Sun,
+	};
+
+	SunGame.Init = function() {
+		system.DoFile("games/experimental/scripts/Sun.gm");
+		system.DoFile("games/experimental/scripts/Planet.gm");
+		.ThreadId = this:thread(.Update);
+		
+		.Sun = MakeSun();
+		.Ps = ParticleSystem(1024);
+		LoadParticleSystemFromFile(.Ps, "games/experimental/res/Background.ps");
+	};
+
+	SunGame.Update = function() {
+		while (true) {
+			RegisterDraw(.Draw, this);
+			RegisterGui(.Gui, this);
+
+			if (Input.IsKeyPressed(Input.KEY_ESCAPE)) {
+				break;
+			}
+
+			.Sun.Update(Timer.GetDeltaTime());
+			.Ps.Update();
+
+			yield();
+		}
+	};
+
+	SunGame.Gui = function() {
+		// .Ps.Gui();
+		.Sun.Gui();
+	};
+
+	SunGame.Draw = function() {
+		.Ps.DrawImmediate();
+		.Sun.Draw();
+	};
+
+	return SunGame;
+};
+
+global g_Game = MakeSunGame();

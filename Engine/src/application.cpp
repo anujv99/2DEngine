@@ -34,6 +34,8 @@
 
 #include "audio/fmod/fmodaudio.h"
 
+#include "postprocessing/bloom.h"
+
 //-----------------TEMP------------------
 #ifdef IMGUI_ENABLED
 #include "imgui.h"
@@ -86,14 +88,28 @@ namespace prev {
 		INITIALIZE_MODULE(FMODAudio);
 		INITIALIZE_MODULE(CameraController);
 
+		// post processing
+		INITIALIZE_MODULE(BloomPass, ToVec2(Window::Ref().GetDisplayMode().GetWindowSize()));
+
 		////////////////////////////////////////TESTING////////////////////////////////////////
 		s.AddSegment(Vec2(0.5f, 0.0f));
 		s.AddSegment(Vec2(1.5f, 0.0f));
+
+		m_CaptureFBO = Framebuffer::CreateFramebuffer();
+		m_CaptureFBO->Init(Vec2(Window::Ref().GetDisplayMode().GetWindowSize().x,
+														Window::Ref().GetDisplayMode().GetWindowSize().y),
+											 PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_NO_FLAGS);
+
+		m_CaptureFBO2 = Framebuffer::CreateFramebuffer();
+		m_CaptureFBO2->Init(Vec2(Window::Ref().GetDisplayMode().GetWindowSize().x,
+														 Window::Ref().GetDisplayMode().GetWindowSize().y),
+											  PV_TEXTURE_FORMAT_RGBA8, FRAMEBUFFER_NO_FLAGS);
 		////////////////////////////////////////TESTING////////////////////////////////////////
 
 	}
 
 	Application::~Application() {
+		DESTROY_MODULE(BloomPass);
 		DESTROY_MODULE(CameraController);
 		DESTROY_MODULE(FMODAudio);
 		DESTROY_MODULE(ImageComponent);
@@ -244,9 +260,19 @@ namespace prev {
 
 			Timer::Update();
 
+			m_CaptureFBO->Bind();
+			m_CaptureFBO->Clear();
+
 			PreRender();
 			//TestRender();
 			Render();
+
+			m_CaptureFBO->UnBind();
+
+			BloomPass::Ref().Pass(m_CaptureFBO, m_CaptureFBO2);
+
+			FramebufferPass::Ref().Pass(m_CaptureFBO2);
+
 			PostRender();
 
 			PROFILER_ROOT_END;
@@ -263,6 +289,9 @@ namespace prev {
 
 	void Application::Gui() {
 		IMGUI_CALL(
+
+			BloomPass::Ref().Gui();
+
 			if (m_IsGuiOpen) {
 				ImGui::Begin("Application Settings", &m_IsGuiOpen);
 				if (ImGui::CollapsingHeader("Window Size")) {

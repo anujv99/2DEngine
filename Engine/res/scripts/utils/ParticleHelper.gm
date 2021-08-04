@@ -2,6 +2,7 @@ global SaveParticleSystemToFile = function(particleSys, file) {
 	local attribs = table();
 
 	attribs.Life					= particleSys.Life;
+	attribs.NumPerEmission			= particleSys.NumPerEmission;
 	attribs.LifeVariance			= particleSys.LifeVariance;
 	attribs.Position				= particleSys.Position;
 	attribs.PositionVariance		= particleSys.PositionVariance;
@@ -32,6 +33,7 @@ global LoadParticleSystemFromFile = function(patricleSystem, file) {
 	local attribs = system.LoadTableFromFile(file);
 
 	patricleSystem.Life 					= attribs.Life;
+	patricleSystem.NumPerEmission			= attribs.NumPerEmission;
 	patricleSystem.LifeVariance 			= attribs.LifeVariance;
 	patricleSystem.Position 				= attribs.Position;
 	patricleSystem.PositionVariance 		= attribs.PositionVariance;

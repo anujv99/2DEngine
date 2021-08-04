@@ -1,0 +1,100 @@
+
+global GRAVITATIONAL_CONSTANT = 0.01f;
+
+global Vec2Normalize = function(vec) {
+	length = sqrt(vec.x * vec.x + vec.y * vec.y);
+	return vec / length;
+};
+
+global Vec2Length = function(vec) {
+	return sqrt(vec.x * vec.x + vec.y * vec.y);
+};
+
+global MakePlanet = function(parent) {
+
+	Planet = {
+		Parent,
+
+		Position,
+		Velocity,
+		Mass,
+
+		Radius,
+		Color,
+
+		Children,
+
+		Ps,
+		Name,
+	};
+
+	Planet.Init = function(p) {
+		.Parent = p;
+		.Children = array(0);
+		.Ps = ParticleSystem(1024);
+	};
+
+	Planet.Update = function(dt) {
+		dist = -.Position;
+		dist_mag = Vec2Length(dist);
+
+		gf = (GRAVITATIONAL_CONSTANT * .Parent.Mass * .Mass) / (dist_mag * dist_mag);
+		force = dist / dist_mag;
+		force *= gf;
+
+		.Velocity += (force / .Mass) * dt;
+		.Position += .Velocity * dt;
+
+		for (i = 0; i < .Children.Size(); i += 1) {
+			.Children[i].Update(dt);
+		}
+
+		.Ps.Position = .Parent.Position + .Position;
+		.Ps.Update();
+	};
+
+	Planet.AddChild = function(child) {
+		child.Parent = this;
+
+		size = .Children.Size();
+		.Children.Resize(size + 1);
+		.Children[size] = child;
+	};
+
+	Planet.Gui = function() {
+		for (i = 0; i < .Children.Size(); i += 1) {
+			.Children[i].Gui();
+		}
+
+		Gui.Begin(.Name);
+		.Ps.Gui();
+		Gui.End();
+	};
+
+	Planet.Draw = function() {
+		.Ps.Draw();
+		
+		// Imm.BeginDraw();
+		// Imm.Color(.Color);
+		// Imm.DrawCircle(.Parent.Position + .Position, .Radius, 64);
+		// Imm.EndDraw();
+
+		for (i = 0; i < .Children.Size(); i += 1) {
+			.Children[i].Draw();
+		}
+	};
+
+	Planet.RandomPs = function() {
+		.Ps.StartScale = Vec2(.Radius * 2.0f);
+		.Ps.VelocityVariance = Vec2(0.001f);
+		.Ps.Life = 0.2f;
+		.Ps.LifeVariance = 0.4f;
+		.Ps.NumPerEmission = 4;
+		.Ps.StartColor = Vec3(.Color.xyz);
+		.Ps.EndColor = Vec3(0.0f);
+		.Ps.EndColorVariance = Vec3(1.0f);
+	};
+
+	Planet.Init(parent);
+	return Planet;
+};

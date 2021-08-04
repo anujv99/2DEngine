@@ -4,10 +4,10 @@
 
 namespace prev {
 
-	static constexpr unsigned int MAX_NUM_SPRITES					= 1024 * 16;
+	static constexpr unsigned int MAX_NUM_SPRITES								= 1024 * 1024;
 	static constexpr unsigned int MAX_NUM_VERTICES_PER_SPRTIE		= 6;
-	static constexpr unsigned int MAX_NUM_VERTICES					= MAX_NUM_SPRITES * MAX_NUM_VERTICES_PER_SPRTIE;
-	static constexpr unsigned int MAX_NUM_TEXTURES					= 16;
+	static constexpr unsigned int MAX_NUM_VERTICES							= MAX_NUM_SPRITES * MAX_NUM_VERTICES_PER_SPRTIE;
+	static constexpr unsigned int MAX_NUM_TEXTURES							= 16;
 	
 	static float ALL_SUBMIT_CALL_TIME								= 0.0f;
 

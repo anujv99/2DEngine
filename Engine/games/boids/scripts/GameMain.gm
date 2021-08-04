@@ -1,0 +1,113 @@
+local MakeBoidsDemo = function() {
+	
+	local Boids = {
+		ThreadId = -1,
+		BoidsArray,
+		Ps,
+
+		SeprationPerceptionRadius = 0.2f,
+		AlignmentPerceptionRadius = 0.2f,
+		CohesionPerceptionRadius  = 0.3f,
+	};
+
+	Boids.Init = function() {
+		system.DoFile("games/boids/scripts/Boid.gm");
+		Random.Srand(Timer.GetTimeMs());
+
+		print("This is a blank game");
+		.ThreadId = this:thread(.Update);
+
+		.BoidsArray = array(50);
+
+		for (i = 0; i < .BoidsArray.Size(); i += 1) {
+			.BoidsArray[i] = MakeBoid();
+		}
+		
+		.Ps = ParticleSystem(4096);
+		.Ps.Life = 1.0f;
+		.Ps.NumPerEmission = 0;
+		.Ps.StartScale = Vec2(0.04f);
+		.Ps.EndScale = Vec2(0.0f);
+		.Ps.Velocity = Vec2(0.0f);
+		.Ps.VelocityVariance = Vec2(0.001f);
+		.Ps.StartColor = Vec3(0.09f, 0.79f, 0.0f);
+		.Ps.EndColor = Vec3(1.0f, 0.9f, 0.0f);
+		.Ps.EndAlpha = 0.0f;
+	};
+
+	Boids.Update = function() {
+		while (true) {
+			RegisterDraw(.Draw, this);
+			// RegisterGui(.Gui, this);
+
+			if (Input.IsKeyPressed(Input.KEY_ESCAPE)) {
+				break;
+			}
+
+			for (i = 0; i < .BoidsArray.Size(); i += 1) {
+
+				separate = .BoidsArray[i].Separate(.BoidsArray, i, .SeprationPerceptionRadius);
+				align = .BoidsArray[i].Align(.BoidsArray, i, .AlignmentPerceptionRadius);
+				cohesion = .BoidsArray[i].Cohesion(.BoidsArray, i, .CohesionPerceptionRadius);
+
+				.BoidsArray[i].Acc += separate;
+				.BoidsArray[i].Acc += align * 0.5f;
+				.BoidsArray[i].Acc += cohesion * 0.5f;
+
+				.BoidsArray[i].Update(Timer.GetDeltaTime());
+			}
+
+			.Ps.Update();
+			
+			yield();
+		}
+	};
+
+	Boids.Draw = function() {
+		// .DrawDebug(0);
+		.DrawBoids();
+	};
+
+	Boids.DrawBoids = function() {
+		for (i = 0; i < .BoidsArray.Size(); i += 1) {
+			.BoidsArray[i].Render();
+			.Ps.Position = .BoidsArray[i].Pos;
+			.Ps.AddNewParticle();
+			.Ps.AddNewParticle();
+		}
+		.Ps.Draw();
+	};
+
+	Boids.Gui = function() {
+		.Ps.Gui();
+	
+		Gui.Begin("Boids");
+
+		.SeprationPerceptionRadius = Gui.DragFloat("Sepration Perception Radius", .SeprationPerceptionRadius, 0.01f);
+		.AlignmentPerceptionRadius = Gui.DragFloat("Alignment Perception Radius", .AlignmentPerceptionRadius, 0.01f);
+		.CohesionPerceptionRadius = Gui.DragFloat("Cohesion Perception Radius", .CohesionPerceptionRadius, 0.01f);
+
+		Gui.End();
+	};
+
+	Boids.DrawDebug = function(index) {
+		index = clamp(index, 0, .BoidsArray.Size());
+
+		Imm.BeginDraw();
+
+		Imm.Color(Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		Imm.DrawCircleWire(.BoidsArray[index].Pos, .SeprationPerceptionRadius);
+
+		Imm.Color(Vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		Imm.DrawCircleWire(.BoidsArray[index].Pos, .AlignmentPerceptionRadius);
+
+		Imm.Color(Vec4(0.0f, 0.0f, 1.0f, 1.0f));
+		Imm.DrawCircleWire(.BoidsArray[index].Pos, .CohesionPerceptionRadius);
+
+		Imm.EndDraw();
+	};
+
+	return Boids;
+};
+
+global g_Game = MakeBoidsDemo();

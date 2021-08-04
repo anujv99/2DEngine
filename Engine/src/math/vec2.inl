@@ -195,10 +195,10 @@ inline Vec2 Hermite(const Vec2 & _v1, const Vec2 & _tan1, const Vec2 & _v2, cons
 
 inline Vec2 Bezier(const Vec2 & _anchor1, const Vec2 & _anchor2, const Vec2 & _control1, const Vec2 & _control2, float _factor) {
 	Clamp(_factor, 0.0f, 1.0f);
-	float a = std::pow(1 - _factor, 3);
-	float b = 3 * std::pow(1 - _factor, 2) * _factor;
-	float c = 3 * (1 - _factor) * std::pow(_factor, 2);
-	float d = std::pow(_factor, 3);
+	float a = (float)std::pow(1 - _factor, 3);
+	float b = 3 * (float)std::pow(1 - _factor, 2) * _factor;
+	float c = 3 * (1 - _factor) * (float)std::pow(_factor, 2);
+	float d = (float)std::pow(_factor, 3);
 	return (a * _anchor1) + (b * _control1) + (c * _control2) + (d * _anchor2);
 }
 

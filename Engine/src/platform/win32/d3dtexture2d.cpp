@@ -167,8 +167,8 @@ namespace prev {
 		}
 
 		TextureParams params;
-		params.Filtering	= PV_TEXTURE_FILTER_NEAREST;
-		params.Wrapping		= PV_TEXTURE_WRAP_CLAMP;
+		params.Filtering	= PV_TEXTURE_FILTER_LINEAR;
+		params.Wrapping		= PV_TEXTURE_WRAP_DEFAULT;
 
 		m_TextureSampler = new D3DSampler2D();
 		m_TextureSampler->Init(params);
@@ -199,7 +199,7 @@ namespace prev {
 
 		TextureParams params;
 		params.Filtering	= PV_TEXTURE_FILTER_LINEAR;
-		params.Wrapping		= PV_TEXTURE_WRAP_CLAMP;
+		params.Wrapping		= PV_TEXTURE_WRAP_DEFAULT;
 
 		m_TextureSampler = new D3DSampler2D();
 		m_TextureSampler->Init(params);

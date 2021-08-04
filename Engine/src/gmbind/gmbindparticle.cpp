@@ -30,7 +30,16 @@ GM_REG_NAMESPACE(ParticleSystem) {
 		return GM_OK;
 	}
 
+	GM_MEMFUNC_DECL(DrawImmediate) {
+		GM_CHECK_NUM_PARAMS(0);
+		GM_GET_THIS_PTR(ParticleSystem, ps);
+		Renderer::Ref().Submit(*ps);
+		Renderer::Ref().Present();
+		return GM_OK;
+	}
+
 	GM_GEN_MEMFUNC_VOID_VOID(ParticleSystem, Update)
+	GM_GEN_MEMFUNC_VOID_VOID(ParticleSystem, AddNewParticle)
 	GM_GEN_MEMFUNC_VOID_VOID(ParticleSystem, Gui)
 
 	GM_SETDOT_FUNC_BEGIN(ParticleSystem)
@@ -87,7 +96,9 @@ GM_REG_NAMESPACE(ParticleSystem) {
 GM_REG_MEM_BEGIN(ParticleSystem)
 	GM_REG_HANDLED_DESTRUCTOR(ParticleSystem)
 	GM_REG_MEMFUNC(ParticleSystem, Draw)
+	GM_REG_MEMFUNC(ParticleSystem, DrawImmediate)
 	GM_REG_MEMFUNC(ParticleSystem, Update)
+	GM_REG_MEMFUNC(ParticleSystem, AddNewParticle)
 	GM_REG_MEMFUNC(ParticleSystem, Gui)
 	GM_REG_SET_GET_DOT_FUNC(ParticleSystem)
 GM_REG_MEM_END(ParticleSystem)

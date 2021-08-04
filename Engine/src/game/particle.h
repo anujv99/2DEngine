@@ -31,7 +31,7 @@ namespace prev {
 
 		float LifeLength;
 
-		bool Update(float dt) {
+		virtual bool Update(float dt) {
 			ElapsedTime += dt;
 			if (ElapsedTime > LifeLength)
 				return false;
@@ -49,6 +49,10 @@ namespace prev {
 		}
 	private:
 		float ElapsedTime = 0.0f;
+	};
+
+	struct BoidParticle {
+
 	};
 
 }

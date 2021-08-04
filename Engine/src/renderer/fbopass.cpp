@@ -71,4 +71,25 @@ namespace prev {
 		RenderState::Ref().SetBlendFunction(bf);
 	}
 
+	void FramebufferPass::Pass(StrongHandle<Framebuffer> fbo, BlendFunction blendFunc, StrongHandle<VertexShader> vShader, StrongHandle<PixelShader> pShader) {
+		if (fbo == nullptr) return;
+		if (vShader == nullptr) vShader = m_DefaultFBOVertexShader;
+		if (pShader == nullptr) pShader = m_DefaultFBOPixelShader;
+
+		fbo->GetTexture()->SetTextureSlot(0);
+		fbo->GetTexture()->Bind();
+		m_VertexLayout->Bind();
+		m_VertexBuffer->Bind();
+		vShader->Bind();
+		pShader->Bind();
+
+		BlendFunction bf = RenderState::Ref().GetBlendFunction();
+
+		RenderState::Ref().SetBlendFunction(blendFunc);
+
+		m_VertexBuffer->Draw(6, 0);
+
+		RenderState::Ref().SetBlendFunction(bf);
+	}
+
 }

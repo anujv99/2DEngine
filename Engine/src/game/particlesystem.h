@@ -11,11 +11,11 @@ namespace prev {
 		~ParticleSystem();
 
 		void Update();
+		void AddNewParticle();
 		void AddParticle(const Particle & particle);
 		void Gui();
 	private:
 		bool UpdateSingleParticle(Particle & particle);
-		void AddNewParticle();
 		void UpdateAndRemoveParticles();
 	private:
 		//Generate Random Number Between -1.0f and  1.0f

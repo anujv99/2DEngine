@@ -1,0 +1,78 @@
+
+global SunColor = Vec4(1.0f, 1.0f, 0.0f, 1.0f);
+
+global MakeSun = function() {
+
+	Sun = {
+		Position,
+		Radius,
+		Mass,
+		Moons,
+	};
+
+	Sun.Init = function() {
+		.Position = Vec2(0.0f);
+		.Radius = 0.13f;
+		.Mass = 10.0f;
+
+		.Moons = array(5);
+
+		Random.TimeSeed();
+
+		for (i = 0; i < .Moons.Size(); i += 1) {
+			.Moons[i] = MakePlanet(this);
+			
+			x = 0.0f;
+			y = 0.0f;
+			minPos = 0.4f;
+			maxPos = 1.0f;
+			if (Random.Rand(-1.0f, 1.0f) < 0.0f) {
+				x = Random.Rand(-minPos, -maxPos);
+			} else {
+				x = Random.Rand(minPos, maxPos);
+			}
+			if (Random.Rand(-1.0f, 1.0f) < 0.0f) {
+				y = Random.Rand(-minPos, -maxPos);
+			} else {
+				y = Random.Rand(minPos, maxPos);
+			}
+			.Moons[i].Position = Vec2(x, y);
+
+			velMag = Random.Rand(0.2f, 0.3f);
+			velDir = .Moons[i].Position - .Position;
+			velDir = Vec2(velDir.y, -velDir.x);
+			velDir = Vec2Normalize(velDir) * velMag;
+
+			.Moons[i].Velocity = velDir;
+			.Moons[i].Mass = Random.Rand(0.5f, 1.0f);
+			.Moons[i].Radius = .Moons[i].Mass / 20.0f;
+			.Moons[i].Color = Vec4(Random.Rand(0.0f, 1.0f), Random.Rand(0.0f, 1.0f), Random.Rand(0.0f, 1.0f), 1.0f);
+			.Moons[i].Name = "Moon" + i;
+
+			.Moons[i].RandomPs();
+		}
+	};
+
+	Sun.Update = function(dt) {
+		for (i = 0; i < .Moons.Size(); i += 1) {
+			.Moons[i].Update(dt);
+		}
+	};
+
+	Sun.Gui = function() {
+	};
+
+	Sun.Draw = function() {
+		Imm.BeginDraw();
+		Imm.Color(SunColor);
+		Imm.DrawCircle(.Position, .Radius, 64);
+		Imm.EndDraw();
+
+		for (i = 0; i < .Moons.Size(); i += 1) {
+			.Moons[i].Draw(dt);
+		}
+	};
+
+	Sun.Init();
+	return Sun;
+};
