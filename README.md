@@ -1,6 +1,6 @@
 # 2DEngine
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/743201b8fff64f09a64aa8383d95b332)](https://app.codacy.com/app/preversewharf45/2DEngine?utm_source=github.com&utm_medium=referral&utm_content=preversewharf45/2DEngine&utm_campaign=Badge_Grade_Dashboard)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e6cc0ac2480948fb88c95dd97298a42d)](https://www.codacy.com/gh/anujv99/2DEngine/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=anujv99/2DEngine&amp;utm_campaign=Badge_Grade)
 [![Build status](https://ci.appveyor.com/api/projects/status/etaolb6d63ofblf1/branch/master?svg=true)](https://ci.appveyor.com/project/preversewharf45/2dengine/branch/master)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/w/preversewharf45/2DEngine.svg)
 ![Cocoapods](https://img.shields.io/cocoapods/l/AFNetworking.svg)
