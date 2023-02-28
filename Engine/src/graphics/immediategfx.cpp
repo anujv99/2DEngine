@@ -5,9 +5,11 @@ static const int IMMEDIATEGFX_MAX_VERTS = 8192;
 
 namespace prev {
 
-	void ImmediateGFX::BeginDefaultShaders() {
+	void ImmediateGFX::BeginDefaultShaders(bool bindPixelShader) {
 		m_VertexShader->Bind();
-		m_PixelShader->Bind();
+		if (bindPixelShader) {
+			m_PixelShader->Bind();
+		}
 		m_VertexShader->UpdateMVP();
 	}
 
@@ -28,9 +30,9 @@ namespace prev {
 		GetVertexBatch().clear();
 	}
 
-	void ImmediateGFX::PolygonEnd() {
+	void ImmediateGFX::PolygonEnd(bool bindPixelShader) {
 		m_IsBuilding = false;
-		DrawCurrentPrimitive();
+		DrawCurrentPrimitive(bindPixelShader);
 	}
 
 	ImmediateGFX::ImmediateGFX() : VertexBatcher(IMMEDIATEGFX_MAX_VERTS), m_IsBuilding(false) {
@@ -67,9 +69,9 @@ namespace prev {
 		m_VertexBuffer->Init(nullptr, IMMEDIATEGFX_MAX_VERTS, GetNumBytesPerVertex(), BUFFER_USAGE_STATIC);
 	}
 
-	void ImmediateGFX::DrawCurrentPrimitive() {
+	void ImmediateGFX::DrawCurrentPrimitive(bool bindPixelShader) {
 		
-		BeginDefaultShaders();
+		BeginDefaultShaders(bindPixelShader);
 		BeginDraw();
 
 		if (m_BufferIndex + GetVertexBatch().size() >= IMMEDIATEGFX_MAX_VERTS) {

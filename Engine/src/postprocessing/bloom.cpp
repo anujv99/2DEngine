@@ -19,7 +19,7 @@ namespace prev {
 
   static float BLOOM_THRESHOLD = 0.6f;
   static float BLOOM_SOFT_KNEE = 0.7f;
-  static float BLOOM_INTENSITY = 0.8f;
+  static float BLOOM_INTENSITY = 0.0f;
 
   BloomPass::BloomPass(Vec2 screenSize) {
     Vec2 res = m_BloomResolution;

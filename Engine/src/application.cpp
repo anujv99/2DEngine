@@ -53,11 +53,11 @@ namespace prev {
 
 	Application::Application() {
 
-		Timer::FPSCounter(false);
+		Timer::FPSCounter(true);
 		INITIALIZE_MODULE(EventHandler);
 
 		m_DisplayModes = GraphicsContext::GetDisplayModes();
-		unsigned int selectedDis = 5;
+		unsigned int selectedDis = 0;
 		m_DisplayModes[selectedDis].SetWindowStyle(WINDOW_STYLE_BORDERLESS);
 		m_DisplayModes[selectedDis].SetMultisample(8);
 		Window::CreateInst(m_DisplayModes[selectedDis]);

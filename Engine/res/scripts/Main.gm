@@ -12,7 +12,7 @@ local MakeMain = function() {
 		global DebugSettings = table();
 
 		// [TODO]: Remove this
-		// DebugSettings.Game = "experimental";
+		// DebugSettings.Game = "slime";
 
 		if (!DebugSettings.Game) {
 			._SelectGame();

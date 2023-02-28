@@ -11,6 +11,7 @@
 
 #include "graphics/font.h"
 #include "graphics/shadermanager.h"
+#include "graphics/computebuffer.h"
 
 #include "game/label.h"
 
@@ -79,3 +80,65 @@ GM_REG_HANDLED_DESTRUCTOR(Texture)
 GM_REG_MEMFUNC(Texture, GetSize)
 GM_REG_MEM_END(Texture)
 GM_BIND_DEFINE(Texture)
+
+// COMPUTE BUFFER ---------------------------------------------------------
+
+GM_REG_NAMESPACE(ComputeBuffer) {
+	
+	GM_MEMFUNC_DECL(CreateComputeBuffer) {
+		GM_CHECK_NUM_PARAMS(2);
+		GM_CHECK_INT_PARAM(size, 0);
+		GM_CHECK_INT_PARAM(bytes, 1);
+		StrongHandle<ComputeBuffer> buffer = ComputeBuffer::CreateComputeBuffer();
+		buffer->Init(nullptr, size, bytes);
+		GM_PUSH_USER_HANDLED(ComputeBuffer, buffer);
+		return GM_OK;
+	}
+
+	GM_MEMFUNC_DECL(Bind) {
+		GM_CHECK_NUM_PARAMS(0);
+		GM_GET_THIS_PTR(ComputeBuffer, buffer);
+		buffer->Bind();
+		return GM_OK;
+	}
+	
+	GM_MEMFUNC_DECL(UnBind) {
+		GM_CHECK_NUM_PARAMS(0);
+		GM_GET_THIS_PTR(ComputeBuffer, buffer);
+		buffer->UnBind();
+		return GM_OK;
+	}
+
+	GM_MEMFUNC_DECL(BindToPixelShader) {
+		GM_CHECK_NUM_PARAMS(1);
+		GM_CHECK_INT_PARAM(slot, 0);
+		GM_GET_THIS_PTR(ComputeBuffer, buffer);
+		buffer->BindToPixelShader(slot);
+		return GM_OK;
+	}
+
+	GM_MEMFUNC_DECL(UnBindFromPixelShader) {
+		GM_CHECK_NUM_PARAMS(0);
+		GM_GET_THIS_PTR(ComputeBuffer, buffer);
+		buffer->UnBindFromPixelShader();
+		return GM_OK;
+	}
+
+	GM_MEMFUNC_DECL(SetBindSlot) {
+		GM_CHECK_NUM_PARAMS(1);
+		GM_CHECK_INT_PARAM(slot, 0);
+		GM_GET_THIS_PTR(ComputeBuffer, buffer);
+		buffer->SetBindSlot(slot);
+		return GM_OK;
+	}
+}
+
+GM_REG_MEM_BEGIN(ComputeBuffer)
+GM_REG_HANDLED_DESTRUCTOR(ComputeBuffer)
+GM_REG_MEMFUNC(ComputeBuffer, Bind)
+GM_REG_MEMFUNC(ComputeBuffer, UnBind)
+GM_REG_MEMFUNC(ComputeBuffer, BindToPixelShader)
+GM_REG_MEMFUNC(ComputeBuffer, UnBindFromPixelShader)
+GM_REG_MEMFUNC(ComputeBuffer, SetBindSlot)
+GM_REG_MEM_END(ComputeBuffer)
+GM_BIND_DEFINE(ComputeBuffer)

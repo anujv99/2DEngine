@@ -29,7 +29,7 @@ namespace prev {
 
 		//Begin End Shape
 		virtual void PolygonBegin(PrimitiveTopology primitive) {}
-		virtual void PolygonEnd() {}
+		virtual void PolygonEnd(bool bindPixelShader = true) {}
 
 		//2D
 		void DrawLine(const Vec2 start, const Vec2 end);

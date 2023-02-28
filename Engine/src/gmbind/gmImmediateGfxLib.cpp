@@ -45,8 +45,9 @@ namespace prev {
 		}
 
 		GM_MEMFUNC_DECL(PolygonEnd) {
-			GM_CHECK_NUM_PARAMS(0);
-			ImmediateGFX::Ref().PolygonEnd();
+			GM_CHECK_NUM_PARAMS_RANGE(0, 1);
+			GM_INT_PARAM(bindPS, 0, 1);
+			ImmediateGFX::Ref().PolygonEnd(bindPS == 1);
 			return GM_OK;
 		}
 
@@ -55,6 +56,15 @@ namespace prev {
 			GM_CHECK_VEC4_PARAM(color, 0);
 
 			ImmediateGFX::Ref().Color(color);
+			return GM_OK;
+		}
+
+		GM_MEMFUNC_DECL(Vertex) {
+			GM_CHECK_NUM_PARAMS_RANGE(1, 2);
+			GM_CHECK_VEC2_PARAM(pos, 0);
+			GM_VEC2_PARAM(uv, 1);
+
+			ImmediateGFX::Ref().Vertex(Vec3(pos), uv);
 			return GM_OK;
 		}
 
@@ -88,6 +98,17 @@ namespace prev {
 			return GM_OK;
 		}
 
+		GM_MEMFUNC_DECL(DrawQuad) {
+			GM_CHECK_NUM_PARAMS(4);
+			GM_CHECK_VEC2_PARAM(p1, 0);
+			GM_CHECK_VEC2_PARAM(p2, 1);
+			GM_CHECK_VEC2_PARAM(p3, 2);
+			GM_CHECK_VEC2_PARAM(p4, 3);
+
+			ImmediateGFX::Ref().DrawQuad(p1, p2, p3, p4);
+			return GM_OK;
+		}
+
 	};
 
 	static gmFunctionEntry s_ImmediateGFXLib[] = {
@@ -98,9 +119,11 @@ namespace prev {
 		GM_LIBFUNC_ENTRY(PolygonBegin, ImmediateGFX)
 		GM_LIBFUNC_ENTRY(PolygonEnd, ImmediateGFX)
 		GM_LIBFUNC_ENTRY(Color, ImmediateGFX)
+		GM_LIBFUNC_ENTRY(Vertex, ImmediateGFX)
 		GM_LIBFUNC_ENTRY(DrawCircle, ImmediateGFX)
 		GM_LIBFUNC_ENTRY(DrawCircleWire, ImmediateGFX)
 		GM_LIBFUNC_ENTRY(DrawEllipseWire, ImmediateGFX)
+		GM_LIBFUNC_ENTRY(DrawQuad, ImmediateGFX)
 	};
 
 	void gmBindImmediateGFXLib(gmMachine * a_machine) {

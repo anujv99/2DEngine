@@ -1,0 +1,179 @@
+local MakeSlimeGame = function() {
+	
+	local SlimeGame = {
+		ThreadId = -1,
+		CS,
+		CSInitAgents,
+		PS,
+		AgentBuffer,
+		Buffer,
+		Buffer2,
+
+		a, b, c, d,
+		uva, uvb, uvc, uvd,
+
+		WIDTH,
+		HEIGHT,
+		NUM_PARTICLES,
+
+		evaporate,
+		angleSpacing,
+		turnSpeed,
+		sensorOffset,
+		sensorSize,
+		color,
+	};
+
+	SlimeGame.UpdateEvaporateUniform = function(newValue) {
+		.evaporate = newValue;
+		.CSEvaporate.SetUniform("data", .WIDTH, .HEIGHT, .evaporate, 0.0f);
+	};
+
+	SlimeGame.UpdateSimulateUniform = function(newAngleSpacing, newTurnSpeed, newSensorOffset, newSensorSize) {
+		.angleSpacing = newAngleSpacing;
+		.turnSpeed = newTurnSpeed;
+		.sensorOffset = newSensorOffset;
+		.sensorSize = newSensorSize;
+		.CS.SetUniform("data", .WIDTH, .HEIGHT, .angleSpacing, .turnSpeed, .sensorOffset, .sensorSize, 0.0f, 0.0f);
+	};
+
+	SlimeGame.UpdatePixelShaderUniform = function(newColor) {
+		.color = newColor;
+		.PS.SetUniform("data", .WIDTH, .HEIGHT, 0.0f, 0.0f, .color.x, .color.y, .color.z, .color.w);
+	};
+
+	SlimeGame.Init = function() {
+		.ThreadId = this:thread(.Update);
+
+		.WIDTH = 3840.0f;
+		.HEIGHT = 2160.0f;
+		.NUM_PARTICLES = 128 * 1024;
+
+		.CS = ShaderManager.LoadComputeShader("slime-compute", "games/slime/res/SlimeSimulateCompute.hlsl");
+		.CSInitAgents = ShaderManager.LoadComputeShader("slime-init", "games/slime/res/SlimeInit.hlsl");
+		.CSEvaporate = ShaderManager.LoadComputeShader("slime-evaporate", "games/slime/res/SlimeEvaporate.hlsl");
+		.PS = ShaderManager.LoadPixelShader("slime-pixel", "games/slime/res/SlimePixel.hlsl");
+
+		local buffSize = .WIDTH.Int() * .HEIGHT.Int();
+		.Buffer = ComputeBuffer(buffSize, 4);
+		.Buffer.SetBindSlot(1);
+		.AgentBuffer = ComputeBuffer(.NUM_PARTICLES, 16);
+		.AgentBuffer.SetBindSlot(2);
+		.Buffer2 = ComputeBuffer(buffSize, 4);
+		.Buffer2.SetBindSlot(3);
+
+		local leftRight = CameraController.GetXCoords();
+		local bottomTop = CameraController.GetYCoords();
+
+		.a = Vec2(leftRight.x, bottomTop.y);
+		.b = Vec2(leftRight.y, bottomTop.y);
+		.c = Vec2(leftRight.y, bottomTop.x);
+		.d = Vec2(leftRight.x, bottomTop.x);
+
+		.uva = Vec2(0, 0);
+		.uvb = Vec2(1, 0);
+		.uvc = Vec2(1, 1);
+		.uvd = Vec2(0, 1);
+
+		// set uniforms
+		.CSInitAgents.SetUniform("data", .WIDTH, .HEIGHT, 0.0f, 0.0f);
+		.UpdateEvaporateUniform(0.5f);
+		.UpdateSimulateUniform(3.141592f, 0.5f, 2.0f, 1.0f);
+		.UpdatePixelShaderUniform(Vec4(1, 1, 1, 1));
+
+		// initialize agents
+		.CSInitAgents.Bind();
+		.AgentBuffer.Bind();
+		.CSInitAgents.Dispatch(.NUM_PARTICLES, 1, 1);
+		.AgentBuffer.UnBind();
+		.CSInitAgents.UnBind();
+	};
+
+	SlimeGame.Update = function() {
+		while (true) {
+			RegisterDraw(.Draw, this);
+			RegisterGui(.Gui, this);
+
+			if (Input.IsKeyPressed(Input.KEY_ESCAPE)) {
+				break;
+			}
+
+			yield();
+		}
+	};
+
+	SlimeGame.Gui = function() {
+		Gui.Begin("Slime");
+
+		local newEvaporate = Gui.DragFloat("Evaporate", .evaporate, 0.01f);
+		local newAngleSpacing = Gui.DragFloat("Angle Spacing", .angleSpacing, 0.01f);
+		local newTurnSpeed = Gui.DragFloat("Turn Speed", .turnSpeed, 0.01f);
+		local newSensorOffset = Gui.DragFloat("Sensor Offset", .sensorOffset, 0.1f);
+		local newSensorSize = Gui.DragFloat("Sensor Size", .sensorSize, 0.1f);
+		local newColor = Gui.ColorEdit4("Color", .color);
+
+		if (newEvaporate != .evaporate) {
+			.UpdateEvaporateUniform(newEvaporate);
+		}
+
+		if (
+			newAngleSpacing != .angleSpacing ||
+			newTurnSpeed != .turnSpeed       ||
+			newSensorOffset != .sensorOffset ||
+			newSensorSize != .sensorSize
+		) {
+			.UpdateSimulateUniform(newAngleSpacing, newTurnSpeed, newSensorOffset, newSensorSize);
+		}
+
+		if (newColor != .color) {
+			.UpdatePixelShaderUniform(newColor);
+		}
+
+		Gui.End();
+	};
+
+	SlimeGame.Draw = function() {
+		.CS.Bind();
+		.Buffer.Bind();
+		.AgentBuffer.Bind();
+		.CS.Dispatch(.NUM_PARTICLES / 1024, 1, 1);
+		.AgentBuffer.UnBind();
+		.Buffer.UnBind();
+		.CS.UnBind();
+
+		.PS.Bind();
+		.Buffer.BindToPixelShader(1);
+		Imm.BeginDraw();
+		Imm.PolygonBegin(3);
+		Imm.Color(Vec4(1, 1, 0, 1));
+		Imm.Vertex(.a, .uva);
+		Imm.Vertex(.b, .uvb);
+		Imm.Vertex(.c, .uvc);
+		Imm.Vertex(.a, .uva);
+		Imm.Vertex(.c, .uvc);
+		Imm.Vertex(.d, .uvd);
+		Imm.PolygonEnd(false);
+		Imm.EndDraw();
+		.Buffer.UnBindFromPixelShader();
+		.PS.UnBind();
+
+		.CSEvaporate.Bind();
+		.Buffer.Bind();
+		.Buffer2.Bind();
+		.CSEvaporate.Dispatch(.WIDTH.Int() / 32, .HEIGHT.Int() / 32, 1);
+		.Buffer2.UnBind();
+		.Buffer.UnBind();
+		.CSEvaporate.UnBind();
+
+		local temp = .Buffer;
+		.Buffer = .Buffer2;
+		.Buffer2 = temp;
+
+		.Buffer.SetBindSlot(1);
+		.Buffer2.SetBindSlot(3);
+	};
+
+	return SlimeGame;
+};
+
+global g_Game = MakeSlimeGame();

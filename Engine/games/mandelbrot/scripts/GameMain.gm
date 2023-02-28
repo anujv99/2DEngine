@@ -1,0 +1,45 @@
+local MakeBlankGame = function() {
+	
+	local BlankGame = {
+		ThreadId = -1,
+		PixelShader,
+		Box,
+	};
+
+	BlankGame.Init = function() {
+		print("This is a mandelbrot set");
+		.ThreadId = this:thread(.Update);
+
+		.PixelShader = ShaderManager.LoadPixelShader("mandelbrot", "games/mandelbrot/shaders/mandelbrotPixel.hlsl");
+		.Box = Sprite();
+		.Box.Color = Vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		.Box.Position = Vec2(0.0f);
+		.Box.Dimension = Vec2(0.2f);
+	};
+
+	BlankGame.Update = function() {
+		while (true) {
+			RegisterDraw(.Draw, this);
+			RegisterGui(.Gui, this);
+
+			if (Input.IsKeyPressed(Input.KEY_ESCAPE)) {
+				break;
+			}
+
+			yield();
+		}
+	};
+
+	BlankGame.Gui = function() {
+	};
+
+	BlankGame.Draw = function() {
+		.PixelShader.Bind();
+		.Box.Draw();
+		.PixelShader.UnBind();
+	};
+
+	return BlankGame;
+};
+
+global g_Game = MakeBlankGame();

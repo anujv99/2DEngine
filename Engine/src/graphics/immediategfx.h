@@ -9,20 +9,20 @@ namespace prev {
 	class ImmediateGFX : public VertexBatcher, public Singleton<ImmediateGFX> {
 		friend Singleton<ImmediateGFX>;
 	public:
-		void BeginDefaultShaders();
+		void BeginDefaultShaders(bool bindPixelShader = true);
 		void EndDefaultShaders();
 
 		void BeginDraw();
 		void EndDraw();
 
 		virtual void PolygonBegin(PrimitiveTopology primitive) override;
-		virtual void PolygonEnd() override;
+		virtual void PolygonEnd(bool bindPixelShader = true) override;
 	private:
 		ImmediateGFX();
 		~ImmediateGFX();
 
 		void InitializeVertexBuffer();
-		void DrawCurrentPrimitive();
+		void DrawCurrentPrimitive(bool bindPixelShader = true);
 	private:
 		StrongHandle<VertexShader> m_VertexShader;
 		StrongHandle<PixelShader> m_PixelShader;

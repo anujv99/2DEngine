@@ -43,6 +43,7 @@ namespace prev {
 		//Custom Types
 		GM_BIND_INIT(VertexShader, vm);
 		GM_BIND_INIT(PixelShader, vm);
+		GM_BIND_INIT(ComputeShader, vm);
 		GM_BIND_INIT(ParticleSystem, vm);
 		GM_BIND_INIT(Sprite, vm);
 		GM_BIND_INIT(Label, vm);
@@ -50,6 +51,7 @@ namespace prev {
 		GM_BIND_INIT(Texture, vm);
 		GM_BIND_INIT(queue, vm);
 		GM_BIND_INIT(linkedlist, vm);
+		GM_BIND_INIT(ComputeBuffer, vm);
 	}
 
 }
